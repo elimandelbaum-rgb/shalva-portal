@@ -309,6 +309,68 @@ app.post('/api/upload/file', auth, upload.single('file'), (req,res) => {
 });
 
 // ── SERVE SPA ──
+// NEWS PROXY — מונע בעיות CORS
+app.get('/api/news', auth, async (req, res) => {
+  const src = req.query.src || 'ynet';
+  const feeds = {
+    ynet: 'https://www.ynet.co.il/Integration/StoryRss2.xml',
+    a7:   'https://www.inn.co.il/Rss.aspx'
+  };
+  const url = feeds[src];
+  if (!url) return res.status(400).json({error:'Unknown source'});
+  try {
+    const https = require('https');
+    const http = require('http');
+    const client = url.startsWith('https') ? https : http;
+    const xml = await new Promise((resolve, reject) => {
+      const request = client.get(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; ShalvaPortal/1.0)',
+          'Accept': 'application/rss+xml, application/xml, text/xml'
+        },
+        timeout: 8000
+      }, (response) => {
+        if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+          const redirectClient = response.headers.location.startsWith('https') ? https : http;
+          redirectClient.get(response.headers.location, {headers:{'User-Agent':'Mozilla/5.0'}}, (r2) => {
+            let d = '';
+            r2.on('data', c => d += c);
+            r2.on('end', () => resolve(d));
+          }).on('error', reject);
+          return;
+        }
+        let data = '';
+        response.on('data', chunk => data += chunk);
+        response.on('end', () => resolve(data));
+      });
+      request.on('error', reject);
+      request.on('timeout', () => { request.destroy(); reject(new Error('timeout')); });
+    });
+
+    // parse XML manually
+    const items = [];
+    const itemMatches = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
+    for (const item of itemMatches.slice(0, 8)) {
+      const get = (tag) => {
+        const m = item.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
+        return m ? (m[1] || m[2] || '').trim() : '';
+      };
+      const enclosure = item.match(/url="([^"]+\.(?:jpg|jpeg|png|webp))"/i);
+      items.push({
+        title: get('title'),
+        link: get('link') || get('guid'),
+        pubDate: get('pubDate'),
+        thumbnail: enclosure ? enclosure[1] : '',
+        description: get('description').replace(/<[^>]+>/g,'').substring(0,120),
+        src
+      });
+    }
+    res.json({ ok: true, items, src });
+  } catch(e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 app.get('*', (req,res) => res.sendFile(path.join(__dirname,'public','index.html')));
 
 app.listen(PORT, () => {

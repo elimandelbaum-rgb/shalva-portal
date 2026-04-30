@@ -1015,17 +1015,16 @@ async function switchNews(src, btn) {
   nb.innerHTML = '<div class="ldg">⟳ טוען...</div>';
 
   try {
-    const API_KEY = 'public';
     const feeds = {
-      ynet: `https://api.rss2json.com/v1/api.json?rss_url=https://www.ynet.co.il/Integration/StoryRss2.xml&api_key=${API_KEY}&count=8`,
-      a7: `https://api.rss2json.com/v1/api.json?rss_url=https://www.inn.co.il/Rss.aspx&api_key=${API_KEY}&count=8`
+      ynet: `/api/news?src=ynet`,
+      a7:   `/api/news?src=a7`
     };
 
     let items = [];
     if (src === 'all') {
       const [ry, ra] = await Promise.all([
-        _newsCache.ynet || fetch(feeds.ynet).then(r=>r.json()),
-        _newsCache.a7 || fetch(feeds.a7).then(r=>r.json())
+        _newsCache.ynet || API.get('/news?src=ynet'),
+        _newsCache.a7   || API.get('/news?src=a7')
       ]);
       _newsCache.ynet = ry; _newsCache.a7 = ra;
       const yi = (ry.items||[]).slice(0,5).map(i=>({...i,src:'ynet'}));
@@ -1033,9 +1032,9 @@ async function switchNews(src, btn) {
       items = [...yi, ...ai].sort((a,b) => new Date(b.pubDate)-new Date(a.pubDate));
     } else {
       const cache = _newsCache[src];
-      const res = cache || await fetch(feeds[src]).then(r=>r.json());
-      _newsCache[src] = res;
-      items = (res.items||[]).map(i=>({...i,src:src==='ynet'?'ynet':'ערוץ 7'}));
+      const res2 = cache || await API.get(`/news?src=${src}`);
+      _newsCache[src] = res2;
+      items = (res2.items||[]).map(i=>({...i,src:src==='ynet'?'ynet':'ערוץ 7'}));
     }
 
     if (!items.length) throw new Error('no items');
