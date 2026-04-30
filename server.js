@@ -320,7 +320,7 @@ app.post('/api/upload/file', auth, upload.single('file'), (req,res) => {
 });
 
 // ── SERVE SPA ──
-// NEWS PROXY — מונע בעיות CORS
+// NEWS PROXY — מביא RSS מהשרת
 app.get('/api/news', auth, async (req, res) => {
   const src = req.query.src || 'ynet';
   const feeds = {
@@ -332,53 +332,53 @@ app.get('/api/news', auth, async (req, res) => {
   try {
     const https = require('https');
     const http = require('http');
-    const client = url.startsWith('https') ? https : http;
-    const xml = await new Promise((resolve, reject) => {
-      const request = client.get(url, {
+    
+    const fetchUrl = (targetUrl) => new Promise((resolve, reject) => {
+      const client = targetUrl.startsWith('https') ? https : http;
+      const req2 = client.get(targetUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; ShalvaPortal/1.0)',
-          'Accept': 'application/rss+xml, application/xml, text/xml'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': '*/*'
         },
-        timeout: 8000
+        timeout: 10000
       }, (response) => {
-        if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
-          const redirectClient = response.headers.location.startsWith('https') ? https : http;
-          redirectClient.get(response.headers.location, {headers:{'User-Agent':'Mozilla/5.0'}}, (r2) => {
-            let d = '';
-            r2.on('data', c => d += c);
-            r2.on('end', () => resolve(d));
-          }).on('error', reject);
-          return;
+        if ([301,302,303,307,308].includes(response.statusCode) && response.headers.location) {
+          return fetchUrl(response.headers.location).then(resolve).catch(reject);
         }
         let data = '';
+        response.setEncoding('utf8');
         response.on('data', chunk => data += chunk);
         response.on('end', () => resolve(data));
       });
-      request.on('error', reject);
-      request.on('timeout', () => { request.destroy(); reject(new Error('timeout')); });
+      req2.on('error', reject);
+      req2.on('timeout', () => { req2.destroy(); reject(new Error('timeout')); });
     });
 
-    // parse XML manually
+    const xml = await fetchUrl(url);
+    
     const items = [];
     const itemMatches = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
     for (const item of itemMatches.slice(0, 8)) {
       const get = (tag) => {
-        const m = item.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
+        const m = item.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`,'i'));
         return m ? (m[1] || m[2] || '').trim() : '';
       };
       const enclosure = item.match(/url="([^"]+\.(?:jpg|jpeg|png|webp))"/i);
+      const title = get('title');
+      if (!title) continue;
       items.push({
-        title: get('title'),
+        title,
         link: get('link') || get('guid'),
         pubDate: get('pubDate'),
         thumbnail: enclosure ? enclosure[1] : '',
-        description: get('description').replace(/<[^>]+>/g,'').substring(0,120),
         src
       });
     }
+    
     res.json({ ok: true, items, src });
   } catch(e) {
-    res.status(500).json({ ok: false, error: e.message });
+    console.error('News fetch error:', e.message);
+    res.status(500).json({ ok: false, error: e.message, items: [] });
   }
 });
 

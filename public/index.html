@@ -990,10 +990,75 @@ async function loadInstagram() {
     </a>`).join('');
   } catch(e) {}
 }
+let _newsCache = {ynet:null, a7:null};
 let _curSource = 'ynet';
 
 async function loadNews() {
   await switchNews('ynet', document.getElementById('btn-ynet'));
+}
+
+async function switchNews(src, btn) {
+  _curSource = src;
+  ['ynet','a7','all'].forEach(s => {
+    const b = document.getElementById('btn-' + s);
+    if (!b) return;
+    if (s === src) { b.style.background='linear-gradient(135deg,#5C1F6A,#7B2D8B)';b.style.color='#fff';b.style.border='none'; }
+    else { b.style.background='#fff';b.style.color='rgba(61,31,74,.65)';b.style.border='1px solid rgba(123,45,139,.12)'; }
+  });
+  const nb=document.getElementById('newsBody'),nt=document.getElementById('newsTime'),nm=document.getElementById('newsMainTitle'),nmm=document.getElementById('newsMainMeta'),nmEl=document.getElementById('newsMain');
+  if (!nb) return;
+  nb.innerHTML='<div class="ldg">⟳ טוען...</div>';
+
+  const fetchOne = async (s) => {
+    if (_newsCache[s]) return _newsCache[s];
+    // נסה דרך השרת
+    try {
+      const r = await fetch(`/api/news?src=${s}`,{credentials:'include'});
+      if (r.ok) { const d=await r.json(); if (d.items?.length) { _newsCache[s]=d; return d; } }
+    } catch(e) {}
+    // fallback: rss2json public
+    try {
+      const urls = {ynet:'https://www.ynet.co.il/Integration/StoryRss2.xml',a7:'https://www.inn.co.il/Rss.aspx'};
+      const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(urls[s])}&count=8`);
+      const d = await r.json();
+      if (d.items?.length) { const res={items:d.items.map(i=>({title:i.title,link:i.link,pubDate:i.pubDate,thumbnail:i.thumbnail,src:s}))}; _newsCache[s]=res; return res; }
+    } catch(e) {}
+    return {items:[]};
+  };
+
+  try {
+    let items=[];
+    if (src==='all') {
+      const [ry,ra]=await Promise.all([fetchOne('ynet'),fetchOne('a7')]);
+      items=[...(ry.items||[]).slice(0,5).map(i=>({...i,src:'ynet'})),...(ra.items||[]).slice(0,5).map(i=>({...i,src:'ערוץ 7'}))].sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate));
+    } else {
+      const d=await fetchOne(src);
+      items=(d.items||[]).map(i=>({...i,src:src==='ynet'?'ynet':'ערוץ 7'}));
+    }
+    if (!items.length) throw new Error('empty');
+    if (nt) nt.textContent=(src==='ynet'?'ynet':src==='a7'?'ערוץ 7':'ynet + ערוץ 7')+' · '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+    const first=items[0];
+    if (nm) nm.textContent=first.title;
+    if (nmm) nmm.innerHTML=`<span style="background:${first.src==='ynet'?'#D32F2F':'#1565C0'};color:#fff;padding:1.5px 7px;border-radius:999px;font-size:7.5px;font-weight:700;margin-left:5px">${first.src}</span> ${new Date(first.pubDate).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}`;
+    if (nmEl) { nmEl.onclick=()=>window.open(first.link,'_blank'); const img=nmEl.querySelector('div'); if (first.thumbnail&&img){img.style.backgroundImage=`url(${first.thumbnail})`;img.style.backgroundSize='cover';img.style.backgroundPosition='center';img.textContent='';} }
+    nb.innerHTML=items.slice(1,7).map((item,i)=>`
+    <a href="${item.link}" target="_blank" style="text-decoration:none;display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(123,45,139,.08);cursor:pointer" onmouseover="this.style.background='rgba(123,45,139,.04)'" onmouseout="this.style.background='transparent'">
+      <div style="font-size:11px;font-weight:800;color:rgba(123,45,139,.22);flex-shrink:0;width:16px;margin-top:1px">${i+2}</div>
+      <div style="flex:1">
+        <div style="font-size:10px;font-weight:700;color:#2D0A3A;line-height:1.4">${item.title}</div>
+        <div style="display:flex;gap:5px;margin-top:3px">
+          <span style="background:${item.src==='ynet'?'#FDECEA':'#E8F0FE'};color:${item.src==='ynet'?'#C0392B':'#1565C0'};padding:1px 6px;border-radius:999px;font-size:7.5px;font-weight:700">${item.src}</span>
+          <span style="font-size:7.5px;color:rgba(61,31,74,.38)">${new Date(item.pubDate).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
+      </div>
+      ${item.thumbnail?`<img src="${item.thumbnail}" style="width:44px;height:33px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>`:''}
+    </a>`).join('');
+  } catch(e) {
+    if (nt) nt.textContent='עדכונים פנימיים';
+    const fb=['ועידת שלוה השנתית — תאריכים הוכרזו','עדכון נהלי חופשות לשנת 2026','גיבוש צוות מנהלים — חודש הבא','תוכנית חבר מביא חבר — הרחבה'];
+    if (nm) nm.textContent=fb[0];
+    nb.innerHTML=fb.slice(1).map((t,i)=>`<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(123,45,139,.08)"><div style="font-size:11px;font-weight:800;color:rgba(123,45,139,.22);flex-shrink:0;width:16px">${i+2}</div><div style="font-size:10px;color:#2D0A3A;line-height:1.4">📌 ${t}</div></div>`).join('');
+  }
 }
 
 async function switchNews(src, btn) {
