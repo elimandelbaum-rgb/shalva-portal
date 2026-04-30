@@ -1272,87 +1272,251 @@ function sendChat() {
 }
 
 // REQUESTS
+// קטגוריות פניות
+const REQ_CATS = {
+  hr:       {lb:'👥 HR — משאבי אנוש',      dept:'HR',          steps:['עובד','מנהל ישיר','HR'],      color:'#7B2D8B'},
+  salary:   {lb:'💰 שכר ותנאי העסקה',      dept:'שכר',         steps:['עובד','מנהל ישיר','שכר'],     color:'#F4813A'},
+  equipment:{lb:'📦 ציוד ומשאבים',          dept:'מחשוב',       steps:['עובד','מנהל ישיר','מחשוב'],   color:'#4BAEE8'},
+  maintenance:{lb:'🔧 תחזוקה',             dept:'תחזוקה',      steps:['עובד','מנהל ישיר','תחזוקה'],  color:'#E84040'},
+  marketing:{lb:'📣 שיווק / צילום / וידאו',  dept:'שיווק',       steps:['עובד','מנהל ישיר','שיווק'],   color:'#E84393'},
+  secretary:{lb:'📋 מזכירות שלוה',          dept:'מזכירות',     steps:['עובד','מזכירות'],              color:'#9B59B6'},
+  ceo:      {lb:'🏛️ לשכת מנכ"ל',           dept:'לשכת מנכ"ל', steps:['עובד','מנהל ישיר','מנכ"ל'],   color:'#2C3E50'},
+  welfare:  {lb:'❤️ רווחה ופנאי',           dept:'רווחה',       steps:['עובד','HR'],                   color:'#E74C3C'},
+  security: {lb:'🔒 ביטחון',               dept:'ביטחון',      steps:['עובד','ביטחון'],               color:'#27AE60'},
+};
+
 async function pgReq(cnt) {
   const reqs = await API.get('/requests');
+  _reqs = reqs;
   const open = reqs.filter(r => !['approved','rejected'].includes(r.status));
+  const s = await API.get('/settings').catch(()=>({}));
+
   cnt.innerHTML = `
-<div class="g13">
-  <div class="card">
-    <div class="st" style="margin-bottom:12px">📨 פניה חדשה</div>
-    <div class="fg"><label class="fl">מחלקה יעד</label>
-      <select class="fsel" id="rdept"><option>מחלקת שכר</option><option>HR</option><option>תפעול</option><option>ביטחון</option><option>מנהל ישיר</option><option>כללי</option></select>
-    </div>
-    <div class="fg"><label class="fl">סוג פניה</label>
-      <select class="fsel" id="rtype">
-        <option value="general">כללי</option>
-        <option value="salary_raise">בקשת העלאת שכר</option>
-        <option value="conditions">שינוי תנאי העסקה</option>
-        <option value="equipment">ציוד ומשאבים</option>
-        <option value="reserves">מילואים</option>
-        <option value="vacation_leave">חופשה ללא תשלום</option>
-        <option value="complaint">תלונה</option>
-        <option value="welfare">רווחה</option>
-      </select>
-    </div>
-    <div class="fg"><label class="fl">נושא הפניה *</label><input class="fi" id="rsubj" placeholder="תיאור קצר וברור..."/></div>
-    <div class="fg"><label class="fl">עדיפות</label>
-      <select class="fsel" id="rpri"><option value="normal">רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select>
-    </div>
-    <div class="fg"><label class="fl">פרטים מלאים</label><textarea class="fta tall" id="rdet" placeholder="תאר את הפניה בפירוט..."></textarea></div>
-    <button class="btn bnt" style="width:100%;justify-content:center" onclick="submitReq()">שלח פניה ↗</button>
-  </div>
-  <div>
-    <div class="card mb">
-      <div class="sh"><span class="st">פניות פתוחות</span><span class="b br">${open.length}</span></div>
-      ${open.map(r => `
-      <div class="row" onclick="viewMyReq(${r.id})" style="cursor:pointer">
-        <div style="flex:1">
-          <div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div>
-          <div style="font-size:8.5px;color:var(--tx3)">#${r.id} · ${r.dept||''} · ${fmtD(r.created_at)}</div>
-        </div>
-        <span class="b ${pC(r.priority)}" style="margin-left:4px">${pL(r.priority)}</span>
-        <span class="b ${sC(r.status)}">${sL(r.status)}</span>
-      </div>`).join('') || empty('אין פניות פתוחות ✓')}
-    </div>
+<div id="reqWrap">
+<div class="tabs2" id="reqTabs">
+  <div class="tab2 on" onclick="swTab(this,'rq0','reqWrap')">📨 פניה חדשה</div>
+  <div class="tab2" onclick="swTab(this,'rq1','reqWrap')">📂 פניות פתוחות <span class="b br" style="font-size:8px;margin-right:4px">${open.length}</span></div>
+  <div class="tab2" onclick="swTab(this,'rq2','reqWrap')">📜 היסטוריה</div>
+</div>
+
+<!-- טופס פניה חדשה -->
+<div class="tbp on" id="rq0">
+  <div class="g13">
     <div class="card">
-      <div class="sh"><span class="st">היסטוריית פניות</span><span class="b bgr">${reqs.length}</span></div>
-      ${reqs.filter(r => ['approved','rejected'].includes(r.status)).slice(0,5).map(r => `
-      <div class="row">
-        <div style="flex:1">
-          <div style="font-size:11px;font-weight:600;color:var(--tx2)">${r.subject}</div>
-          <div style="font-size:8.5px;color:var(--tx3)">${fmtD(r.updated_at||r.created_at)}</div>
-        </div>
-        <span class="b ${sC(r.status)}">${sL(r.status)}</span>
-      </div>`).join('') || empty('אין היסטוריה עדיין')}
+      <!-- בחירת קטגוריה -->
+      <div class="st" style="margin-bottom:11px">בחר קטגוריה</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px" id="catGrid">
+        ${Object.entries(REQ_CATS).map(([k,c]) => `
+        <div class="chk-it" data-cat="${k}" onclick="selCat('${k}',this)" style="gap:7px;border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;font-weight:700;color:inherit">${c.lb}</div>
+        </div>`).join('')}
+      </div>
+      <input type="hidden" id="rcat" value="hr"/>
+
+      <!-- מסלול אישור -->
+      <div id="reqFlow" style="background:#F7F4FA;border-radius:9px;padding:10px 12px;margin-bottom:13px;border:1px solid var(--bd)">
+        <div style="font-size:8.5px;font-weight:700;color:var(--tx3);margin-bottom:7px">מסלול הפניה:</div>
+        <div id="flowSteps" style="display:flex;align-items:center;gap:0"></div>
+      </div>
+
+      <!-- פרטי הפניה -->
+      <div class="fg"><label class="fl">נושא הפניה *</label><input class="fi" id="rsubj" placeholder="תיאור קצר וברור..."/></div>
+      <div class="fg"><label class="fl">עדיפות</label>
+        <select class="fsel" id="rpri">
+          <option value="normal">רגיל</option>
+          <option value="high">גבוהה</option>
+          <option value="urgent">דחוף ⚡</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">פרטי הפניה *</label><textarea class="fta tall" id="rdet" placeholder="תאר את הפניה בפירוט מלא..."></textarea></div>
+      <div class="fg"><label class="fl">מייל לקבלת עותק (אופציונלי)</label><input class="fi" id="rcopymail" type="email" placeholder="${ME?.email||'your@email.com'}"/></div>
+      <div class="info-box">📧 העותק יישלח גם למייל המחלקה הרלוונטית ולמנהל הישיר שלך.</div>
+      <button class="btn bnt" style="width:100%;justify-content:center" onclick="submitReqNew()">📨 שלח פניה ↗</button>
+    </div>
+    <div>
+      <div class="card mb">
+        <div class="sh"><span class="st">⏱️ פניות אחרונות</span><span class="b bgr">${reqs.length}</span></div>
+        ${reqs.slice(0,4).map(r => `
+        <div class="row" onclick="viewMyReq(${r.id})" style="cursor:pointer">
+          <div style="flex:1">
+            <div style="font-size:10.5px;font-weight:700;color:var(--wh)">${r.subject}</div>
+            <div style="font-size:8px;color:var(--tx3)">#${r.id} · ${r.dept||''} · ${fmtD(r.created_at)}</div>
+          </div>
+          <span class="b ${sC(r.status)}">${sL(r.status)}</span>
+        </div>`).join('') || empty('אין פניות עדיין')}
+      </div>
+      <div class="card">
+        <div class="st" style="margin-bottom:9px">📊 סטטיסטיקה אישית</div>
+        ${[['סה"כ פניות',reqs.length,'bgr'],['פתוחות',open.length,'br'],['אושרו',reqs.filter(r=>r.status==='approved').length,'bt'],['נדחו',reqs.filter(r=>r.status==='rejected').length,'br']].map(([lb,n,c])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bd)">
+          <span style="font-size:10px;color:var(--tx2)">${lb}</span>
+          <span class="b ${c}">${n}</span>
+        </div>`).join('')}
+      </div>
     </div>
   </div>
-</div>`;
-}
-async function submitReq() {
-  const subj = document.getElementById('rsubj')?.value.trim();
-  if (!subj) { toast('אנא מלא נושא לפניה', false); return; }
-  await API.post('/requests', {
-    dept: document.getElementById('rdept')?.value,
-    subject: subj,
-    type: document.getElementById('rtype')?.value,
-    priority: document.getElementById('rpri')?.value,
-    details: document.getElementById('rdet')?.value || ''
-  });
-  toast('הפניה נשלחה בהצלחה! 📨');
-  goEmp('req', null);
-}
-function viewMyReq(id) {
-  const reqs = window._reqs || [];
-  const r = reqs.find(x => x.id === id);
-  if (!r) return;
-  document.getElementById('rmTitle').textContent = `${r.subject} #${r.id}`;
-  document.getElementById('rmBody').innerHTML = `
-    <div class="sh"><span class="b ${sC(r.status)}" style="font-size:10px">${sL(r.status)}</span><span class="b ${pC(r.priority)}">${pL(r.priority)}</span></div>
-    <div class="steps">
-      ${['emp','manager','hr'].map((s,i) => `<div class="step ${r.current_step>i?'done':r.current_step===i?'cur':''}"><div class="step-dot">${i+1}</div><div class="step-lbl">${{emp:'שלחת',manager:'מנהל',hr:'HR'}[s]}</div></div>${i<2?'<div class="step-line"></div>':''}`).join('')}
+</div>
+
+<!-- פניות פתוחות -->
+<div class="tbp" id="rq1">
+  ${open.length ? open.map(r => `
+  <div class="card mb" onclick="viewMyReq(${r.id})" style="cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="background:${REQ_CATS[r.type]?.color||'#7B2D8B'}22;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${REQ_CATS[r.type]?.lb.split(' ')[0]||'📨'}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--wh)">${r.subject}</div>
+        <div style="font-size:8.5px;color:var(--tx3)">פניה #${r.id} · ${r.dept||''} · ${fmtD(r.created_at)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="b ${sC(r.status)}">${sL(r.status)}</span>
+        <span class="b ${pC(r.priority)}">${pL(r.priority)}</span>
+      </div>
     </div>
-    ${r.details ? `<div style="padding:10px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--bd);font-size:10.5px;color:var(--tx2);line-height:1.6;margin-bottom:10px">${r.details}</div>` : ''}
-    ${r.resolution_note ? `<div class="suc-box">✅ הערת מנהל: ${r.resolution_note}</div>` : ''}
+    <!-- פס התקדמות -->
+    <div style="display:flex;align-items:center;gap:0">
+      ${(REQ_CATS[r.type]?.steps || ['עובד','מנהל','מחלקה']).map((st,i,arr) => `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div style="width:22px;height:22px;border-radius:50%;background:${i<(r.current_step||0)?'var(--t)':i===(r.current_step||0)?'var(--g)':'#EDE4F5'};display:flex;align-items:center;justify-content:center;font-size:9px;color:${i<=(r.current_step||0)?'#fff':'var(--tx3)'};font-weight:700;border:2px solid ${i<(r.current_step||0)?'var(--t)':i===(r.current_step||0)?'var(--g)':'#D0C4E0'}">${i<(r.current_step||0)?'✓':i+1}</div>
+        <div style="font-size:7.5px;color:${i<(r.current_step||0)?'var(--t)':i===(r.current_step||0)?'var(--g)':'var(--tx3)'};margin-top:2px;text-align:center">${st}</div>
+      </div>
+      ${i<arr.length-1?`<div style="flex:0 0 14px;height:2px;background:${i<(r.current_step||0)?'var(--t)':'#EDE4F5'};margin-bottom:16px"></div>`:''}`).join('')}
+    </div>
+    ${r.resolution_note?`<div class="suc-box" style="margin-top:8px;margin-bottom:0">💬 ${r.resolution_note}</div>`:''}
+  </div>`).join('') : `<div class="card" style="text-align:center;padding:32px"><div style="font-size:40px;margin-bottom:12px">✅</div><div style="font-size:13px;font-weight:700;color:var(--wh)">אין פניות פתוחות</div><div style="font-size:10px;color:var(--tx3);margin-top:5px">כל הפניות טופלו</div></div>`}
+</div>
+
+<!-- היסטוריה -->
+<div class="tbp" id="rq2">
+  <div class="card">
+    <div class="sh"><span class="st">📜 כל הפניות</span><span class="b bgr">${reqs.length}</span></div>
+    <table class="tbl">
+      <thead><tr><th>#</th><th>קטגוריה</th><th>נושא</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th></tr></thead>
+      <tbody>
+        ${reqs.map(r => `
+        <tr onclick="viewMyReq(${r.id})">
+          <td class="mn">${r.id}</td>
+          <td style="font-size:9px">${REQ_CATS[r.type]?.lb.substring(0,15)||r.dept||'—'}</td>
+          <td style="font-size:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.subject}</td>
+          <td class="mn">${fmtD(r.created_at)}</td>
+          <td><span class="b ${pC(r.priority)}">${pL(r.priority)}</span></td>
+          <td><span class="b ${sC(r.status)}">${sL(r.status)}</span></td>
+        </tr>`).join('') || `<tr><td colspan="6">${empty('אין פניות')}</td></tr>`}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>`;
+
+  // בחר קטגוריה ראשונה כברירת מחדל
+  const firstCat = document.querySelector('#catGrid .chk-it');
+  if (firstCat) selCat('hr', firstCat);
+}
+
+function selCat(key, el) {
+  document.querySelectorAll('#catGrid .chk-it').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('rcat').value = key;
+  const cat = REQ_CATS[key];
+  if (!cat) return;
+  const steps = cat.steps;
+  document.getElementById('flowSteps').innerHTML = steps.map((s,i) => `
+    <div style="display:flex;align-items:center;flex:1">
+      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+        <div style="width:24px;height:24px;border-radius:50%;background:${i===0?cat.color+'22':'#EDE4F5'};border:2px solid ${i===0?cat.color:'#D0C4E0'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${i===0?cat.color:'var(--tx3)'}">${i+1}</div>
+        <div style="font-size:7.5px;color:${i===0?cat.color:'var(--tx3)'};margin-top:2px;text-align:center">${s}</div>
+      </div>
+      ${i<steps.length-1?`<div style="flex:0 0 12px;height:2px;background:#D0C4E0;margin-bottom:14px"></div>`:''}
+    </div>`).join('');
+}
+
+async function submitReqNew() {
+  const subj = document.getElementById('rsubj')?.value.trim();
+  const det = document.getElementById('rdet')?.value.trim();
+  const cat = document.getElementById('rcat')?.value || 'hr';
+  const copyMail = document.getElementById('rcopymail')?.value.trim();
+  if (!subj) { toast('אנא מלא נושא לפניה', false); return; }
+  if (!det) { toast('אנא מלא פרטי הפניה', false); return; }
+  const catData = REQ_CATS[cat];
+  const btn = document.querySelector('#rq0 .btn.bnt');
+  if (btn) { btn.disabled=true; btn.textContent='⟳ שולח...'; }
+  try {
+    const res = await API.post('/requests', {
+      dept: catData?.dept || cat,
+      subject: subj,
+      type: cat,
+      priority: document.getElementById('rpri')?.value || 'normal',
+      details: det,
+      copy_email: copyMail || ME?.email || '',
+      steps: JSON.stringify(catData?.steps || ['עובד','מנהל','מחלקה'])
+    });
+    // הצג אישור עם מספר פניה
+    const ticketNum = res?.id || Math.floor(Math.random()*9000+1000);
+    const card = document.querySelector('#rq0 .card');
+    if (card) card.innerHTML = `
+      <div style="text-align:center;padding:28px 16px">
+        <div style="font-size:44px;margin-bottom:14px">✅</div>
+        <div style="font-size:15px;font-weight:900;color:var(--wh);margin-bottom:6px">הפניה נשלחה בהצלחה!</div>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:var(--t3);border:1px solid rgba(123,45,139,.2);border-radius:10px;padding:10px 18px;margin-bottom:16px">
+          <span style="font-size:11px;color:var(--tx2)">מספר פניה:</span>
+          <span style="font-size:18px;font-weight:900;color:var(--t)">#${ticketNum}</span>
+        </div>
+        <div style="font-size:10px;color:var(--tx2);line-height:1.8;margin-bottom:18px">
+          📧 עותק נשלח ל: <b>${copyMail || ME?.email || 'המייל שלך'}</b><br>
+          📨 הפניה הועברה ל: <b>${catData?.dept}</b><br>
+          ⏱️ זמן טיפול משוער: <b>3-5 ימי עסקים</b>
+        </div>
+        <!-- מסלול אישור -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:20px">
+          ${(catData?.steps||[]).map((s,i,arr)=>`
+          <div style="display:flex;align-items:center">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div style="width:28px;height:28px;border-radius:50%;background:${i===0?'var(--t)':'#EDE4F5'};border:2px solid ${i===0?'var(--t)':'#D0C4E0'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${i===0?'#fff':'var(--tx3)'}">${i===0?'✓':i+1}</div>
+              <div style="font-size:7.5px;color:${i===0?'var(--t)':'var(--tx3)'};margin-top:3px">${s}</div>
+            </div>
+            ${i<arr.length-1?`<div style="width:18px;height:2px;background:${i===0?'var(--t)':'#EDE4F5'};margin-bottom:16px"></div>`:''}
+          </div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center">
+          <button class="btn bno bnsm" onclick="goEmp('req',null)">📋 צפה בפניות</button>
+          <button class="btn bnt bnsm" onclick="goEmp('personal',null)">👤 האזור האישי</button>
+        </div>
+      </div>`;
+    toast(`פניה #${ticketNum} נשלחה! ✅`);
+  } catch(e) {
+    toast('שגיאה בשליחה — נסה שוב', false);
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent='📨 שלח פניה ↗'; }
+  }
+}
+
+function viewMyReq(id) {
+  const r = (_reqs||[]).find(x => x.id === id);
+  if (!r) return;
+  const cat = REQ_CATS[r.type];
+  const steps = cat?.steps || ['עובד','מנהל','HR'];
+  document.getElementById('rmTitle').textContent = `${r.subject} — פניה #${r.id}`;
+  document.getElementById('rmBody').innerHTML = `
+    <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+      <span class="b ${sC(r.status)}">${sL(r.status)}</span>
+      <span class="b ${pC(r.priority)}">${pL(r.priority)}</span>
+      <span class="b bgr">${cat?.lb||r.dept||'—'}</span>
+      <span class="b bgr">מחלקה: ${r.dept||'—'}</span>
+    </div>
+    <!-- פס התקדמות -->
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:14px">
+      ${steps.map((st,i) => `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div style="width:26px;height:26px;border-radius:50%;background:${i<(r.current_step||0)?'var(--t)':i===(r.current_step||0)?'var(--g)':'#EDE4F5'};display:flex;align-items:center;justify-content:center;font-size:10px;color:${i<=(r.current_step||0)?'#fff':'var(--tx3)'};font-weight:700;border:2px solid ${i<(r.current_step||0)?'var(--t)':i===(r.current_step||0)?'var(--g)':'#D0C4E0'}">${i<(r.current_step||0)?'✓':i+1}</div>
+        <div style="font-size:8px;color:${i<(r.current_step||0)?'var(--t)':i===(r.current_step||0)?'var(--g)':'var(--tx3)'};margin-top:3px;text-align:center">${st}</div>
+      </div>
+      ${i<steps.length-1?`<div style="flex:0 0 16px;height:2px;background:${i<(r.current_step||0)?'var(--t)':'#EDE4F5'};margin-bottom:18px"></div>`:''}`).join('')}
+    </div>
+    <div class="fr2" style="margin-bottom:11px">
+      <div><div style="font-size:8px;color:var(--tx3)">תאריך הגשה</div><div style="font-size:11px;font-weight:700;color:var(--wh)">${fmtD(r.created_at)}</div></div>
+      <div><div style="font-size:8px;color:var(--tx3)">מספר פניה</div><div style="font-size:11px;font-weight:700;color:var(--t)">#${r.id}</div></div>
+    </div>
+    ${r.details ? `<div style="padding:11px;background:#F7F4FA;border-radius:8px;border:1px solid var(--bd);font-size:10.5px;color:var(--tx2);line-height:1.65;margin-bottom:11px">${r.details}</div>` : ''}
+    ${r.resolution_note ? `<div class="suc-box">✅ הערת מטפל: ${r.resolution_note}</div>` : ''}
     <button class="btn bno bnsm" onclick="closeM('reqModal')">סגור</button>`;
   document.getElementById('reqModal').classList.add('on');
 }
@@ -1623,43 +1787,228 @@ async function submitBulk() {
 }
 
 // TRAININGS
+// תוכן הדרכות מובנה
+const TRAIN_CONTENT = {
+  harassment: {
+    title: 'מניעת הטרדה מינית',
+    type: 'mandatory',
+    icon: '🛡️',
+    duration: '45 דק׳',
+    color: '#E84040',
+    sections: [
+      {title:'מה זו הטרדה מינית?', content:`הטרדה מינית היא כל התנהגות בעלת אופי מיני שהאחר אינו רוצה בה. החוק למניעת הטרדה מינית (תשנ"ח-1998) מגדיר מספר סוגים:\n\n• <b>מעשה מגונה</b> — כל מגע פיזי בעל אופי מיני ללא הסכמה\n• <b>הצעות חוזרות</b> — הצעות בעלות אופי מיני לאחר שנדחו\n• <b>התייחסות מבזה</b> — דברים, תמונות, או מחוות שיש בהם השפלה על רקע מגדרי\n• <b>סחיטה מינית</b> — ניצול יחסי מרות לצורך מיני`, icon:'📖'},
+      {title:'כיצד מזהים הטרדה?', content:`הטרדה מינית יכולה להיות:\n\n<b>פיזית:</b> נגיעות, חיבוקים, נשיקות לא רצויות\n<b>מילולית:</b> הערות על גוף, הצעות מיניות, בדיחות גסות\n<b>חזותית:</b> הצגת תמונות פורנוגרפיות, מבטים מינישים\n<b>דיגיטלית:</b> הודעות, תמונות, מסרים ברשתות חברתיות\n\n⚠️ חשוב: גם אם הפוגע לא התכוון לפגוע — אם הנפגע חש פגיעה, זו הטרדה!`, icon:'🔍'},
+      {title:'חוק ותקנון שלוה', content:`<b>המרכז הלאומי שלוה מחויב לאפס-סבלנות כלפי הטרדה מינית.</b>\n\nהממונה על מניעת הטרדה מינית בשלוה: <b>מנהלת HR</b>\n\nהתקנון קובע:\n• כל עובד רשאי לפנות בביטחון ובסודיות מלאה\n• תלונה תטופל תוך 7 ימי עסקים\n• המתלונן מוגן מפני פיטורים או נקמה\n• עברת הטרדה מינית היא עילה לפיטורים מיידיים\n• כל עובד חדש מקבל הדרכה זו תוך 30 יום מתחילת עבודתו`, icon:'📜'},
+      {title:'כיצד מתלוננים?', content:`<b>3 ערוצי דיווח — כולם חסויים:</b>\n\n1️⃣ <b>פנייה ישירה לממונה</b> — מנהלת HR, ניתן גם בכתב\n2️⃣ <b>פורטל זה</b> — פניות ← קטגוריה "HR — משאבי אנוש"\n3️⃣ <b>טלפון חירום</b> — 1-800-XXX-XXX (אנונימי, 24/7)\n\nגם עדים למקרה יכולים ועליהם לדווח!\n\n<b>מה קורה אחרי התלונה:</b>\nבירור פנימי → שימוע לשני הצדדים → החלטה → ערעור`, icon:'📞'},
+      {title:'מבחן ידע', content:`סמן את התשובה הנכונה לכל שאלה:`, icon:'✅', quiz: [
+        {q:'מנהל שהציע לעובדת קידום תמורת יחסים — האם זו הטרדה?', correct:0, opts:['כן — זו סחיטה מינית','לא — זו עסקה לגיטימית']},
+        {q:'עובד סיפר בדיחה מינית. עמיתה נפגעה אך לא אמרה כלום. האם זו הטרדה?', correct:0, opts:['כן — גם ללא מחאה מפורשת','לא — היא הייתה צריכה לומר']},
+        {q:'הממונה על הטרדה מינית בשלוה היא:', correct:0, opts:['מנהלת HR','מנכ"ל הארגון']},
+      ]}
+    ]
+  },
+  safety: {
+    title: 'בטיחות בעבודה',
+    type: 'mandatory',
+    icon: '⛑️',
+    duration: '30 דק׳',
+    color: '#F4813A',
+    sections: [
+      {title:'זכויות ספציפיות לעובדים', content:`<b>חוק ארגון הפיקוח על העבודה</b> מחייב כל מעסיק לספק:\n\n• סביבת עבודה בטוחה ונקייה\n• ציוד מגן אישי (כפפות, משקפיים וכו׳)\n• הדרכות בטיחות תקופתיות\n• ביטוח תאונות עבודה\n\n<b>זכויותיך:</b>\n• לסרב לעבודה מסוכנת ללא פגיעה בתנאים\n• לדווח על מפגע בטיחותי בלי חשש\n• לקבל עזרה ראשונה מיידית בתאונה`, icon:'📋'},
+      {title:'נהלי חירום', content:`<b>בשריפה:</b>\n1. הפעל אזעקה\n2. פנה את הבניין דרך מדרגות (לא מעלית)\n3. התאסף בנקודת הכינוס החיצונית\n4. דווח לקצין הביטחון\n\n<b>בתאונה:</b>\n1. הזמן עזרה — 101 (מד"א)\n2. אל תזיז נפגע עם חשד לפגיעת עמוד שדרה\n3. מלא טופס תאונת עבודה תוך 24 שעות\n4. שמור עדים ותיעוד`, icon:'🚨'},
+      {title:'ארגונומיה', content:`<b>עמדת עבודה נכונה:</b>\n\n• גובה כיסא: הברכיים בזווית 90°\n• מסך: גובה עיניים, מרחק 50-70 ס"מ\n• תאורה: לא ישירות על המסך\n• הפסקות: 5 דקות כל שעה\n\n<b>תרגיל למניעת כאבי גב:</b>\nקום מהכיסא לפחות פעם בשעה ומתח את הגב אחורה`, icon:'💺'},
+    ]
+  },
+  fire: {
+    title: 'נהלי חירום ופינוי',
+    type: 'mandatory',
+    icon: '🚒',
+    duration: '20 דק׳',
+    color: '#E84040',
+    sections: [
+      {title:'נקודות כינוס', content:`<b>נקודות הכינוס בשלוה:</b>\n\n• כניסה ראשית — חניה חיצונית\n• כניסה צדדית — גן ירק\n• בניין B — שער אחורי\n\nלאחר הכינוס: <b>מנה נוכחות</b> מול רשימת העובדים.\nאל תחזור לבניין ללא אישור מנהל הפינוי!`, icon:'📍'},
+      {title:'שימוש בטלפון חירום', content:`• <b>מד"א:</b> 101\n• <b>משטרה:</b> 100\n• <b>כבאות:</b> 102\n• <b>קצין הביטחון שלוה:</b> פנה לרשימה הפנימית\n\n<b>כיצד לדווח:</b>\n1. שמך ומיקומך המדויק\n2. מה קרה\n3. כמה נפגעים\n4. האם יש סכנה מיידית`, icon:'📞'},
+    ]
+  },
+  digital: {
+    title: 'אבטחת מידע ופרטיות',
+    type: 'mandatory',
+    icon: '🔐',
+    duration: '25 דק׳',
+    color: '#4BAEE8',
+    sections: [
+      {title:'סיסמאות חזקות', content:`<b>סיסמה חזקה כוללת:</b>\n• לפחות 12 תווים\n• אותיות גדולות וקטנות\n• מספרים וסימנים (!@#$)\n• לא מילה שנמצאת במילון\n\n<b>אסור:</b>\n• לשתף סיסמה עם אחרים — כולל IT!\n• להשתמש באותה סיסמה לכמה מערכות\n• לרשום סיסמה על פתק\n\n<b>מומלץ:</b> השתמש במנהל סיסמאות (Bitwarden, 1Password)`, icon:'🔑'},
+      {title:'פישינג ותרמיות', content:`<b>כיצד לזהות מייל פישינג:</b>\n\n🚩 שולח לא מוכר או כתובת חשודה\n🚩 בקשה דחופה לפרטים אישיים\n🚩 לינק שונה ממה שרשום\n🚩 שגיאות כתיב רבות\n\n<b>מה לעשות:</b>\n• אל תלחץ על קישורים חשודים\n• אמת את הזהות בטלפון\n• דווח ל-IT מיד\n• מחק את המייל`, icon:'🎣'},
+      {title:'טיפול במידע רגיש', content:`<b>מידע רגיש בשלוה כולל:</b>\n• פרטי מטופלים ומשפחות\n• נתוני שכר ופיננסים\n• מידע רפואי\n• מסמכים משפטיים\n\n<b>כללים:</b>\n• מידע רגיש — אך ורק ברשת הפנימית\n• אסור לשלוח מידע רגיש במייל לא מוצפן\n• נעל מסך בכל עזיבת עמדה (Win+L)\n• הדפסות עם מידע רגיש — גרוס מיד`, icon:'🔒'},
+    ]
+  },
+  service: {
+    title: 'שירות ומצוינות',
+    type: 'optional',
+    icon: '⭐',
+    duration: '35 דק׳',
+    color: '#9B59B6',
+    sections: [
+      {title:'ערכי שלוה', content:`<b>שלוה — נותנים תקווה. משנים חיים.</b>\n\nהערכים המנחים:\n\n• <b>כבוד</b> — כל אדם נברא בצלם אלוהים, ללא יוצא מן הכלל\n• <b>מקצועיות</b> — הטוב ביותר לאלו שסומכים עלינו\n• <b>חמלה</b> — לראות את האדם, לא רק את הצורך\n• <b>חדשנות</b> — לחפש כל הזמן דרכים טובות יותר\n• <b>שותפות</b> — ביחד נצליח יותר`, icon:'💜'},
+      {title:'שפת שירות', content:`<b>במקום לומר... תגיד:</b>\n\n❌ "לא יודע" → ✅ "אמצא לך תשובה"\n❌ "זה לא אצלי" → ✅ "אני אתאם עבורך"\n❌ "אי אפשר" → ✅ "הנה מה שכן אפשרי"\n❌ "זה נגד הנהלים" → ✅ "הנה מה שהנהלים מאפשרים"\n\n<b>עיקרון הזהב:</b>\nהתייחס לכל מטופל/לקוח כמו שהיית רוצה שיתייחסו לבן משפחה שלך`, icon:'💬'},
+    ]
+  }
+};
+
 async function pgTrain(cnt) {
   const tr = await API.get('/trainings');
   const done = tr.filter(t => t.completed_by.includes(ME.id)).length;
   const mandTotal = tr.filter(t => t.type === 'mandatory').length;
   const mandDone = tr.filter(t => t.type === 'mandatory' && t.completed_by.includes(ME.id)).length;
   const pct = tr.length ? Math.round((done / tr.length) * 100) : 0;
+
+  // מפה בין שמות הדרכות לתוכן מובנה
+  const contentMap = {
+    'מניעת הטרדה מינית': 'harassment',
+    'הטרדה מינית': 'harassment',
+    'בטיחות בעבודה': 'safety',
+    'בטיחות': 'safety',
+    'נהלי חירום': 'fire',
+    'חירום ופינוי': 'fire',
+    'אבטחת מידע': 'digital',
+    'סייבר': 'digital',
+    'שירות ומצוינות': 'service',
+    'שירות': 'service',
+  };
+  const getContent = (name) => {
+    for (const [k,v] of Object.entries(contentMap)) {
+      if (name?.includes(k)) return TRAIN_CONTENT[v];
+    }
+    return null;
+  };
+
   cnt.innerHTML = `
 <div class="mwrap m4">
-  <div class="mc r"><div class="mv">${mandTotal - mandDone}</div><div class="ml">חובה ממתינות</div><div class="md ${mandTotal-mandDone>0?'mddn':'mdup'}">${mandTotal-mandDone>0?'⚠ דחוף':'הושלמו ✓'}</div><div class="mi">⏳</div><div class="mst mR"></div></div>
+  <div class="mc r"><div class="mv">${mandTotal-mandDone}</div><div class="ml">חובה ממתינות</div><div class="md ${mandTotal-mandDone>0?'mddn':'mdup'}">${mandTotal-mandDone>0?'⚠ דחוף':'הושלמו ✓'}</div><div class="mi">⏳</div><div class="mst mR"></div></div>
   <div class="mc t"><div class="mv">${done}</div><div class="ml">הושלמו</div><div class="md mdup">✓</div><div class="mi">✅</div><div class="mst mT"></div></div>
   <div class="mc g"><div class="mv">${pct}%</div><div class="ml">אחוז השלמה</div><div class="md ${pct<70?'mddn':'mdup'}">${pct<70?'שפר':'מצוין'}</div><div class="mi">📊</div><div class="mst mG"></div></div>
   <div class="mc v"><div class="mv">${mandDone}</div><div class="ml">תעודות זמינות</div><div class="md mdup">🎓</div><div class="mi">🏆</div><div class="mst mV"></div></div>
 </div>
+
+<!-- הדרכת הטרדה מינית — תמיד בחוץ -->
+<div class="card mb" style="border:2px solid rgba(232,64,64,.25);background:linear-gradient(135deg,rgba(232,64,64,.04),#fff)">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+    <div style="font-size:32px">🛡️</div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:800;color:var(--wh)">מניעת הטרדה מינית — חובה חוקית</div>
+      <div style="font-size:9px;color:var(--tx3);margin-top:2px">45 דק׳ · חוק למניעת הטרדה מינית תשנ"ח-1998 · חובה לכל עובד</div>
+    </div>
+    <span class="b br">חובה חוקית</span>
+  </div>
+  <div style="font-size:10px;color:var(--tx2);line-height:1.7;margin-bottom:12px;padding:10px;background:#FFF5F5;border-radius:8px;border:1px solid rgba(232,64,64,.15)">
+    לפי חוק למניעת הטרדה מינית, כל ארגון מחויב לקיים הדרכה זו לכל עובדיו. אי-ביצוע ההדרכה עלול לגרור אחריות משפטית לארגון.
+  </div>
+  <button class="btn" style="background:linear-gradient(135deg,#BB1030,#E84040);color:#fff;font-size:12px;padding:9px 20px" onclick="openTraining('harassment')">🛡️ התחל הדרכה חובה →</button>
+</div>
+
 <div class="g3">
   ${tr.map(t => {
     const isDone = t.completed_by.includes(ME.id);
     const daysLeft = t.deadline ? Math.ceil((new Date(t.deadline) - new Date()) / 86400000) : null;
     const urgent = !isDone && daysLeft !== null && daysLeft < 14;
+    const content = getContent(t.name);
     return `
-    <div class="card ${urgent?'':''}">
-      <div style="height:65px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:11px;background:${isDone?'rgba(0,229,180,.08)':t.type==='mandatory'?'rgba(255,77,109,.08)':'rgba(124,92,252,.08)'};border:1px solid ${isDone?'rgba(0,229,180,.15)':t.type==='mandatory'?'rgba(255,77,109,.15)':'rgba(124,92,252,.15)'}">${isDone?'✅':t.type==='mandatory'?'⚠️':'📚'}</div>
+    <div class="card cl" onclick="openTraining('${content ? Object.keys(contentMap).find(k=>t.name?.includes(k))?contentMap[Object.keys(contentMap).find(k=>t.name?.includes(k))]:'generic' : 'generic'}', ${t.id}, '${t.name.replace(/'/g,"'")}')">
+      <div style="height:65px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:11px;background:${isDone?'rgba(123,45,139,.07)':t.type==='mandatory'?'rgba(232,64,64,.07)':'rgba(155,89,182,.07)'};border:1px solid ${isDone?'rgba(123,45,139,.15)':t.type==='mandatory'?'rgba(232,64,64,.15)':'rgba(155,89,182,.15)'}">
+        ${content?.icon || (isDone?'✅':t.type==='mandatory'?'⚠️':'📚')}
+      </div>
       <div style="font-size:11.5px;font-weight:700;color:var(--wh);margin-bottom:3px">${t.name}</div>
       <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;flex-wrap:wrap">
         <span class="b ${t.type==='mandatory'?'br':'bv'}">${t.type==='mandatory'?'חובה':'רשות'}</span>
         ${t.duration?`<span class="b bgr">${t.duration}</span>`:''}
         ${urgent?`<span class="b br">⏰ ${daysLeft} ימים</span>`:''}
-        ${t.deadline&&!urgent?`<span class="b bgr">עד ${fmtD(t.deadline)}</span>`:''}
+        ${isDone?`<span class="b bt">✓ הושלם</span>`:''}
       </div>
       <div class="pb" style="margin-bottom:9px"><div class="pf ${isDone?'pT':t.type==='mandatory'?'pR':'pV'}" style="width:${isDone?100:0}%"></div></div>
-      ${isDone
-        ? `<div style="display:flex;gap:5px"><button class="btn bno bnsm" style="flex:1;justify-content:center" onclick="toast('תעודת ${t.name} נשלחת למייל! 🎓')">הורד תעודה</button></div>`
-        : `<button class="btn bnt bnsm" style="width:100%;justify-content:center" onclick="completeTr(${t.id},this)">התחל הדרכה →</button>`
-      }
+      <button class="btn ${isDone?'bno':'bnt'} bnsm" style="width:100%;justify-content:center" onclick="event.stopPropagation();${isDone?`toast('תעודת ${t.name} נשלחת למייל! 🎓')`:`openTraining('${content?Object.values(contentMap).find((v,i)=>t.name?.includes(Object.keys(contentMap)[i])):'generic'}', ${t.id}, '${t.name.replace(/'/g,"'")}')`}">
+        ${isDone?'📄 הורד תעודה':'▶ פתח הדרכה'}
+      </button>
     </div>`;
-  }).join('') || empty('אין הדרכות מוגדרות כרגע')}
+  }).join('') || empty('אין הדרכות מוגדרות')}
 </div>`;
 }
+
+function openTraining(contentKey, dbId, dbName) {
+  const content = TRAIN_CONTENT[contentKey] || {
+    title: dbName || 'הדרכה',
+    icon: '📚',
+    color: '#7B2D8B',
+    sections: [{title:'תוכן ההדרכה', content:'תוכן ההדרכה ייטען בקרוב. אנא פנה למנהל ההדרכות.', icon:'📖'}]
+  };
+
+  document.getElementById('rmTitle').textContent = `${content.icon} ${content.title}`;
+  let quizAnswers = {};
+
+  const renderSection = (sec, idx) => `
+  <div style="margin-bottom:16px;border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,${content.color}18,${content.color}08);padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
+      <span style="font-size:16px">${sec.icon}</span>
+      <span style="font-size:11.5px;font-weight:700;color:var(--wh)">${sec.title}</span>
+    </div>
+    <div style="padding:13px 14px">
+      ${sec.quiz ? `
+        ${sec.quiz.map((q,qi) => `
+        <div style="margin-bottom:12px;padding:10px;background:#F7F4FA;border-radius:8px">
+          <div style="font-size:10.5px;font-weight:700;color:var(--wh);margin-bottom:7px">${q.q}</div>
+          ${q.opts.map((opt,oi) => `
+          <label style="display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:6px;cursor:pointer;font-size:10px;color:var(--tx2);border:1px solid var(--bd);margin-bottom:4px;transition:all .13s" onmouseover="this.style.background='rgba(123,45,139,.06)'" onmouseout="this.style.background='transparent'">
+            <input type="radio" name="q${idx}_${qi}" value="${oi}" onchange="quizA[${idx}*10+${qi}]=${oi}"/> ${opt}
+          </label>`).join('')}
+        </div>`).join('')}
+        <button class="btn bnt bnsm" onclick="checkQuiz(${JSON.stringify(sec.quiz).replace(/"/g,'&quot;')}, ${idx})">בדוק תשובות ✓</button>
+        <div id="quiz_result_${idx}" style="margin-top:8px"></div>
+      ` : `<div style="font-size:10.5px;color:var(--tx2);line-height:1.85;white-space:pre-wrap">${sec.content}</div>`}
+    </div>
+  </div>`;
+
+  document.getElementById('rmBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:${content.color}12;border-radius:9px;margin-bottom:14px;border:1px solid ${content.color}25">
+      <span style="font-size:22px">${content.icon}</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--wh)">${content.title}</div>
+        <div style="font-size:8.5px;color:var(--tx3)">${content.duration||''} · ${content.type==='mandatory'?'⚠️ חובה':'📚 רשות'}</div>
+      </div>
+    </div>
+    <div id="trainSections">${content.sections.map(renderSection).join('')}</div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bd);display:flex;gap:8px">
+      <button class="btn bnt" style="flex:1;justify-content:center" onclick="completeTrModal(${dbId||0}, '${(dbName||content.title).replace(/'/g,"'")}')">✅ סיימתי את ההדרכה</button>
+      <button class="btn bno" onclick="closeM('reqModal')">סגור</button>
+    </div>`;
+
+  window.quizA = {};
+  document.getElementById('reqModal').classList.add('on');
+}
+
+function checkQuiz(questions, sectionIdx) {
+  let correct = 0;
+  questions.forEach((q, qi) => {
+    const sel = document.querySelector(`input[name="q${sectionIdx}_${qi}"]:checked`);
+    if (sel && parseInt(sel.value) === q.correct) correct++;
+  });
+  const res = document.getElementById(`quiz_result_${sectionIdx}`);
+  if (res) {
+    const pct = Math.round((correct/questions.length)*100);
+    res.innerHTML = pct === 100
+      ? `<div class="suc-box">🎉 מצוין! ענית נכון על כל השאלות!</div>`
+      : `<div class="warn-box">ענית נכון על ${correct}/${questions.length}. עיין שוב בחומר ונסה שוב.</div>`;
+  }
+}
+
+async function completeTrModal(id, name) {
+  if (id) {
+    await API.post(`/trainings/${id}/complete`).catch(()=>{});
+  }
+  closeM('reqModal');
+  // הצג תעודה
+  toast(`🎓 הדרכת "${name}" הושלמה! תעודה נשלחת למייל.`);
+  goEmp('train', null);
+}
+
 async function completeTr(id, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '⟳ מסמן...'; }
   await API.post(`/trainings/${id}/complete`);
@@ -2775,6 +3124,11 @@ async function pgSet(cnt) {
     <div class="st" style="margin-bottom:10px">ערוצי תקשורת</div>
     <div class="fg"><label class="fl">Instagram Access Token</label><input class="fi" id="s_ig_token" value="${s.instagram_token||''}" placeholder="Token מ-Meta Developers..."/></div>
     <div class="fg"><label class="fl">WhatsApp Business</label><input class="fi" id="s_wa" value="${s.whatsapp_num||''}"/></div>
+    <div class="sep"></div>
+    <div class="st" style="margin-bottom:11px">📧 מיילים לקטגוריות פניות</div>
+    <div class="info-box">כתובות אלה יקבלו פניות חדשות מהקטגוריה שלהן. השאר ריק לשימוש במייל הארגוני הכללי.</div>
+    ${Object.entries(REQ_CATS||{}).map(([k,c])=>`
+    <div class="fg"><label class="fl">${c.lb}</label><input class="fi" id="s_mail_${k}" value="${s['mail_'+k]||''}" placeholder="department@shalva.org.il"/></div>`).join('')}
     <div class="fr2"><div class="fg"><label class="fl">ספק SMS</label><select class="fsel" id="s_sms"><option value="twilio" ${s.sms_provider==='twilio'?'selected':''}>Twilio</option><option value="messagebird" ${s.sms_provider==='messagebird'?'selected':''}>MessageBird</option><option value="none">ללא</option></select></div><div class="fg"><label class="fl">בונוס חבר מביא חבר ₪</label><input class="fi" id="s_bonus" type="number" value="${s.recruit_bonus||500}"/></div></div>
     <div class="sep"></div>
     <div class="fg"><label class="fl">כתובת URL של הפורטל</label><input class="fi" id="s_url" value="${s.portal_url||'https://portal.shalva.org.il'}"/></div>
@@ -2827,6 +3181,8 @@ async function saveSets() {
     chatbot_active: String(document.getElementById('t_ai')?.classList.contains('on')),
     sms_active: String(document.getElementById('t_sms')?.classList.contains('on')),
     maintenance: String(document.getElementById('t_maint')?.classList.contains('on')),
+    // מיילים לקטגוריות
+    ...Object.keys(REQ_CATS).reduce((acc,k)=>{const el=document.getElementById('s_mail_'+k);if(el)acc['mail_'+k]=el.value;return acc;},{})
   };
   const pw = document.getElementById('s_smtp_p')?.value;
   if (pw) d.smtp_pass = pw;
