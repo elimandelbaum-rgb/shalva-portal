@@ -644,7 +644,7 @@ const ADM_M = [
   {ic:'🔑', lb:'משתמשים',        id:'ausers'},
   {ic:'⚙️', lb:'הגדרות',         id:'aset'},
 ];
-const E_TITLES = {home:'דף הבית',feed:'עדכוני צוות',chat:'שלומית AI',req:'פניות לHR',hr:'הערכה ותנאים',sal:'שכר ומילואים',bulk:'שליחה מרוכזת',train:'הדרכות',forms:'טפסים',proj:'פרויקטים',int:'התממשקויות'};
+const E_TITLES = {home:'דף הבית',feed:'עדכוני צוות',chat:'שלומית AI',req:'פניות לHR',hr:'הערכה ותנאים',sal:'שכר ומילואים',bulk:'שליחה מרוכזת',train:'הדרכות',forms:'טפסים',proj:'פרויקטים',int:'התממשקויות',personal:'האזור האישי שלי'};
 const A_TITLES = {adash:'דשבורד',aemp:'ניהול עובדים',areq:'כל הפניות',asal:'ניהול שכר',atrain:'ניהול הדרכות',abcast:'שידור הודעות',aforms:'ניהול טפסים',arep:'דוחות',amenus:'ניהול תפריטים',ausers:'ניהול משתמשים',aset:'הגדרות מערכת'};
 
 async function buildSidebar() {
@@ -680,6 +680,9 @@ async function buildSidebar() {
   }
 
   html += `<div class="sbf">
+    <div class="ni" id="ni_personal" onclick="goEmp('personal',this)" style="margin-bottom:4px;border:1px solid rgba(123,45,139,.15);background:rgba(123,45,139,.05)">
+      <span class="nic">👤</span>האזור האישי שלי
+    </div>
     <div class="ubtn">${avEl(ME)}<div><div class="uname">${ME.name}</div><div class="urole2">${ME.title || (isAdm ? 'מנהל מערכת' : 'עובד')}</div></div></div>
     <button class="logoutbtn" onclick="doLogout()">יציאה מהמערכת 🚪</button>
   </div>`;
@@ -695,7 +698,7 @@ function goEmp(id, el) {
   if (ni) ni.classList.add('on');
   document.getElementById('ptitle').textContent = E_TITLES[id] || id;
   const cnt = document.getElementById('cntEl'); ld(cnt);
-  const pages = {home:pgHome, feed:pgFeed, chat:pgChat, req:pgReq, hr:pgHR, sal:pgSal, bulk:pgBulk, train:pgTrain, forms:pgForms, proj:pgProj, int:pgInt};
+  const pages = {home:pgHome, feed:pgFeed, chat:pgChat, req:pgReq, hr:pgHR, sal:pgSal, bulk:pgBulk, train:pgTrain, forms:pgForms, proj:pgProj, int:pgInt, personal:pgPersonal};
   pages[id] ? pages[id](cnt) : (cnt.innerHTML = `<div class="card"><div class="st">הדף "${id}" בקרוב</div></div>`);
 }
 function goAdm(id, el) {
@@ -1704,9 +1707,29 @@ async function pgForms(cnt) {
     </div>
     <div class="fg"><label class="fl">נימוק לבקשה *</label><textarea class="fta" id="eq_r" placeholder="למה נדרש הציוד? כיצד ישתמש?"></textarea></div>
     <div class="fg"><label class="fl">קישור למוצר (אופציונלי)</label><input class="fi" id="eq_link" placeholder="https://..."/></div>
-    <button class="btn bnt" onclick="subEquip()">הגש בקשה ↗</button>
+
+    <!-- זרימת אישור ויזואלית -->
+    <div style="background:#F7F4FA;border-radius:10px;padding:12px 14px;margin-bottom:13px;border:1px solid var(--bd)">
+      <div style="font-size:9px;font-weight:700;color:var(--tx3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">מסלול אישור הבקשה</div>
+      <div style="display:flex;align-items:center;gap:0">
+        ${[['👤','אתה','הגשת הבקשה'],['👔','מנהל ישיר','בדיקה ואישור ראשוני'],['💻','מחשוב','בדיקה טכנית וסידור'],['✅','הושלם','הציוד הוזמן']].map(([ic,t,s],i,arr) => `
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;text-align:center">
+          <div style="width:32px;height:32px;border-radius:50%;background:${i===0?'linear-gradient(135deg,#5C1F6A,#7B2D8B)':'#E8E0F0'};display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:4px;border:2px solid ${i===0?'var(--t)':'#D0C4E0'}">${ic}</div>
+          <div style="font-size:8.5px;font-weight:700;color:${i===0?'var(--t)':'var(--tx3)'}">${t}</div>
+          <div style="font-size:7.5px;color:var(--tx3);margin-top:1px">${s}</div>
+        </div>
+        ${i<arr.length-1?`<div style="flex:0 0 20px;height:2px;background:linear-gradient(90deg,${i===0?'var(--t)':'#D0C4E0'},${i===0?'#D0C4E0':'#D0C4E0'});margin-bottom:18px"></div>`:''}`).join('')}
+      </div>
+    </div>
+
+    <button class="btn bnt" onclick="subEquip()">📦 הגש בקשת ציוד ↗</button>
   </div>
-</div>
+
+  <!-- היסטוריית הזמנות ציוד -->
+  <div class="card" id="equipHistCard">
+    <div class="sh"><span class="st">📋 הזמנות הציוד שלי</span><button class="btn bno bnsm" onclick="loadEquipHist()">רענן</button></div>
+    <div id="equipHist"><div class="ldg">⟳ טוען...</div></div>
+  </div>
 <div class="tbp" id="ff2">
   <div class="card">
     <div class="st" style="margin-bottom:12px">✈️ בקשת חופשה</div>
@@ -1782,8 +1805,164 @@ async function subTrip() {
 async function subEquip() {
   const i=document.getElementById('eq_i')?.value.trim(), r=document.getElementById('eq_r')?.value.trim();
   if (!i||!r) { toast('מלא פריט ונימוק', false); return; }
-  await API.post('/equipment', {item:i, quantity:parseInt(document.getElementById('eq_q')?.value)||1, urgency:document.getElementById('eq_u')?.value, reason:r, price_estimate:parseInt(document.getElementById('eq_p')?.value)||0});
-  toast('בקשת ציוד הוגשה!');
+  const btn = document.querySelector('#ff1 .btn.bnt');
+  if (btn) { btn.disabled=true; btn.textContent='⟳ שולח...'; }
+  try {
+    await API.post('/equipment', {
+      item:i,
+      quantity:parseInt(document.getElementById('eq_q')?.value)||1,
+      urgency:document.getElementById('eq_u')?.value,
+      reason:r,
+      price_estimate:parseInt(document.getElementById('eq_p')?.value)||0,
+      link:document.getElementById('eq_link')?.value||''
+    });
+    // הצג אישור ויזואלי
+    const card = document.querySelector('#ff1 .card');
+    if (card) card.innerHTML = `
+      <div style="text-align:center;padding:24px">
+        <div style="font-size:48px;margin-bottom:12px">✅</div>
+        <div style="font-size:14px;font-weight:800;color:var(--wh);margin-bottom:6px">הבקשה התקבלה!</div>
+        <div style="font-size:10.5px;color:var(--tx2);margin-bottom:14px">בקשתך נשלחה למנהל הישיר שלך לאישור.<br>תקבל עדכון ברגע שיאשר.</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px">
+          ${[['👤','אתה','✓','var(--t)'],['👔','מנהל','ממתין','#F4813A'],['💻','מחשוב','בהמתנה','var(--tx3)'],['✅','הושלם','בהמתנה','var(--tx3)']].map(([ic,lb,st,c])=>`
+          <div style="text-align:center">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(123,45,139,.1);border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto 4px">${ic}</div>
+            <div style="font-size:8px;font-weight:700;color:${c}">${st}</div>
+          </div>`).join('<div style="width:20px;height:2px;background:#E0D0F0;margin-bottom:16px"></div>')}
+        </div>
+        <button class="btn bno bnsm" onclick="goEmp('forms',null)">הגש בקשה נוספת</button>
+        <button class="btn bnt bnsm" style="margin-right:7px" onclick="goEmp('personal',null)">📋 צפה בכל הבקשות</button>
+      </div>`;
+    loadEquipHist();
+  } catch(e) {
+    toast('שגיאה בשליחה', false);
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent='📦 הגש בקשת ציוד ↗'; }
+  }
+}
+
+async function loadEquipHist() {
+  const el = document.getElementById('equipHist');
+  if (!el) return;
+  try {
+    const eq = await API.get('/equipment');
+    const myEq = eq.filter(e => e.user_id === ME?.id || !e.user_id);
+    if (!myEq.length) { el.innerHTML = empty('אין הזמנות ציוד עדיין'); return; }
+    const stepLabels = {pending:'ממתין למנהל',manager_review:'אצל מנהל',it_review:'אצל מחשוב',approved:'אושר ✓',rejected:'נדחה'};
+    const stepColors = {pending:'bg2',manager_review:'bv',it_review:'bs',approved:'bt',rejected:'br'};
+    el.innerHTML = myEq.map(e => `
+    <div style="padding:11px 0;border-bottom:1px solid var(--bd)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <div style="font-size:18px">📦</div>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700;color:var(--wh)">${e.item}</div>
+          <div style="font-size:8.5px;color:var(--tx3)">כמות: ${e.quantity||1} · ${fmtD(e.created_at)}</div>
+        </div>
+        <span class="b ${stepColors[e.status]||'bgr'}">${stepLabels[e.status]||e.status||'ממתין'}</span>
+      </div>
+      <!-- פס התקדמות -->
+      <div style="display:flex;align-items:center;gap:0">
+        ${['הוגשה','מנהל','מחשוב','הושלם'].map((lb,i) => {
+          const done = (e.current_step||0) > i;
+          const cur = (e.current_step||0) === i;
+          return `<div style="display:flex;align-items:center;flex:1">
+            <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+              <div style="width:18px;height:18px;border-radius:50%;background:${done?'var(--t)':cur?'var(--g)':'#E0D0F0'};display:flex;align-items:center;justify-content:center;font-size:8px;color:${done||cur?'#fff':'var(--tx3)'};font-weight:700;border:1.5px solid ${done?'var(--t)':cur?'var(--g)':'#D0C4E0'}">${done?'✓':i+1}</div>
+              <div style="font-size:7px;color:${done?'var(--t)':cur?'var(--g)':'var(--tx3)'};margin-top:2px">${lb}</div>
+            </div>
+            ${i<3?`<div style="flex:0 0 16px;height:1.5px;background:${done?'var(--t)':'#E0D0F0'};margin-bottom:13px"></div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+      ${e.reason?`<div style="font-size:8.5px;color:var(--tx3);margin-top:4px;padding:5px 8px;background:#F7F4FA;border-radius:6px">${e.reason}</div>`:''}
+    </div>`).join('');
+  } catch(ex) {
+    el.innerHTML = empty('לא ניתן לטעון נתונים');
+  }
+}
+
+// PERSONAL PAGE
+async function pgPersonal(cnt) {
+  const [reqs, eq, vacs, forms] = await Promise.all([
+    API.get('/requests'),
+    API.get('/equipment').catch(()=>[]),
+    API.get('/vacations').catch(()=>[]),
+    API.get('/forms').catch(()=>[])
+  ]);
+  const myEq = eq.filter(e => e.user_id === ME?.id || !e.user_id);
+  const myForms = forms.filter(f => f.user_id === ME?.id || !f.user_id);
+  const allActions = [
+    ...reqs.map(r=>({type:'req',icon:'📨',title:r.subject,status:r.status,date:r.created_at,color:sC(r.status),label:sL(r.status)})),
+    ...myEq.map(e=>({type:'eq',icon:'📦',title:`ציוד: ${e.item}`,status:e.status||'pending',date:e.created_at,color:'bg2',label:e.status==='approved'?'אושר ✓':'ממתין'})),
+    ...vacs.map(v=>({type:'vac',icon:'✈️',title:`חופשה ${fmtD(v.from_date)}–${fmtD(v.to_date)}`,status:v.status||'pending',date:v.created_at,color:'bs',label:v.status==='approved'?'אושרה':'ממתין'})),
+    ...myForms.map(f=>({type:'form',icon:'📋',title:`טופס: ${f.form_type}`,status:f.status||'pending',date:f.created_at,color:'bgr',label:f.status==='approved'?'אושר':'ממתין'}))
+  ].sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  cnt.innerHTML = `
+<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;background:linear-gradient(135deg,var(--t2),var(--t));border-radius:14px;margin-bottom:16px;color:#fff">
+  <div style="font-size:40px">👤</div>
+  <div>
+    <div style="font-size:16px;font-weight:900">${ME.name}</div>
+    <div style="font-size:9.5px;opacity:.8">${ME.title||''} · ${ME.dept||''}</div>
+    <div style="font-size:8.5px;opacity:.7;margin-top:4px">הצטרף: ${fmtD(ME.hire_date)} · ${ME.email||''}</div>
+  </div>
+  <div style="margin-right:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    ${[['פניות',reqs.length,'📨'],['הזמנות ציוד',myEq.length,'📦'],['חופשות',vacs.length,'✈️'],['טפסים',myForms.length,'📋']].map(([lb,n,ic])=>`
+    <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:7px 11px;text-align:center">
+      <div style="font-size:16px">${ic}</div>
+      <div style="font-size:16px;font-weight:900">${n}</div>
+      <div style="font-size:7.5px;opacity:.8">${lb}</div>
+    </div>`).join('')}
+  </div>
+</div>
+
+<div class="g2">
+  <!-- הזמנות ציוד עם מעקב -->
+  <div class="card">
+    <div class="sh"><span class="st">📦 הזמנות ציוד</span><button class="btn bnt bnsm" onclick="goEmp('forms',null)">+ הזמנה חדשה</button></div>
+    ${myEq.length ? myEq.map(e => {
+      const step = e.current_step || 0;
+      const steps = ['הוגשה','מנהל','מחשוב','הושלם'];
+      const statuses = ['ממתין למנהל','אצל מנהל ✋','אצל מחשוב 💻','הושלם ✅'];
+      return `
+      <div style="padding:12px 0;border-bottom:1px solid var(--bd)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="font-size:22px">📦</div>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:700;color:var(--wh)">${e.item}</div>
+            <div style="font-size:8.5px;color:var(--tx3)">כמות ${e.quantity||1} · ${fmtD(e.created_at)}</div>
+          </div>
+          <div style="text-align:left">
+            <div style="font-size:8px;font-weight:700;color:${step>=3?'var(--t)':step>=2?'var(--s)':step>=1?'var(--g)':'var(--tx3)'}">${statuses[step]}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0;margin-bottom:6px">
+          ${steps.map((lb,i) => `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+            <div style="width:20px;height:20px;border-radius:50%;background:${i<step?'var(--t)':i===step?'var(--g)':'#EDE4F5'};display:flex;align-items:center;justify-content:center;font-size:9px;color:${i<=step?'#fff':'var(--tx3)'};font-weight:700;border:2px solid ${i<step?'var(--t)':i===step?'var(--g)':'#D0C4E0'}">${i<step?'✓':i+1}</div>
+            <div style="font-size:7px;color:${i<step?'var(--t)':i===step?'var(--g)':'var(--tx3)'};margin-top:2px;text-align:center">${lb}</div>
+          </div>
+          ${i<steps.length-1?`<div style="flex:0 0 12px;height:2px;background:${i<step?'var(--t)':'#EDE4F5'};margin-bottom:14px"></div>`:''}`).join('')}
+        </div>
+        ${e.reason?`<div style="font-size:8.5px;color:var(--tx3);padding:5px 9px;background:#F7F4FA;border-radius:6px">${e.reason.substring(0,80)}${e.reason.length>80?'...':''}</div>`:''}
+      </div>`;
+    }).join('') : empty('אין הזמנות ציוד עדיין<br><button class="btn bnt bnsm" style="margin-top:8px" onclick="goEmp(\'forms\',null)">הזמן ציוד</button>')}
+  </div>
+
+  <!-- כל הפעולות -->
+  <div class="card">
+    <div class="sh"><span class="st">⏱️ היסטוריית פעולות</span><span class="b bgr">${allActions.length} סה"כ</span></div>
+    ${allActions.slice(0,10).map(a => `
+    <div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--bd)">
+      <div style="font-size:18px;width:26px;text-align:center">${a.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:10.5px;font-weight:600;color:var(--wh);line-height:1.3">${a.title}</div>
+        <div style="font-size:8px;color:var(--tx3);margin-top:2px">${fmtD(a.date)}</div>
+      </div>
+      <span class="b ${a.color}" style="font-size:8px">${a.label}</span>
+    </div>`).join('') || empty('אין פעולות עדיין')}
+  </div>
+</div>`;
 }
 async function subVac() {
   const f=document.getElementById('vf')?.value, t=document.getElementById('vt')?.value;
