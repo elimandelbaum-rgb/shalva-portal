@@ -738,26 +738,51 @@ async function markRead() {
 
 // HOME
 async function pgHome(cnt) {
-  const [me, reqs, trainings] = await Promise.all([API.get('/me'), API.get('/requests'), API.get('/trainings')]);
+  const [me, reqs, trainings, users] = await Promise.all([
+    API.get('/me'), API.get('/requests'), API.get('/trainings'), API.get('/users').catch(()=>[])
+  ]);
   const open = reqs.filter(r => !['approved','rejected'].includes(r.status)).length;
   const mandPending = trainings.filter(t => t.type === 'mandatory' && !t.completed_by.includes(me.id)).length;
-  const approved = reqs.filter(r => r.status === 'approved').length;
-  const pct = reqs.length ? Math.round((approved / reqs.length) * 100) : 0;
+
+  // ימי הולדת קרובים
+  const today = new Date();
+  const birthdays = users.filter(u => {
+    if (!u.birth_date || u.id === me.id) return false;
+    const b = new Date(u.birth_date);
+    const next = new Date(today.getFullYear(), b.getMonth(), b.getDate());
+    if (next < today) next.setFullYear(today.getFullYear() + 1);
+    const diff = Math.ceil((next - today) / 86400000);
+    return diff <= 30;
+  }).map(u => {
+    const b = new Date(u.birth_date);
+    const next = new Date(today.getFullYear(), b.getMonth(), b.getDate());
+    if (next < today) next.setFullYear(today.getFullYear() + 1);
+    const diff = Math.ceil((next - today) / 86400000);
+    return {...u, daysLeft: diff};
+  }).sort((a,b) => a.daysLeft - b.daysLeft).slice(0,4);
+
+  // הגדר HTML
   cnt.innerHTML = `
-<div style="display:flex;align-items:center;gap:18px;padding:18px 22px;border-radius:var(--rd);background:linear-gradient(135deg,rgba(0,229,180,.09),rgba(0,229,180,.03));border:1px solid rgba(0,229,180,.15);margin-bottom:17px">
+<!-- כרטיס ברכה -->
+<div style="background:linear-gradient(135deg,var(--t2),var(--t));border-radius:16px;padding:20px 24px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:16px;box-shadow:0 6px 24px rgba(123,45,139,.35)">
   <div style="flex:1">
-    <div style="font-size:10px;color:var(--tx3);margin-bottom:2px">שלום,</div>
-    <div style="font-size:22px;font-weight:900;color:var(--wh);line-height:1.1">${me.name} 👋</div>
-    <div style="font-size:10.5px;color:var(--tx2);margin-top:3px">${me.title||''} ${me.dept?'· '+me.dept:''}</div>
-    <div style="margin-top:8px;display:inline-flex;align-items:center;gap:5px;background:rgba(0,229,180,.09);border:1px solid rgba(0,229,180,.16);border-radius:999px;padding:3px 11px;font-size:8.5px;color:var(--t)">
-      🟢 מחובר · ${new Date().toLocaleDateString('he-IL', {weekday:'long', day:'numeric', month:'long'})}
+    <div style="font-size:11px;opacity:.8;margin-bottom:3px">שלום,</div>
+    <div style="font-size:24px;font-weight:900;line-height:1.1">${me.name} 👋</div>
+    <div style="font-size:10.5px;opacity:.8;margin-top:3px">${me.title||''} ${me.dept?'· '+me.dept:''}</div>
+    <div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-size:9px">
+      🟢 ${new Date().toLocaleDateString('he-IL', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}
     </div>
   </div>
-  <div style="font-size:52px;opacity:.3">🏛️</div>
+  <div id="weatherWid" style="text-align:center;background:rgba(255,255,255,.15);border-radius:12px;padding:12px 16px;min-width:90px">
+    <div style="font-size:9px;opacity:.8;margin-bottom:4px">☁️ ירושלים</div>
+    <div style="font-size:22px;font-weight:900" id="wTemp">...</div>
+    <div style="font-size:8px;opacity:.8" id="wDesc">טוען...</div>
+  </div>
 </div>
 
-<div class="mwrap m4">
-  <div class="mc t" onclick="goEmp('req',null)">
+<!-- 5 קוביות מטריקות -->
+<div class="mwrap m5" style="margin-bottom:16px">
+  <div class="mc t" onclick="goEmp('req',null)" style="cursor:pointer">
     <div class="mv">${open}</div><div class="ml">פניות פתוחות</div>
     <div class="md ${open>0?'mddn':'mdup'}">${open>0?'⚠ ממתינות':'הכל טופל ✓'}</div>
     <div class="mi">📨</div><div class="mst mT"></div>
@@ -767,7 +792,7 @@ async function pgHome(cnt) {
     <div class="md ${(me.vacation_days||0)<5?'mddn':'mdup'}">${(me.vacation_days||0)<5?'⚠ נמוך':'זמינים'}</div>
     <div class="mi">🏖</div><div class="mst mV"></div>
   </div>
-  <div class="mc g" onclick="goEmp('train',null)">
+  <div class="mc g" onclick="goEmp('train',null)" style="cursor:pointer">
     <div class="mv">${mandPending}</div><div class="ml">הדרכות חובה</div>
     <div class="md ${mandPending>0?'mddn':'mdup'}">${mandPending>0?'⚠ ממתינות':'הושלמו ✓'}</div>
     <div class="mi">📚</div><div class="mst mG"></div>
@@ -777,50 +802,132 @@ async function pgHome(cnt) {
     <div class="md mdnt">יתרה</div>
     <div class="mi">🤒</div><div class="mst mR"></div>
   </div>
+  <div class="mc s">
+    <div class="mv">${me.reserve_days||0}</div><div class="ml">ימי מילואים</div>
+    <div class="md mdnt">יתרה</div>
+    <div class="mi">🪖</div><div class="mst mS"></div>
+  </div>
 </div>
 
-<div class="g2">
+<!-- שורה ראשית: פניות + ימי הולדת -->
+<div class="g2" style="margin-bottom:14px">
   <div class="card">
-    <div class="sh"><span class="st">הפניות שלי האחרונות</span><span class="sla" onclick="goEmp('req',null)">הכל ←</span></div>
+    <div class="sh"><span class="st">📨 הפניות שלי</span><span class="sla" onclick="goEmp('req',null)">הכל ←</span></div>
     ${reqs.slice(0,5).map(r => `
-    <div class="row">
+    <div class="row" onclick="goEmp('req',null)" style="cursor:pointer">
       <div style="flex:1">
         <div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div>
         <div style="font-size:8.5px;color:var(--tx3)">${r.dept||''} · ${fmtD(r.created_at)}</div>
       </div>
       <span class="b ${sC(r.status)}">${sL(r.status)}</span>
-    </div>`).join('') || empty('אין פניות עדיין. <span class="sla" onclick="goEmp(\'req\',null)" style="cursor:pointer">צור פניה →</span>')}
+    </div>`).join('') || `<div style="text-align:center;padding:18px;font-size:10.5px;color:var(--tx3)">אין פניות פתוחות ✓<br><button class="btn bnt bnsm" style="margin-top:8px" onclick="goEmp('req',null)">פתח פניה חדשה</button></div>`}
   </div>
+
+  <div class="card">
+    <div class="sh"><span class="st">🎂 ימי הולדת קרובים</span><span style="font-size:9px;color:var(--tx3)">30 יום קרוב</span></div>
+    ${birthdays.length ? birthdays.map(u => `
+    <div class="row">
+      <div style="width:34px;height:34px;border-radius:50%;background:${u.color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">${(u.name||'').substring(0,2)}</div>
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:var(--wh)">${u.name}</div>
+        <div style="font-size:8.5px;color:var(--tx3)">${u.dept||''} · ${new Date(u.birth_date).toLocaleDateString('he-IL',{day:'numeric',month:'long'})}</div>
+      </div>
+      <span class="b ${u.daysLeft===0?'br':u.daysLeft<=3?'bg2':'bt'}">${u.daysLeft===0?'🎉 היום!':u.daysLeft===1?'מחר':'עוד '+u.daysLeft+' יום'}</span>
+    </div>`).join('') : `<div style="text-align:center;padding:18px;font-size:10.5px;color:var(--tx3)">אין ימי הולדת ב-30 הימים הקרובים 🎈</div>`}
+    <button class="btn bno bnsm" style="width:100%;justify-content:center;margin-top:8px" onclick="toast('🎂 ברכות יום הולדת נשלחות אוטומטית!')">שלח ברכה לכולם</button>
+  </div>
+</div>
+
+<!-- שורה שנייה: חדשות + יתרות -->
+<div class="g2">
+  <div class="card">
+    <div class="sh"><span class="st">📰 חדשות</span><span id="newsTime" style="font-size:8.5px;color:var(--tx3)">טוען...</span></div>
+    <div id="newsBody">
+      <div class="ldg"><span>⟳</span> טוען חדשות...</div>
+    </div>
+  </div>
+
   <div>
     <div class="card mb">
-      <div class="sh"><span class="st">יתרת ימים</span></div>
-      <div class="fr3">
-        <div style="text-align:center;padding:11px 5px;background:rgba(0,229,180,.07);border-radius:9px;border:1px solid rgba(0,229,180,.13)">
-          <div style="font-size:22px;font-weight:900;color:var(--t)">${me.vacation_days||0}</div>
-          <div style="font-size:8px;color:var(--tx3);margin-top:2px">חופשה</div>
-        </div>
-        <div style="text-align:center;padding:11px 5px;background:rgba(255,184,0,.07);border-radius:9px;border:1px solid rgba(255,184,0,.13)">
-          <div style="font-size:22px;font-weight:900;color:var(--g)">${me.sick_days||0}</div>
-          <div style="font-size:8px;color:var(--tx3);margin-top:2px">מחלה</div>
-        </div>
-        <div style="text-align:center;padding:11px 5px;background:rgba(255,77,109,.07);border-radius:9px;border:1px solid rgba(255,77,109,.13)">
-          <div style="font-size:22px;font-weight:900;color:var(--r)">${me.reserve_days||0}</div>
-          <div style="font-size:8px;color:var(--tx3);margin-top:2px">מילואים</div>
-        </div>
+      <div class="sh"><span class="st">💼 יתרות שלי</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        ${[['חופשה',me.vacation_days||0,'var(--t)','🏖'],['מחלה',me.sick_days||0,'var(--g)','🤒'],['מילואים',me.reserve_days||0,'var(--s)','🪖']].map(([lb,n,c,ic])=>`
+        <div style="text-align:center;padding:12px 6px;border-radius:10px;background:${c}14;border:1px solid ${c}30">
+          <div style="font-size:20px;margin-bottom:2px">${ic}</div>
+          <div style="font-size:20px;font-weight:900;color:${c}">${n}</div>
+          <div style="font-size:8px;color:var(--tx3);margin-top:2px">${lb}</div>
+        </div>`).join('')}
       </div>
     </div>
+
     <div class="card">
-      <div class="sh"><span class="st">סטטוס פניות</span><span style="font-size:9.5px;color:var(--tx3)">${reqs.length} סה"כ</span></div>
-      <div style="display:flex;flex-direction:column;gap:5px;font-size:10px">
-        ${[['אושרו','approved','bt',reqs.filter(r=>r.status==='approved').length],['ממתינות','pending','br',reqs.filter(r=>r.status==='pending').length],['בבדיקה','hr_review','bg2',reqs.filter(r=>['hr_review','manager_review','committee'].includes(r.status)).length]].map(([lb,s,cls,n])=>`
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="color:var(--tx2)">${lb}</span>
-          <span class="b ${cls}">${n}</span>
-        </div>`).join('')}
+      <div class="sh"><span class="st">⚡ פעולות מהירות</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <button class="btn bnt bnsm" style="justify-content:center" onclick="goEmp('req',null)">📨 פניה חדשה</button>
+        <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('forms',null)">📋 טפסים</button>
+        <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('train',null)">🎓 הדרכות</button>
+        <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('chat',null)">🤖 שלומית AI</button>
       </div>
     </div>
   </div>
 </div>`;
+
+  // טען מזג אוויר ירושלים
+  loadWeather();
+  // טען חדשות
+  loadNews();
+}
+
+async function loadWeather() {
+  try {
+    const r = await fetch('https://wttr.in/Jerusalem?format=j1');
+    const d = await r.json();
+    const cur = d.current_condition[0];
+    const temp = cur.temp_C;
+    const desc = cur.lang_he?.[0]?.value || cur.weatherDesc[0].value;
+    const icons = {'Sunny':'☀️','Clear':'🌙','Partly cloudy':'⛅','Cloudy':'☁️','Overcast':'☁️','Mist':'🌫️','Rain':'🌧️','Drizzle':'🌦️','Snow':'❄️','Thunder':'⛈️'};
+    const icon = Object.entries(icons).find(([k])=>desc.includes(k))?.[1] || '🌤️';
+    const wt = document.getElementById('wTemp');
+    const wd = document.getElementById('wDesc');
+    if (wt) wt.textContent = temp + '°C';
+    if (wd) wd.textContent = icon + ' ' + (desc.length > 12 ? desc.substring(0,12)+'...' : desc);
+  } catch(e) {
+    const wt = document.getElementById('wTemp');
+    if (wt) wt.textContent = '—';
+  }
+}
+
+async function loadNews() {
+  const nb = document.getElementById('newsBody');
+  const nt = document.getElementById('newsTime');
+  if (!nb) return;
+  try {
+    // RSS ynet דרך proxy חינמי
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.ynet.co.il/Integration/StoryRss2.xml&api_key=public&count=5';
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d.status !== 'ok' || !d.items?.length) throw new Error('no items');
+    if (nt) nt.textContent = 'ynet · ' + new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+    nb.innerHTML = d.items.slice(0,5).map(item => `
+    <a href="${item.link}" target="_blank" style="text-decoration:none;display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s" onmouseover="this.style.background='var(--t3)'" onmouseout="this.style.background='transparent'">
+      ${item.thumbnail ? `<img src="${item.thumbnail}" style="width:48px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>` : ''}
+      <div style="flex:1">
+        <div style="font-size:10.5px;font-weight:700;color:var(--wh);line-height:1.4">${item.title}</div>
+        <div style="font-size:8px;color:var(--tx3);margin-top:2px">${new Date(item.pubDate).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+    </a>`).join('');
+  } catch(e) {
+    // fallback — חדשות לדוגמה
+    if (nt) nt.textContent = 'עדכונים כלליים';
+    nb.innerHTML = [
+      'ועידת שלוה השנתית — תאריכים הוכרזו',
+      'עדכון נהלי חופשות לשנת 2026',
+      'גיבוש צוות מנהלים — חודש הבא',
+      'תוכנית חבר מביא חבר — הרחבה',
+      'עדכון מערכת שכר — אפריל 2026',
+    ].map(t => `
+    <div style="padding:8px 0;border-bottom:1px solid var(--bd);font-size:10.5px;color:var(--wh);line-height:1.45">📌 ${t}</div>`).join('');
+  }
 }
 
 // FEED
