@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>שלוה | פורטל עובדים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --t:#00E5B4;--t2:#00C49A;--t3:rgba(0,229,180,.12);--t4:rgba(0,229,180,.06);
+  --g:#FFB800;--g2:rgba(255,184,0,.13);
+  --v:#7C5CFC;--v2:rgba(124,92,252,.12);
+  --r:#FF4D6D;--r2:rgba(255,77,109,.12);
+  --s:#22D3EE;--s2:rgba(34,211,238,.12);
+  --ink:#070B14;--ink2:#0F1623;
+  --gl:rgba(255,255,255,.04);--gl2:rgba(255,255,255,.07);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);
+  --tx:#CBD5E1;--tx2:rgba(203,213,225,.65);--tx3:rgba(203,213,225,.3);
+  --wh:#F0F6FF;--rd:12px
+}
+html,body{height:100%;font-family:"Heebo",sans-serif;background:var(--ink);color:var(--tx)}
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);animation:drift 20s ease-in-out infinite}
+.o1{width:550px;height:550px;background:radial-gradient(circle,rgba(0,196,154,.15),transparent 70%);top:-180px;right:-120px}
+.o2{width:450px;height:450px;background:radial-gradient(circle,rgba(124,92,252,.11),transparent 70%);bottom:-120px;left:-100px;animation-delay:-8s}
+@keyframes drift{0%,100%{transform:translate(0,0)}33%{transform:translate(30px,-20px)}66%{transform:translate(-20px,28px)}}
+#app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column}
+.scr{display:none;height:100%}.scr.on{display:flex}
+#loginScr{align-items:center;justify-content:center;padding:20px}
+/* LOGIN */
+.lbox{width:100%;max-width:390px;background:rgba(12,18,32,.92);backdrop-filter:blur(28px);border:1px solid var(--bd);border-radius:20px;padding:30px;box-shadow:0 28px 70px rgba(0,0,0,.5)}
+.llogo{text-align:center;margin-bottom:24px}
+.llogo img{height:52px;object-fit:contain;display:block;margin:0 auto}
+.llogo-fb{font-size:24px;font-weight:900;color:var(--wh)}
+.llogo-sub{font-size:9px;color:var(--tx3);letter-spacing:.08em;margin-top:2px}
+.rtabs{display:flex;gap:5px;margin-bottom:20px}
+.rtab{flex:1;padding:8px;border-radius:9px;font-size:11.5px;font-weight:700;text-align:center;cursor:pointer;border:1px solid var(--bd);color:var(--tx3);transition:all .18s;background:transparent;font-family:inherit}
+.rtab.on{background:var(--t3);border-color:rgba(0,229,180,.35);color:var(--t)}
+.lfl{font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:4px;display:block}
+.lfi{width:100%;padding:10px 12px;font-size:12.5px;font-family:inherit;border:1px solid var(--bd);border-radius:9px;background:rgba(255,255,255,.04);color:var(--wh);outline:none;margin-bottom:13px;transition:all .17s}
+.lfi:focus{border-color:rgba(0,229,180,.55);background:var(--t4);box-shadow:0 0 0 3px rgba(0,229,180,.08)}
+.lfi::placeholder{color:var(--tx3)}
+.lerr{background:var(--r2);border:1px solid rgba(255,77,109,.28);border-radius:8px;padding:9px 12px;font-size:11px;color:var(--r);margin-bottom:11px;display:none}
+.lbtn{width:100%;padding:11px;font-size:13px;font-weight:800;border:none;border-radius:9px;background:linear-gradient(135deg,var(--t2),var(--t));color:var(--ink);cursor:pointer;transition:all .18s;font-family:inherit;letter-spacing:.01em}
+.lbtn:hover{box-shadow:0 5px 22px rgba(0,229,180,.45);transform:translateY(-1px)}
+.lbtn:active{transform:translateY(0)}
+.lbtn:disabled{opacity:.6;cursor:default}
+.lhint{margin-top:15px;padding:11px 13px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:9px;font-size:10px;color:var(--tx3);line-height:1.9}
+.lhint b{color:var(--tx2)}
+/* SHELL */
+#shellScr{flex-direction:row}
+.sb{width:224px;background:rgba(5,8,15,.96);backdrop-filter:blur(30px);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;height:100vh;flex-shrink:0;position:sticky;top:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+.topbar{height:54px;background:rgba(7,11,20,.93);backdrop-filter:blur(22px);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0}
+.cnt{flex:1;overflow-y:auto;padding:20px}
+.sbl{padding:15px 14px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px}
+.sb-logo{height:32px;object-fit:contain;max-width:140px}
+.sb-txt{font-size:14px;font-weight:800;color:var(--wh)}
+.sb-sub{font-size:7px;color:var(--tx3);letter-spacing:.06em}
+.ngl{padding:11px 14px 4px;font-size:7.5px;font-weight:800;color:var(--tx3);letter-spacing:.14em;text-transform:uppercase}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 12px;margin:1px 6px;border-radius:8px;cursor:pointer;color:var(--tx2);font-size:10.5px;font-weight:500;transition:all .14s;position:relative;border:1px solid transparent}
+.ni:hover{background:var(--gl2);color:var(--tx)}
+.ni.on{background:rgba(0,229,180,.09);color:var(--t);border-color:rgba(0,229,180,.16)}
+.ni.aon{background:rgba(124,92,252,.09);color:#A78BFA;border-color:rgba(124,92,252,.2)}
+.nic{font-size:13px;flex-shrink:0;opacity:.7}.ni.on .nic,.ni.aon .nic{opacity:1}
+.npill{margin-right:auto;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px}
+.npR{background:var(--r2);color:var(--r)}.npY{background:var(--g2);color:var(--g)}.npT{background:var(--t3);color:var(--t)}
+.sbf{margin-top:auto;padding:8px 5px;border-top:1px solid var(--bd)}
+.ubtn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:background .14s}
+.ubtn:hover{background:var(--gl)}
+.uav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.uname{font-size:10.5px;font-weight:700;color:var(--wh)}.urole2{font-size:8.5px;color:var(--tx3)}
+.logoutbtn{width:calc(100% - 18px);margin:4px 9px;padding:5px;font-size:10px;font-weight:700;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.2);border-radius:6px;color:var(--r);cursor:pointer;font-family:inherit;transition:all .14s}
+.logoutbtn:hover{background:rgba(255,77,109,.16)}
+/* TOPBAR */
+.ttt{font-size:13.5px;font-weight:700;color:var(--wh);flex:1}
+.tsrch{display:flex;align-items:center;gap:6px;background:var(--gl);border:1px solid var(--bd);border-radius:999px;padding:6px 12px;width:170px;transition:all .18s}
+.tsrch:focus-within{width:210px;border-color:rgba(0,229,180,.38);background:var(--t4)}
+.tsrch input{background:transparent;border:none;outline:none;color:var(--tx);font-family:inherit;font-size:10.5px;width:100%}
+.tsrch input::placeholder{color:var(--tx3)}
+.tib{width:32px;height:32px;border-radius:50%;border:1px solid var(--bd);background:var(--gl);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .14s;position:relative}
+.tib:hover{border-color:var(--bd2);background:var(--gl2)}
+.ndot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--r);border:1.5px solid var(--ink);display:none;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+/* NOTIF PANEL */
+.npnl{position:fixed;top:59px;left:18px;width:280px;background:rgba(9,14,26,.99);backdrop-filter:blur(30px);border:1px solid var(--bd);border-radius:var(--rd);box-shadow:0 20px 55px rgba(0,0,0,.55);z-index:200;display:none;overflow:hidden}
+.npnl.on{display:block;animation:fi .18s ease}
+.ndh{padding:10px 13px;border-bottom:1px solid var(--bd);font-size:10.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center;color:var(--wh)}
+.ndi{display:flex;gap:8px;padding:9px 13px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
+.ndi:hover{background:var(--gl)}.ndi:last-child{border-bottom:none}
+.ndp{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.ndt{font-size:10px;color:var(--tx);line-height:1.45}.ndtm{font-size:8px;color:var(--tx3);margin-top:2px}
+/* ANIMATIONS */
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* CARDS */
+.card{background:var(--gl);backdrop-filter:blur(12px);border:1px solid var(--bd);border-radius:var(--rd);padding:15px;transition:border-color .18s}
+.card:hover{border-color:var(--bd2)}
+.card.cl{cursor:pointer}.card.cl:hover{transform:translateY(-2px)}
+/* METRIC CARDS */
+.mwrap{display:grid;gap:11px;margin-bottom:15px}
+.m4{grid-template-columns:repeat(4,1fr)}.m5{grid-template-columns:repeat(5,1fr)}
+.mc{border-radius:var(--rd);padding:14px;position:relative;overflow:hidden;cursor:pointer;transition:all .17s}
+.mc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.mc.t{background:linear-gradient(135deg,rgba(0,229,180,.12),rgba(0,229,180,.04));border:1px solid rgba(0,229,180,.18)}
+.mc.v{background:linear-gradient(135deg,rgba(124,92,252,.12),rgba(124,92,252,.04));border:1px solid rgba(124,92,252,.18)}
+.mc.g{background:linear-gradient(135deg,rgba(255,184,0,.12),rgba(255,184,0,.04));border:1px solid rgba(255,184,0,.18)}
+.mc.r{background:linear-gradient(135deg,rgba(255,77,109,.12),rgba(255,77,109,.04));border:1px solid rgba(255,77,109,.18)}
+.mc.s{background:linear-gradient(135deg,rgba(34,211,238,.12),rgba(34,211,238,.04));border:1px solid rgba(34,211,238,.18)}
+.mv{font-size:26px;font-weight:900;color:var(--wh);line-height:1;letter-spacing:-.5px}
+.ml{font-size:9px;color:var(--tx2);margin-top:3px}.md{font-size:8px;font-weight:700;margin-top:5px}
+.mdup{color:var(--t)}.mddn{color:var(--r)}.mdnt{color:var(--tx3)}
+.mi{position:absolute;bottom:9px;left:11px;font-size:26px;opacity:.1}
+.mst{position:absolute;bottom:0;left:0;right:0;height:2.5px}
+.mT{background:linear-gradient(90deg,transparent,var(--t))}.mV{background:linear-gradient(90deg,transparent,var(--v))}.mG{background:linear-gradient(90deg,transparent,var(--g))}.mR{background:linear-gradient(90deg,transparent,var(--r))}.mS{background:linear-gradient(90deg,transparent,var(--s))}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g13{display:grid;grid-template-columns:1fr 2fr;gap:13px}
+/* SECTION HEADERS */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.st{font-size:12px;font-weight:700;color:var(--wh)}.sla{font-size:9.5px;color:var(--t);font-weight:600;cursor:pointer}
+/* BADGES */
+.b{display:inline-flex;align-items:center;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:999px}
+.bt{background:var(--t3);color:var(--t);border:1px solid rgba(0,229,180,.22)}
+.bv{background:var(--v2);color:var(--v);border:1px solid rgba(124,92,252,.22)}
+.bg2{background:var(--g2);color:var(--g);border:1px solid rgba(255,184,0,.22)}
+.br{background:var(--r2);color:var(--r);border:1px solid rgba(255,77,109,.22)}
+.bs{background:var(--s2);color:var(--s);border:1px solid rgba(34,211,238,.22)}
+.bgr{background:rgba(255,255,255,.06);color:var(--tx2);border:1px solid var(--bd)}
+/* PROGRESS BAR */
+.pb{height:3px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden;margin-top:4px}
+.pf{height:100%;border-radius:999px;transition:width .5s}
+.pT{background:linear-gradient(90deg,#008B6E,var(--t))}.pV{background:linear-gradient(90deg,#4422AA,var(--v))}.pG{background:linear-gradient(90deg,#BB7F00,var(--g))}.pR{background:linear-gradient(90deg,#BB1030,var(--r))}.pS{background:linear-gradient(90deg,#0A9CB8,var(--s))}
+/* FORMS */
+.fg{margin-bottom:11px}.fl{font-size:9.5px;font-weight:700;color:var(--tx2);margin-bottom:4px;display:block}
+.fi,.fsel,.fta{width:100%;padding:8px 11px;font-size:11.5px;font-family:inherit;border:1px solid var(--bd);border-radius:8px;background:rgba(255,255,255,.035);color:var(--tx);transition:all .14s;outline:none}
+.fi:focus,.fsel:focus,.fta:focus{border-color:rgba(0,229,180,.52);background:var(--t4);box-shadow:0 0 0 3px rgba(0,229,180,.08)}
+.fi::placeholder,.fta::placeholder{color:var(--tx3)}
+.fta{height:72px;resize:none;line-height:1.55}.fta.tall{height:105px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.fsel option{background:var(--ink2)}
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:8px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .14s;border:none;display:inline-flex;align-items:center;gap:5px}
+.bnt{background:linear-gradient(135deg,var(--t2),var(--t));color:var(--ink)}.bnt:hover{box-shadow:0 5px 18px rgba(0,229,180,.45);transform:translateY(-1px)}
+.bno{background:transparent;color:var(--tx2);border:1px solid var(--bd)}.bno:hover{border-color:var(--bd2);color:var(--tx);background:var(--gl)}
+.bnv{background:linear-gradient(135deg,#4422AA,var(--v));color:#fff}.bnv:hover{box-shadow:0 5px 18px rgba(124,92,252,.4);transform:translateY(-1px)}
+.bng{background:linear-gradient(135deg,#BB7F00,var(--g));color:var(--ink)}.bng:hover{transform:translateY(-1px)}
+.bnr{background:linear-gradient(135deg,#BB1030,var(--r));color:#fff}.bnr:hover{transform:translateY(-1px)}
+.bnsm{padding:5px 11px;font-size:9.5px}
+/* ACTION BUTTONS */
+.ab{padding:3px 9px;border-radius:6px;font-size:8.5px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:all .14s}
+.abt{background:var(--t3);color:var(--t)}.abt:hover{background:rgba(0,229,180,.22)}
+.abv{background:var(--v2);color:var(--v)}.abv:hover{background:rgba(124,92,252,.22)}
+.abs{background:var(--s2);color:var(--s)}.abs:hover{background:rgba(34,211,238,.22)}
+.abc{background:var(--r2);color:var(--r)}.abc:hover{background:rgba(255,77,109,.2)}
+/* LIST ROWS */
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}.row:last-child{border-bottom:none}
+/* FEED ITEMS */
+.fi2{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd)}.fi2:last-child{border-bottom:none}
+.fav2{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800}
+.fb{flex:1}.fn{font-size:11.5px;font-weight:700;color:var(--wh)}.ftx{font-size:10.5px;color:var(--tx2);line-height:1.55;margin-top:2px}
+.fm{font-size:9px;color:var(--tx3);margin-top:4px;display:flex;gap:9px;align-items:center}
+.flk{cursor:pointer;transition:color .13s;display:flex;align-items:center;gap:3px}.flk.on{color:#F472B6}.flk:hover{color:#F472B6}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:10.5px}
+.tbl thead th{padding:7px 10px;text-align:right;font-size:8px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--bd)}
+.tbl tbody tr{border-bottom:1px solid var(--bd);transition:background .12s;cursor:pointer}
+.tbl tbody tr:last-child{border-bottom:none}.tbl tbody tr:hover{background:rgba(255,255,255,.028)}
+.tbl td{padding:9px 10px;color:var(--tx2);vertical-align:middle}
+.tbl td.b2{color:var(--wh);font-weight:600}.tbl td.mn{font-family:monospace;font-size:9.5px;color:var(--tx3)}
+/* TABS */
+.tabs2{display:flex;border-bottom:1px solid var(--bd);margin-bottom:14px;flex-wrap:wrap;gap:2px}
+.tab2{padding:7px 13px;font-size:10.5px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);transition:all .14s;font-family:inherit;white-space:nowrap}
+.tab2.on{color:var(--t);border-bottom-color:var(--t)}.tab2:hover:not(.on){color:var(--tx2)}
+.tbp{display:none}.tbp.on{display:block;animation:fi .2s ease}
+/* TOGGLE */
+.tog{width:34px;height:18px;background:rgba(255,255,255,.1);border-radius:999px;cursor:pointer;position:relative;transition:background .18s;flex-shrink:0;border:1px solid var(--bd)}
+.tog.on{background:var(--t);border-color:var(--t2)}
+.tog::after{content:"";position:absolute;top:2.5px;width:11px;height:11px;background:#fff;border-radius:50%;transition:right .16s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tog.on::after{right:3px}.tog:not(.on)::after{right:calc(100% - 14px)}
+/* MISC */
+.sep{height:1px;background:var(--bd);margin:12px 0}.mb{margin-bottom:13px}
+.irow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd)}.irow:last-child{border-bottom:none}
+.iico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.inm{font-size:11.5px;font-weight:700;color:var(--wh);flex:1}.idc{font-size:8.5px;color:var(--tx3);margin-top:1px}
+/* CHAT */
+.cw{border:1px solid var(--bd);border-radius:var(--rd);overflow:hidden;background:rgba(4,7,14,.6)}
+.chd{padding:10px 13px;background:rgba(0,229,180,.07);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px}
+.cmsgs{padding:11px;min-height:200px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;background:rgba(0,0,0,.18)}
+.bww{display:flex;flex-direction:column}
+.bub{max-width:82%;padding:8px 12px;font-size:10.5px;line-height:1.55;border-radius:12px}
+.bub.bot{background:rgba(255,255,255,.07);border:1px solid var(--bd);border-radius:4px 12px 12px 12px;color:var(--tx)}
+.bub.uu{background:linear-gradient(135deg,var(--t2),var(--t));color:var(--ink);border-radius:12px 4px 12px 12px;align-self:flex-end;font-weight:600}
+.bnn{font-size:8px;color:var(--tx3);margin-bottom:3px}
+.cft{display:flex;gap:7px;padding:9px 11px;border-top:1px solid var(--bd)}
+.cin{flex:1;padding:7px 12px;font-size:11px;font-family:inherit;border:1px solid var(--bd);border-radius:999px;outline:none;background:rgba(255,255,255,.04);color:var(--tx);transition:all .14s}
+.cin:focus{border-color:rgba(0,229,180,.45);background:var(--t4)}
+.csn{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--t2),var(--t));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:all .14s;color:var(--ink);font-weight:900}
+.csn:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(0,229,180,.45)}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.on{display:flex;animation:fi .22s ease}
+.modal{background:rgba(9,14,26,.99);border:1px solid var(--bd);border-radius:18px;padding:24px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 28px 70px rgba(0,0,0,.6)}
+.modal.sm{max-width:460px}
+.mc-x{position:absolute;top:15px;left:20px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bd);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--tx2);transition:all .14s}
+.mc-x:hover{background:var(--r2);color:var(--r)}
+.mt{font-size:15px;font-weight:800;color:var(--wh);margin-bottom:4px}
+.ms2{font-size:9.5px;color:var(--tx3);margin-bottom:18px}
+/* CHECKBOXES */
+.chk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:13px}
+.chk-it{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;border:1px solid var(--bd);cursor:pointer;transition:all .13s;font-size:9.5px;color:var(--tx2);font-family:inherit;background:transparent}
+.chk-it:hover{border-color:var(--bd2)}.chk-it.on{background:var(--t3);border-color:rgba(0,229,180,.28);color:var(--t)}
+/* COLOR PICKER */
+.cp-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.cp{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .14s}
+.cp.on{border-color:#fff;transform:scale(1.2);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:11px;font-size:12px;font-weight:700;z-index:1000;display:none;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+/* LOADING */
+.ldg{display:flex;align-items:center;justify-content:center;padding:35px;color:var(--tx3);font-size:11px;gap:8px}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+/* STEP PROGRESS */
+.steps{display:flex;align-items:center;gap:5px;margin-bottom:14px}
+.step{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.step-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--tx3);transition:all .3s}
+.step.done .step-dot{background:var(--t);border-color:var(--t);color:var(--ink)}
+.step.cur .step-dot{background:var(--g2);border-color:var(--g);color:var(--g)}
+.step-line{height:1px;flex:1;background:var(--bd)}.step.done+.step .step-line,.step.cur+.step .step-line{background:transparent}
+.step-lbl{font-size:7.5px;color:var(--tx3);text-align:center;white-space:nowrap}.step.done .step-lbl{color:var(--t)}.step.cur .step-lbl{color:var(--g)}
+/* SALARY COMPARE */
+.sal-compare{display:flex;gap:12px;margin:12px 0}
+.sal-box{flex:1;padding:10px;border-radius:9px;text-align:center}
+.sal-box.cur{background:rgba(255,255,255,.05);border:1px solid var(--bd)}
+.sal-box.req{background:var(--t3);border:1px solid rgba(0,229,180,.22)}
+.sal-amt{font-size:18px;font-weight:900;color:var(--wh)}.sal-lbl{font-size:8px;color:var(--tx3);margin-top:2px}
+/* WARN BANNER */
+.warn-box{background:var(--r2);border:1px solid rgba(255,77,109,.28);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:9.5px;color:var(--r);line-height:1.55}
+.info-box{background:var(--g2);border:1px solid rgba(255,184,0,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:9.5px;color:var(--g);line-height:1.55}
+.suc-box{background:var(--t3);border:1px solid rgba(0,229,180,.22);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:9.5px;color:var(--t);line-height:1.55}
+/* DRAG HANDLE */
+.drag-zone{border:2px dashed var(--bd);border-radius:9px;padding:16px;text-align:center;cursor:pointer;color:var(--tx3);font-size:10.5px;transition:all .15s}
+.drag-zone:hover{border-color:rgba(0,229,180,.4);color:var(--t);background:var(--t4)}
+</style>
+</head>
+<body>
+<div class="orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+<div class="toast" id="toast"></div>
+
+<div id="app">
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div class="scr on" id="loginScr">
+<div class="lbox">
+  <div class="llogo">
+    <img src="/logo.svg" id="loginLogo" onerror="this.style.display='none';document.getElementById('loginFb').style.display='block'"/>
+    <div id="loginFb" style="display:none"><div class="llogo-fb">שלוה</div><div class="llogo-sub">EMPLOYEE PORTAL · המרכז הלאומי</div></div>
+  </div>
+  <div class="rtabs">
+    <div class="rtab on" id="rt-e" onclick="selRole('emp')">👤 עובד</div>
+    <div class="rtab" id="rt-a" onclick="selRole('adm')">🛡 מנהל</div>
+  </div>
+  <div class="lerr" id="lerr">שם משתמש או סיסמה שגויים</div>
+  <label class="lfl">שם משתמש</label>
+  <input class="lfi" id="lun" placeholder="הכנס שם משתמש..." autocomplete="username"/>
+  <label class="lfl">סיסמה</label>
+  <input class="lfi" id="lpw" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+  <button class="lbtn" id="loginBtn" onclick="doLogin()">כניסה לפורטל ←</button>
+  <div class="lhint">
+    <b>עובד:</b> מיכל / 1234 &nbsp;·&nbsp; יוסי / 1234 &nbsp;·&nbsp; רות / 1234<br>
+    <b>מנהל:</b> admin / admin123
+  </div>
+</div>
+</div>
+
+<!-- ══════════ SHELL SCREEN ══════════ -->
+<div class="scr" id="shellScr">
+  <aside class="sb" id="sbEl"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="ttt" id="ptitle">טוען...</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-right:auto">
+        <div class="tsrch"><span style="color:var(--tx3);font-size:11px">🔍</span><input placeholder="חיפוש..." id="searchIn" oninput="doSearch(this.value)"/></div>
+        <div class="tib" id="notifBtn" onclick="toggleNotif()" title="התראות">🔔<div class="ndot" id="notifDot"></div></div>
+        <div class="tib" onclick="doLogout()" title="יציאה">🚪</div>
+      </div>
+    </div>
+    <div class="npnl" id="nd">
+      <div class="ndh">התראות <span style="font-size:9px;color:var(--t);cursor:pointer" onclick="markRead()">סמן כנקרא ✓</span></div>
+      <div id="notifList"></div>
+    </div>
+    <div class="cnt" id="cntEl"></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ EMPLOYEE MODAL ══════════ -->
+<div class="modal-bg" id="empModal">
+<div class="modal">
+  <div class="mc-x" onclick="closeM('empModal')">✕</div>
+  <div class="mt" id="emTitle">הוספת עובד חדש</div>
+  <div class="ms2">כל השדות המסומנים ב-* הם חובה. השינויים נשמרים ב-DB באופן מיידי.</div>
+  <input type="hidden" id="eid"/>
+  <div class="tabs2" id="empTabs">
+    <div class="tab2 on" onclick="empTab(this,'et0')">פרטים בסיסיים</div>
+    <div class="tab2" onclick="empTab(this,'et1')">פרטי העסקה</div>
+    <div class="tab2" onclick="empTab(this,'et2')">בנק ותנאים</div>
+    <div class="tab2" onclick="empTab(this,'et3')">יצירת קשר</div>
+    <div class="tab2" onclick="empTab(this,'et4')">גישה לפורטל</div>
+  </div>
+  <!-- TAB 0: Basic -->
+  <div class="tbp on" id="et0">
+    <div class="fr2">
+      <div class="fg"><label class="fl">שם מלא (עברית) *</label><input class="fi" id="en" placeholder="שם ומשפחה"/></div>
+      <div class="fg"><label class="fl">שם מלא (אנגלית)</label><input class="fi" id="en_en" placeholder="First Last"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">שם משתמש *</label><input class="fi" id="eu" placeholder="לכניסה למערכת"/></div>
+      <div class="fg"><label class="fl">סיסמה *</label><input class="fi" id="ep" type="password" placeholder="סיסמה ראשונית"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">תעודת זהות</label><input class="fi" id="eid_num" placeholder="000000000" maxlength="9"/></div>
+      <div class="fg"><label class="fl">תאריך לידה</label><input class="fi" id="ebirth" type="date"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">כתובת</label><input class="fi" id="eaddr" placeholder="רחוב ומספר"/></div>
+      <div class="fg"><label class="fl">עיר</label><input class="fi" id="ecity" placeholder="עיר"/></div>
+    </div>
+    <div class="fg">
+      <label class="fl">צבע אווטאר</label>
+      <div class="cp-row" id="cpRow">
+        <div class="cp on" style="background:#7C5CFC" data-c="#7C5CFC" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#00C49A" data-c="#00C49A" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#FF4D6D" data-c="#FF4D6D" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#FFB800" data-c="#FFB800" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#22D3EE" data-c="#22D3EE" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#F472B6" data-c="#F472B6" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#86EFAC" data-c="#86EFAC" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#FB923C" data-c="#FB923C" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#A78BFA" data-c="#A78BFA" onclick="pickC(this)"></div>
+        <div class="cp" style="background:#34D399" data-c="#34D399" onclick="pickC(this)"></div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">הערות כלליות</label><textarea class="fta" id="enotes" placeholder="הערות פנימיות..."></textarea></div>
+  </div>
+  <!-- TAB 1: Employment -->
+  <div class="tbp" id="et1">
+    <div class="fr2">
+      <div class="fg"><label class="fl">מחלקה</label><input class="fi" id="ed" placeholder="תפעול / שכר / HR..."/></div>
+      <div class="fg"><label class="fl">תפקיד (עברית)</label><input class="fi" id="et" placeholder="תפקיד"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">תפקיד (אנגלית)</label><input class="fi" id="et_en" placeholder="Job Title"/></div>
+      <div class="fg"><label class="fl">תאריך תחילת עבודה</label><input class="fi" id="ehire" type="date"/></div>
+    </div>
+    <div class="fr3">
+      <div class="fg"><label class="fl">שכר ברוטו ₪</label><input class="fi" id="esal" type="number" placeholder="0"/></div>
+      <div class="fg"><label class="fl">היקף משרה %</label><input class="fi" id="escope" type="number" value="100" min="1" max="100"/></div>
+      <div class="fg"><label class="fl">סוג העסקה</label><select class="fsel" id="eemptype"><option value="full">עובד מן המניין</option><option value="part">חלקי</option><option value="hourly">שעתי</option><option value="contract">קבלן</option><option value="volunteer">מתנדב</option></select></div>
+    </div>
+    <div class="fr3">
+      <div class="fg"><label class="fl">ימי חופשה שנתיים</label><input class="fi" id="evac" type="number" value="16" min="0"/></div>
+      <div class="fg"><label class="fl">ימי מחלה</label><input class="fi" id="esick" type="number" value="10" min="0"/></div>
+      <div class="fg"><label class="fl">ימי מילואים</label><input class="fi" id="eres" type="number" value="0" min="0"/></div>
+    </div>
+  </div>
+  <!-- TAB 2: Bank -->
+  <div class="tbp" id="et2">
+    <div class="suc-box">🔒 מידע בנקאי מוצפן ומאובטח. גישה לעובד HR בלבד.</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">שם הבנק</label><input class="fi" id="ebank" placeholder="בנק הפועלים / לאומי..."/></div>
+      <div class="fg"><label class="fl">מספר סניף</label><input class="fi" id="ebbranch" placeholder="###"/></div>
+    </div>
+    <div class="fg"><label class="fl">מספר חשבון</label><input class="fi" id="ebacc" placeholder="############"/></div>
+    <div class="sep"></div>
+    <div class="fg"><label class="fl">הסכמים מיוחדים</label><textarea class="fta" id="eagreements" placeholder="הסכמים, בונוסים, תנאים מיוחדים..."></textarea></div>
+  </div>
+  <!-- TAB 3: Contact -->
+  <div class="tbp" id="et3">
+    <div class="fr2">
+      <div class="fg"><label class="fl">כתובת מייל</label><input class="fi" id="ee" type="email" placeholder="name@shalva.org.il"/></div>
+      <div class="fg"><label class="fl">טלפון נייד</label><input class="fi" id="ephone" type="tel" placeholder="05x-xxxxxxx"/></div>
+    </div>
+    <div class="sep"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--wh);margin-bottom:10px">👤 איש קשר לחירום</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">שם מלא</label><input class="fi" id="eemname" placeholder="שם איש קשר"/></div>
+      <div class="fg"><label class="fl">טלפון</label><input class="fi" id="eemphone" type="tel" placeholder="05x-xxxxxxx"/></div>
+    </div>
+    <div class="fg"><label class="fl">קרבה</label><input class="fi" id="eemrel" placeholder="בן/ת זוג / הורה..."/></div>
+  </div>
+  <!-- TAB 4: Access -->
+  <div class="tbp" id="et4">
+    <div class="info-box">📋 בחר אילו דפים יהיו זמינים לעובד זה בפורטל. השינוי יכנס לתוקף בכניסה הבאה.</div>
+    <div class="chk-grid" id="menuGrid">
+      <div class="chk-it on" data-m="home" onclick="this.classList.toggle('on')">⌂ דף הבית</div>
+      <div class="chk-it on" data-m="feed" onclick="this.classList.toggle('on')">📢 עדכוני צוות</div>
+      <div class="chk-it on" data-m="chat" onclick="this.classList.toggle('on')">🤖 שלומית AI</div>
+      <div class="chk-it on" data-m="req" onclick="this.classList.toggle('on')">📨 פניות לHR</div>
+      <div class="chk-it on" data-m="hr" onclick="this.classList.toggle('on')">⭐ הערכה ותנאים</div>
+      <div class="chk-it on" data-m="sal" onclick="this.classList.toggle('on')">💰 שכר ומילואים</div>
+      <div class="chk-it" data-m="bulk" onclick="this.classList.toggle('on')">✉️ שליחה מרוכזת</div>
+      <div class="chk-it on" data-m="train" onclick="this.classList.toggle('on')">🎓 הדרכות</div>
+      <div class="chk-it on" data-m="forms" onclick="this.classList.toggle('on')">📋 טפסים</div>
+      <div class="chk-it" data-m="proj" onclick="this.classList.toggle('on')">🚀 פרויקטים</div>
+      <div class="chk-it" data-m="int" onclick="this.classList.toggle('on')">🔗 התממשקויות</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn bno bnsm" onclick="document.querySelectorAll('#menuGrid .chk-it').forEach(c=>c.classList.add('on'))">בחר הכל</button>
+      <button class="btn bno bnsm" onclick="document.querySelectorAll('#menuGrid .chk-it').forEach(c=>c.classList.remove('on'))">נקה הכל</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
+    <button class="btn bnt" onclick="saveEmp()" style="flex:1;justify-content:center;font-size:12px">💾 שמור עובד</button>
+    <button class="btn bno" onclick="closeM('empModal')">ביטול</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ REQUEST MODAL ══════════ -->
+<div class="modal-bg" id="reqModal">
+<div class="modal sm">
+  <div class="mc-x" onclick="closeM('reqModal')">✕</div>
+  <div class="mt" id="rmTitle">פניה</div>
+  <div id="rmBody" style="margin-top:14px"></div>
+</div>
+</div>
+
+<!-- ══════════ TRAINING MODAL ══════════ -->
+<div class="modal-bg" id="trainModal">
+<div class="modal sm">
+  <div class="mc-x" onclick="closeM('trainModal')">✕</div>
+  <div class="mt">הוספת הדרכה חדשה</div>
+  <div class="ms2" style="margin-bottom:14px">פרט את ההדרכה הנדרשת</div>
+  <div class="fg"><label class="fl">שם ההדרכה *</label><input class="fi" id="tn" placeholder="שם ההדרכה"/></div>
+  <div class="fr2">
+    <div class="fg"><label class="fl">משך</label><input class="fi" id="tdur" placeholder="7 דק׳ / שעה..."/></div>
+    <div class="fg"><label class="fl">סוג</label><select class="fsel" id="ttype"><option value="mandatory">חובה</option><option value="optional">רשות</option></select></div>
+  </div>
+  <div class="fg"><label class="fl">תאריך יעד</label><input class="fi" id="tdeadline" type="date"/></div>
+  <div class="fg"><label class="fl">תיאור</label><textarea class="fta" id="tdesc" placeholder="תיאור קצר של ההדרכה..."></textarea></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn bnt" onclick="addTraining()">הוסף הדרכה</button>
+    <button class="btn bno" onclick="closeM('trainModal')">ביטול</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ BROADCAST MODAL ══════════ -->
+<div class="modal-bg" id="bcModal">
+<div class="modal sm">
+  <div class="mc-x" onclick="closeM('bcModal')">✕</div>
+  <div class="mt">שידור הודעה דחופה 📡</div>
+  <div class="ms2" style="margin-bottom:14px">ההודעה תישלח מיד בכל הערוצים הנבחרים</div>
+  <div class="fg"><label class="fl">נמענים</label><select class="fsel" id="bcTo2"><option value="all">כל העובדים</option></select></div>
+  <div class="fg"><label class="fl">נושא *</label><input class="fi" id="bcSubj2" placeholder="נושא..."/></div>
+  <div class="fg"><label class="fl">תוכן *</label><textarea class="fta tall" id="bcBody2" placeholder="תוכן ההודעה..."></textarea></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn bnt" onclick="sendBcModal()">📡 שדר עכשיו</button>
+    <button class="btn bno" onclick="closeM('bcModal')">ביטול</button>
+  </div>
+</div>
+</div>
+
+<script>
+'use strict';
+// ══════════════════════════════════════════════════════
+// CORE API CLIENT
+// ══════════════════════════════════════════════════════
+const API = {
+  async req(method, path, body) {
+    try {
+      const opts = { method, headers: {'Content-Type':'application/json'}, credentials: 'include' };
+      if (body) opts.body = JSON.stringify(body);
+      const r = await fetch('/api' + path, opts);
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'שגיאה');
+      return data;
+    } catch(e) { toast(e.message, false); throw e; }
+  },
+  get: p => API.req('GET', p),
+  post: (p, b) => API.req('POST', p, b),
+  put: (p, b) => API.req('PUT', p, b),
+  del: p => API.req('DELETE', p)
+};
+
+// ══════════════════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════════════════
+let ME = null, selCol = '#7C5CFC', curRole = 'emp';
+let _users = [], _reqs = [], _trainings = [];
+
+// ══════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════
+function toast(msg, ok = true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = ok ? 'rgba(0,229,180,.16)' : 'rgba(255,77,109,.16)';
+  t.style.border = `1px solid ${ok ? 'rgba(0,229,180,.4)' : 'rgba(255,77,109,.4)'}`;
+  t.style.color = ok ? 'var(--t)' : 'var(--r)';
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3200);
+}
+function closeM(id) { document.getElementById(id).classList.remove('on'); }
+function selRole(r) {
+  curRole = r;
+  document.getElementById('rt-e').classList.toggle('on', r === 'emp');
+  document.getElementById('rt-a').classList.toggle('on', r === 'adm');
+}
+function pickC(el) {
+  selCol = el.dataset.c;
+  document.querySelectorAll('.cp').forEach(c => c.classList.toggle('on', c === el));
+}
+function empTab(btn, tid) {
+  document.getElementById('empTabs').querySelectorAll('.tab2').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  ['et0','et1','et2','et3','et4'].forEach(id => document.getElementById(id)?.classList.remove('on'));
+  document.getElementById(tid)?.classList.add('on');
+}
+function swTab(btn, tid, wrapId) {
+  const w = document.getElementById(wrapId);
+  w.querySelectorAll('.tab2').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  w.querySelectorAll('.tbp').forEach(t => t.classList.remove('on'));
+  document.getElementById(tid)?.classList.add('on');
+}
+function fmtD(iso) {
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleDateString('he-IL'); } catch { return iso; }
+}
+function ago(iso) {
+  if (!iso) return '';
+  const m = (Date.now() - new Date(iso)) / 60000;
+  if (m < 1) return 'עכשיו';
+  if (m < 60) return `${Math.floor(m)} דק׳`;
+  if (m < 1440) return `${Math.floor(m/60)} שע׳`;
+  return `${Math.floor(m/1440)} ימים`;
+}
+function sL(s) { return {pending:'ממתין',manager_review:'אצל מנהל',hr_review:'אצל HR',committee:'ועדה',approved:'אושר',rejected:'נדחה',leave:'חל״ד',sick:'מחלה'}[s] || s; }
+function sC(s) { return {approved:'bt',rejected:'br',pending:'br',hr_review:'bg2',manager_review:'bv',committee:'bs',leave:'bv',sick:'bgr'}[s] || 'bgr'; }
+function pL(p) { return {high:'גבוהה',urgent:'דחוף!',normal:'רגיל',low:'נמוך'}[p] || p; }
+function pC(p) { return {high:'bg2',urgent:'br',normal:'bgr',low:'bgr'}[p] || 'bgr'; }
+function avEl(u, sz = 30) {
+  return `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${u.color||'#7C5CFC'};display:flex;align-items:center;justify-content:center;font-size:${Math.round(sz*.35)}px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)">${u.avatar||u.name?.substring(0,2)||'?'}</div>`;
+}
+function ld(c) { c.innerHTML = '<div class="ldg"><span style="animation:spin .8s linear infinite;display:inline-block">⟳</span> טוען...</div>'; }
+function empty(msg) { return `<div style="text-align:center;padding:22px;font-size:10.5px;color:var(--tx3)">${msg}</div>`; }
+function numFmt(n) { return parseInt(n||0).toLocaleString('he-IL'); }
+
+// ══════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════
+async function doLogin() {
+  const un = document.getElementById('lun').value.trim();
+  const pw = document.getElementById('lpw').value;
+  const err = document.getElementById('lerr');
+  const btn = document.getElementById('loginBtn');
+  err.style.display = 'none';
+  if (!un || !pw) { err.textContent = 'אנא מלא שם משתמש וסיסמה'; err.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = '⟳ מתחבר...';
+  try {
+    const res = await API.post('/login', {username: un, password: pw, role: curRole});
+    ME = res.user;
+    document.getElementById('loginScr').classList.remove('on');
+    document.getElementById('shellScr').classList.add('on');
+    await buildSidebar();
+    loadNotifs();
+    if (ME.role === 'adm') goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
+  } catch(e) {
+    err.textContent = 'שם משתמש או סיסמה שגויים';
+    err.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'כניסה לפורטל ←'; }
+}
+
+async function doLogout() {
+  await API.post('/logout').catch(() => {});
+  ME = null; _users = []; _reqs = []; _trainings = [];
+  document.getElementById('shellScr').classList.remove('on');
+  document.getElementById('loginScr').classList.add('on');
+  document.getElementById('lpw').value = '';
+  document.getElementById('lerr').style.display = 'none';
+}
+
+// Auto-check session on load
+window.addEventListener('load', async () => {
+  try {
+    ME = await API.get('/me');
+    document.getElementById('loginScr').classList.remove('on');
+    document.getElementById('shellScr').classList.add('on');
+    await buildSidebar();
+    loadNotifs();
+    if (ME.role === 'adm') goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
+  } catch(e) { /* not logged in */ }
+});
+
+// Close notif panel on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notifBtn') && !e.target.closest('.npnl'))
+    document.getElementById('nd').classList.remove('on');
+});
+
+// Search
+function doSearch(v) {
+  if (!v || !ME) return;
+  const map = {בית:'home',עדכון:'feed',פניה:'req',שכר:'sal',הדרכ:'train',טופס:'forms',ניהול:'adash',עובד:'aemp'};
+  for (const [k, id] of Object.entries(map)) {
+    if (v.includes(k)) {
+      if (ME.role === 'adm') goAdm(id); else if ((ME.menu||[]).includes(id)) goEmp(id);
+      document.getElementById('searchIn').value = '';
+      return;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════════════════
+const ALL_M = {
+  home:  {ic:'⌂', lb:'דף הבית', gr:'ראשי'},
+  feed:  {ic:'📢', lb:'עדכוני צוות', gr:'ראשי'},
+  chat:  {ic:'🤖', lb:'שלומית AI', gr:'ראשי'},
+  req:   {ic:'📨', lb:'פניות לHR', gr:'ניהול אישי'},
+  hr:    {ic:'⭐', lb:'הערכה ותנאים', gr:'ניהול אישי'},
+  sal:   {ic:'💰', lb:'שכר ומילואים', gr:'ניהול אישי'},
+  bulk:  {ic:'✉️', lb:'שליחה מרוכזת', gr:'ניהול אישי'},
+  train: {ic:'🎓', lb:'הדרכות', gr:'ידע ופיתוח'},
+  forms: {ic:'📋', lb:'טפסים', gr:'ידע ופיתוח'},
+  proj:  {ic:'🚀', lb:'פרויקטים', gr:'נוסף'},
+  int:   {ic:'🔗', lb:'התממשקויות', gr:'נוסף'},
+};
+const ADM_M = [
+  {gr:'ניהול כללי'},
+  {ic:'📊', lb:'דשבורד',         id:'adash'},
+  {ic:'👥', lb:'ניהול עובדים',   id:'aemp'},
+  {ic:'📨', lb:'כל הפניות',      id:'areq', pill:true},
+  {ic:'💰', lb:'ניהול שכר',      id:'asal'},
+  {ic:'🎓', lb:'הדרכות',         id:'atrain'},
+  {gr:'תקשורת ומידע'},
+  {ic:'📡', lb:'שידור הודעות',   id:'abcast'},
+  {ic:'📋', lb:'ניהול טפסים',    id:'aforms'},
+  {ic:'📈', lb:'דוחות',          id:'arep'},
+  {gr:'מערכת'},
+  {ic:'🗂', lb:'ניהול תפריטים',  id:'amenus'},
+  {ic:'🔑', lb:'משתמשים',        id:'ausers'},
+  {ic:'⚙️', lb:'הגדרות',         id:'aset'},
+];
+const E_TITLES = {home:'דף הבית',feed:'עדכוני צוות',chat:'שלומית AI',req:'פניות לHR',hr:'הערכה ותנאים',sal:'שכר ומילואים',bulk:'שליחה מרוכזת',train:'הדרכות',forms:'טפסים',proj:'פרויקטים',int:'התממשקויות'};
+const A_TITLES = {adash:'דשבורד',aemp:'ניהול עובדים',areq:'כל הפניות',asal:'ניהול שכר',atrain:'ניהול הדרכות',abcast:'שידור הודעות',aforms:'ניהול טפסים',arep:'דוחות',amenus:'ניהול תפריטים',ausers:'ניהול משתמשים',aset:'הגדרות מערכת'};
+
+async function buildSidebar() {
+  const sb = document.getElementById('sbEl');
+  const s = await API.get('/settings').catch(() => ({}));
+  const logo = s.logo_url || '/logo.svg';
+  const orgName = s.org_name || 'שלוה';
+  const isAdm = ME.role === 'adm';
+  let openReqs = 0;
+  if (isAdm) {
+    try { const st = await API.get('/stats'); openReqs = st.openReqs || 0; } catch {}
+  }
+
+  let html = `<div class="sbl">
+    <img src="${logo}" class="sb-logo" onerror="this.style.display='none';document.getElementById('sbl-fb').style.display='block'"/>
+    <div id="sbl-fb" style="display:none"><div class="sb-txt">${orgName}</div><div class="sb-sub">${isAdm ? 'MANAGEMENT' : 'PORTAL'}</div></div>
+  </div>`;
+
+  if (isAdm) {
+    let curGr = '';
+    ADM_M.forEach((m, i) => {
+      if (m.gr) { if (m.gr !== curGr) { html += `<div class="ngl">${m.gr}</div>`; curGr = m.gr; } return; }
+      const pill = m.pill && openReqs > 0 ? `<span class="npill npR">${openReqs}</span>` : '';
+      html += `<div class="ni ${i===1?'aon':''}" id="ni_${m.id}" onclick="goAdm('${m.id}',this)"><span class="nic">${m.ic}</span>${m.lb}${pill}</div>`;
+    });
+  } else {
+    let lastGr = '';
+    (ME.menu || []).forEach((id, i) => {
+      const m = ALL_M[id]; if (!m) return;
+      if (m.gr !== lastGr) { html += `<div class="ngl">${m.gr}</div>`; lastGr = m.gr; }
+      html += `<div class="ni ${i===0?'on':''}" id="ni_${id}" onclick="goEmp('${id}',this)"><span class="nic">${m.ic}</span>${m.lb}</div>`;
+    });
+  }
+
+  html += `<div class="sbf">
+    <div class="ubtn">${avEl(ME)}<div><div class="uname">${ME.name}</div><div class="urole2">${ME.title || (isAdm ? 'מנהל מערכת' : 'עובד')}</div></div></div>
+    <button class="logoutbtn" onclick="doLogout()">יציאה מהמערכת 🚪</button>
+  </div>`;
+  sb.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function goEmp(id, el) {
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on', 'aon'));
+  const ni = el || document.getElementById('ni_' + id);
+  if (ni) ni.classList.add('on');
+  document.getElementById('ptitle').textContent = E_TITLES[id] || id;
+  const cnt = document.getElementById('cntEl'); ld(cnt);
+  const pages = {home:pgHome, feed:pgFeed, chat:pgChat, req:pgReq, hr:pgHR, sal:pgSal, bulk:pgBulk, train:pgTrain, forms:pgForms, proj:pgProj, int:pgInt};
+  pages[id] ? pages[id](cnt) : (cnt.innerHTML = `<div class="card"><div class="st">הדף "${id}" בקרוב</div></div>`);
+}
+function goAdm(id, el) {
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on', 'aon'));
+  const ni = el || document.getElementById('ni_' + id);
+  if (ni) ni.classList.add('aon');
+  document.getElementById('ptitle').textContent = A_TITLES[id] || id;
+  const cnt = document.getElementById('cntEl'); ld(cnt);
+  const pages = {adash:pgDash, aemp:pgEmp, areq:pgAllReq, asal:pgASal, atrain:pgATrain, abcast:pgBcast, aforms:pgAForms, arep:pgRep, amenus:pgMenus, ausers:pgUsers, aset:pgSet};
+  pages[id] ? pages[id](cnt) : (cnt.innerHTML = `<div class="card"><div class="st">הדף "${id}" בקרוב</div></div>`);
+}
+
+// ══════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════════════════════
+async function loadNotifs() {
+  try {
+    const notifs = await API.get('/notifications');
+    const unread = notifs.filter(n => !n.read).length;
+    document.getElementById('notifDot').style.display = unread > 0 ? 'block' : 'none';
+    const list = document.getElementById('notifList');
+    if (!notifs.length) { list.innerHTML = empty('אין התראות'); return; }
+    list.innerHTML = notifs.slice(0, 8).map(n => `
+      <div class="ndi">
+        <div class="ndp" style="background:${n.type==='success'?'var(--t)':n.type==='warn'?'var(--g)':'var(--r)'}"></div>
+        <div><div class="ndt">${n.text}</div><div class="ndtm">${ago(n.created_at)}</div></div>
+      </div>`).join('');
+  } catch(e) {}
+}
+function toggleNotif() { document.getElementById('nd').classList.toggle('on'); }
+async function markRead() {
+  await API.post('/notifications/read').catch(() => {});
+  document.getElementById('notifDot').style.display = 'none';
+  document.getElementById('notifList').innerHTML = empty('אין התראות');
+}
+
+// ══════════════════════════════════════════════════════
+// ═══════════ EMPLOYEE PAGES ═══════════════════════════
+// ══════════════════════════════════════════════════════
+
+// HOME
+async function pgHome(cnt) {
+  const [me, reqs, trainings] = await Promise.all([API.get('/me'), API.get('/requests'), API.get('/trainings')]);
+  const open = reqs.filter(r => !['approved','rejected'].includes(r.status)).length;
+  const mandPending = trainings.filter(t => t.type === 'mandatory' && !t.completed_by.includes(me.id)).length;
+  const approved = reqs.filter(r => r.status === 'approved').length;
+  const pct = reqs.length ? Math.round((approved / reqs.length) * 100) : 0;
+  cnt.innerHTML = `
+<div style="display:flex;align-items:center;gap:18px;padding:18px 22px;border-radius:var(--rd);background:linear-gradient(135deg,rgba(0,229,180,.09),rgba(0,229,180,.03));border:1px solid rgba(0,229,180,.15);margin-bottom:17px">
+  <div style="flex:1">
+    <div style="font-size:10px;color:var(--tx3);margin-bottom:2px">שלום,</div>
+    <div style="font-size:22px;font-weight:900;color:var(--wh);line-height:1.1">${me.name} 👋</div>
+    <div style="font-size:10.5px;color:var(--tx2);margin-top:3px">${me.title||''} ${me.dept?'· '+me.dept:''}</div>
+    <div style="margin-top:8px;display:inline-flex;align-items:center;gap:5px;background:rgba(0,229,180,.09);border:1px solid rgba(0,229,180,.16);border-radius:999px;padding:3px 11px;font-size:8.5px;color:var(--t)">
+      🟢 מחובר · ${new Date().toLocaleDateString('he-IL', {weekday:'long', day:'numeric', month:'long'})}
+    </div>
+  </div>
+  <div style="font-size:52px;opacity:.3">🏛️</div>
+</div>
+
+<div class="mwrap m4">
+  <div class="mc t" onclick="goEmp('req',null)">
+    <div class="mv">${open}</div><div class="ml">פניות פתוחות</div>
+    <div class="md ${open>0?'mddn':'mdup'}">${open>0?'⚠ ממתינות':'הכל טופל ✓'}</div>
+    <div class="mi">📨</div><div class="mst mT"></div>
+  </div>
+  <div class="mc v">
+    <div class="mv">${me.vacation_days||0}</div><div class="ml">ימי חופשה</div>
+    <div class="md ${(me.vacation_days||0)<5?'mddn':'mdup'}">${(me.vacation_days||0)<5?'⚠ נמוך':'זמינים'}</div>
+    <div class="mi">🏖</div><div class="mst mV"></div>
+  </div>
+  <div class="mc g" onclick="goEmp('train',null)">
+    <div class="mv">${mandPending}</div><div class="ml">הדרכות חובה</div>
+    <div class="md ${mandPending>0?'mddn':'mdup'}">${mandPending>0?'⚠ ממתינות':'הושלמו ✓'}</div>
+    <div class="mi">📚</div><div class="mst mG"></div>
+  </div>
+  <div class="mc r">
+    <div class="mv">${me.sick_days||0}</div><div class="ml">ימי מחלה</div>
+    <div class="md mdnt">יתרה</div>
+    <div class="mi">🤒</div><div class="mst mR"></div>
+  </div>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="sh"><span class="st">הפניות שלי האחרונות</span><span class="sla" onclick="goEmp('req',null)">הכל ←</span></div>
+    ${reqs.slice(0,5).map(r => `
+    <div class="row">
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div>
+        <div style="font-size:8.5px;color:var(--tx3)">${r.dept||''} · ${fmtD(r.created_at)}</div>
+      </div>
+      <span class="b ${sC(r.status)}">${sL(r.status)}</span>
+    </div>`).join('') || empty('אין פניות עדיין. <span class="sla" onclick="goEmp(\'req\',null)" style="cursor:pointer">צור פניה →</span>')}
+  </div>
+  <div>
+    <div class="card mb">
+      <div class="sh"><span class="st">יתרת ימים</span></div>
+      <div class="fr3">
+        <div style="text-align:center;padding:11px 5px;background:rgba(0,229,180,.07);border-radius:9px;border:1px solid rgba(0,229,180,.13)">
+          <div style="font-size:22px;font-weight:900;color:var(--t)">${me.vacation_days||0}</div>
+          <div style="font-size:8px;color:var(--tx3);margin-top:2px">חופשה</div>
+        </div>
+        <div style="text-align:center;padding:11px 5px;background:rgba(255,184,0,.07);border-radius:9px;border:1px solid rgba(255,184,0,.13)">
+          <div style="font-size:22px;font-weight:900;color:var(--g)">${me.sick_days||0}</div>
+          <div style="font-size:8px;color:var(--tx3);margin-top:2px">מחלה</div>
+        </div>
+        <div style="text-align:center;padding:11px 5px;background:rgba(255,77,109,.07);border-radius:9px;border:1px solid rgba(255,77,109,.13)">
+          <div style="font-size:22px;font-weight:900;color:var(--r)">${me.reserve_days||0}</div>
+          <div style="font-size:8px;color:var(--tx3);margin-top:2px">מילואים</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sh"><span class="st">סטטוס פניות</span><span style="font-size:9.5px;color:var(--tx3)">${reqs.length} סה"כ</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:10px">
+        ${[['אושרו','approved','bt',reqs.filter(r=>r.status==='approved').length],['ממתינות','pending','br',reqs.filter(r=>r.status==='pending').length],['בבדיקה','hr_review','bg2',reqs.filter(r=>['hr_review','manager_review','committee'].includes(r.status)).length]].map(([lb,s,cls,n])=>`
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="color:var(--tx2)">${lb}</span>
+          <span class="b ${cls}">${n}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+// FEED
+async function pgFeed(cnt) {
+  const feed = await API.get('/feed');
+  cnt.innerHTML = `
+<div class="g13">
+  <div>
+    <div class="card mb">
+      <div class="st" style="margin-bottom:10px">📣 פרסם עדכון</div>
+      <textarea class="fta" id="newPost" placeholder="שתף עדכון עם הצוות..." style="margin-bottom:9px"></textarea>
+      <div style="display:flex;gap:7px;align-items:center">
+        <button class="btn bnt bnsm" onclick="submitPost()">פרסם ←</button>
+        <span style="font-size:9px;color:var(--tx3)">יפורסם לכולם</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:10px">📢 קהלים</div>
+      ${[['כולם','all'],['HR','hr'],['הנהלה','mgmt']].map(([lb,k])=>`
+      <div class="row" style="padding:7px 0">
+        <span style="font-size:11px;color:var(--tx2);flex:1">📢 ${lb}</span>
+        <span class="b bgr" style="font-size:8px">כולל</span>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="sh"><span class="st">פיד עובדים</span><span class="b bt">🟢 חי · ${feed.length}</span></div>
+    ${feed.map(p => `
+    <div class="fi2">
+      <div class="fav2" style="background:${p.author_color||'#00C49A'}22;color:${p.author_color||'#00C49A'}">${p.author_name.substring(0,2)}</div>
+      <div class="fb">
+        <div class="fn">${p.author_name}</div>
+        <div class="ftx">${p.text}</div>
+        <div class="fm">
+          <span>${ago(p.created_at)}</span>
+          <span class="flk ${(p.likes||[]).includes(ME.id)?'on':''}" onclick="doLike(${p.id},this)">
+            ${(p.likes||[]).includes(ME.id)?'❤️':'🤍'} ${(p.likes||[]).length}
+          </span>
+          ${ME.role==='adm'?`<span style="cursor:pointer;color:var(--r)" onclick="delPost(${p.id})">🗑</span>`:''}
+        </div>
+      </div>
+    </div>`).join('') || empty('אין עדכונים עדיין. היה הראשון לפרסם!')}
+  </div>
+</div>`;
+}
+async function submitPost() {
+  const txt = document.getElementById('newPost')?.value.trim();
+  if (!txt) { toast('כתוב משהו לפרסום', false); return; }
+  await API.post('/feed', {text: txt}); toast('עדכון פורסם! 🎉'); goEmp('feed', null);
+}
+async function doLike(pid, el) {
+  const r = await API.post(`/feed/${pid}/like`);
+  el.classList.toggle('on', r.likes.includes(ME.id));
+  el.innerHTML = `${r.likes.includes(ME.id)?'❤️':'🤍'} ${r.likes.length}`;
+}
+async function delPost(pid) {
+  if (!confirm('למחוק פוסט זה?')) return;
+  await API.del(`/feed/${pid}`); toast('נמחק'); goEmp('feed', null);
+}
+
+// CHAT
+async function pgChat(cnt) {
+  cnt.innerHTML = `
+<div class="g13">
+  <div>
+    <div class="card mb">
+      <div class="st" style="margin-bottom:10px">שאלות נפוצות</div>
+      ${[['🏖','ימי חופשה','חופשה'],['🪖','מילואים','מילואים'],['💰','שכר','שכר'],['🤒','מחלה','מחלה'],['🎁','הטבות','הטבות'],['⏰','שעות גמישות','גמישות'],['📜','נהלים','נהלים'],['🏥','ביטוח','ביטוח']].map(([ic,lb,k]) =>
+        `<button onclick="setChatQ('${k}')" style="display:flex;align-items:center;gap:7px;width:100%;background:var(--gl);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;margin-bottom:5px;cursor:pointer;color:var(--tx2);font-size:10px;font-family:inherit;text-align:right;transition:all .13s" onmouseover="this.style.background='var(--t3)';this.style.color='var(--t)'" onmouseout="this.style.background='var(--gl)';this.style.color='var(--tx2)'">${ic} ${lb}</button>`
+      ).join('')}
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:8px">שעות זמינות</div>
+      <div style="font-size:10px;color:var(--tx2);line-height:1.8">
+        ✅ זמין 24/7<br>
+        🤖 מבוסס AI<br>
+        📚 מבוסס על נהלי הארגון
+      </div>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="chd">
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,229,180,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--t);flex-shrink:0">ש</div>
+      <div style="margin-right:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--wh)">שלומית AI</div>
+        <div style="font-size:8px;color:var(--t);display:flex;align-items:center;gap:4px">
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--t);display:inline-block;animation:pulse 2s infinite"></span>
+          מחוברת ומוכנה לעזור
+        </div>
+      </div>
+    </div>
+    <div class="cmsgs" id="chatMsgs">
+      <div class="bww"><div class="bnn">שלומית AI</div><div class="bub bot">שלום ${ME.name}! 👋 אני שלומית, העוזרת האישית שלך. אוכל לעזור בשאלות על שכר, חופשות, נהלים, הטבות ועוד. במה אוכל לעזור?</div></div>
+    </div>
+    <div class="cft">
+      <input class="cin" id="cin" placeholder="הקלד שאלה..." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="csn" onclick="sendChat()">↑</button>
+    </div>
+  </div>
+</div>`;
+}
+const CHAT_KB = {
+  חופשה: 'ימי חופשה לפי ותק: עד 5 שנים — 16 ימים/שנה, 5-10 — 18 ימים, מעל 10 שנים — 22 ימים. יתרה לא מנוצלת ניתנת להעברה עד 30 ימים. לבקשת חופשה: טפסים → בקשת חופשה.',
+  מילואים: 'דיווח מילואים: שכר → דיווח מילואים → העלה צו קריאה + מספר ימים. השכר מושלם לפי שכר מלא. ימי מילואים לא נגרעים מימי חופשה.',
+  שכר: 'בקשת העלאת שכר: שכר → בקשת העלאת שכר. זרימת אישור: עובד → מנהל ישיר → HR → ועדה. זמן טיפול: 14-21 ימי עסקים.',
+  מחלה: 'ימי מחלה: עד 3 ימים — אישור רפואי מומלץ. מ-3 ימים ומעלה — אישור רופא חובה. שלח בטפסים → ימי מחלה. הצבירה: 1.5 יום לחודש.',
+  הטבות: 'הטבות עובד: ✅ ביטוח קבוצתי ✅ קרן פנסיה ✅ קרן השתלמות ✅ הנחות בחנויות שותפות ✅ גיבוש שנתי ✅ בונוס חבר מביא חבר.',
+  גמישות: 'שעות גמישות: הגעה בין 07:00-09:00, עבודה 8 שעות. עבודה מהבית: בתיאום מנהל ישיר, עד 2 ימים בשבוע.',
+  נהלים: 'הנהלים המעודכנים זמינים בפורטל ובאינטרנט הארגוני. לשאלות ספציפיות פתח פניה לHR או שלח מייל ל-hr@shalva.org.il',
+  ביטוח: 'ביטוח בריאות קבוצתי כולל: ביקורי רופא, תרופות, אשפוז, ייעוץ מומחים. הצרפה בשלושת חודשי העבודה הראשונים.',
+};
+function setChatQ(k) { const i = document.getElementById('cin'); if (i) { i.value = k + '?'; sendChat(); } }
+function sendChat() {
+  const inp = document.getElementById('cin'); if (!inp) return;
+  const msg = inp.value.trim(); if (!msg) return;
+  const ms = document.getElementById('chatMsgs');
+  ms.innerHTML += `<div class="bww uu" style="align-items:flex-end"><div class="bub uu">${msg}</div></div>`;
+  inp.value = ''; ms.scrollTop = 99999;
+  setTimeout(() => {
+    let r = 'שאלה מצוינת! לקבלת מענה מדויק ומיידי, אפשר לפתוח פניה רשמית ב"פניות לHR". אני כאן לעזור בכל שאלה נוספת!';
+    for (const [k, v] of Object.entries(CHAT_KB)) { if (msg.includes(k)) { r = v; break; } }
+    ms.innerHTML += `<div class="bww"><div class="bnn">שלומית AI</div><div class="bub bot">${r}</div></div>`;
+    ms.scrollTop = 99999;
+  }, 700);
+}
+
+// REQUESTS
+async function pgReq(cnt) {
+  const reqs = await API.get('/requests');
+  const open = reqs.filter(r => !['approved','rejected'].includes(r.status));
+  cnt.innerHTML = `
+<div class="g13">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">📨 פניה חדשה</div>
+    <div class="fg"><label class="fl">מחלקה יעד</label>
+      <select class="fsel" id="rdept"><option>מחלקת שכר</option><option>HR</option><option>תפעול</option><option>ביטחון</option><option>מנהל ישיר</option><option>כללי</option></select>
+    </div>
+    <div class="fg"><label class="fl">סוג פניה</label>
+      <select class="fsel" id="rtype">
+        <option value="general">כללי</option>
+        <option value="salary_raise">בקשת העלאת שכר</option>
+        <option value="conditions">שינוי תנאי העסקה</option>
+        <option value="equipment">ציוד ומשאבים</option>
+        <option value="reserves">מילואים</option>
+        <option value="vacation_leave">חופשה ללא תשלום</option>
+        <option value="complaint">תלונה</option>
+        <option value="welfare">רווחה</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">נושא הפניה *</label><input class="fi" id="rsubj" placeholder="תיאור קצר וברור..."/></div>
+    <div class="fg"><label class="fl">עדיפות</label>
+      <select class="fsel" id="rpri"><option value="normal">רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select>
+    </div>
+    <div class="fg"><label class="fl">פרטים מלאים</label><textarea class="fta tall" id="rdet" placeholder="תאר את הפניה בפירוט..."></textarea></div>
+    <button class="btn bnt" style="width:100%;justify-content:center" onclick="submitReq()">שלח פניה ↗</button>
+  </div>
+  <div>
+    <div class="card mb">
+      <div class="sh"><span class="st">פניות פתוחות</span><span class="b br">${open.length}</span></div>
+      ${open.map(r => `
+      <div class="row" onclick="viewMyReq(${r.id})" style="cursor:pointer">
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div>
+          <div style="font-size:8.5px;color:var(--tx3)">#${r.id} · ${r.dept||''} · ${fmtD(r.created_at)}</div>
+        </div>
+        <span class="b ${pC(r.priority)}" style="margin-left:4px">${pL(r.priority)}</span>
+        <span class="b ${sC(r.status)}">${sL(r.status)}</span>
+      </div>`).join('') || empty('אין פניות פתוחות ✓')}
+    </div>
+    <div class="card">
+      <div class="sh"><span class="st">היסטוריית פניות</span><span class="b bgr">${reqs.length}</span></div>
+      ${reqs.filter(r => ['approved','rejected'].includes(r.status)).slice(0,5).map(r => `
+      <div class="row">
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:600;color:var(--tx2)">${r.subject}</div>
+          <div style="font-size:8.5px;color:var(--tx3)">${fmtD(r.updated_at||r.created_at)}</div>
+        </div>
+        <span class="b ${sC(r.status)}">${sL(r.status)}</span>
+      </div>`).join('') || empty('אין היסטוריה עדיין')}
+    </div>
+  </div>
+</div>`;
+}
+async function submitReq() {
+  const subj = document.getElementById('rsubj')?.value.trim();
+  if (!subj) { toast('אנא מלא נושא לפניה', false); return; }
+  await API.post('/requests', {
+    dept: document.getElementById('rdept')?.value,
+    subject: subj,
+    type: document.getElementById('rtype')?.value,
+    priority: document.getElementById('rpri')?.value,
+    details: document.getElementById('rdet')?.value || ''
+  });
+  toast('הפניה נשלחה בהצלחה! 📨');
+  goEmp('req', null);
+}
+function viewMyReq(id) {
+  const reqs = window._reqs || [];
+  const r = reqs.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('rmTitle').textContent = `${r.subject} #${r.id}`;
+  document.getElementById('rmBody').innerHTML = `
+    <div class="sh"><span class="b ${sC(r.status)}" style="font-size:10px">${sL(r.status)}</span><span class="b ${pC(r.priority)}">${pL(r.priority)}</span></div>
+    <div class="steps">
+      ${['emp','manager','hr'].map((s,i) => `<div class="step ${r.current_step>i?'done':r.current_step===i?'cur':''}"><div class="step-dot">${i+1}</div><div class="step-lbl">${{emp:'שלחת',manager:'מנהל',hr:'HR'}[s]}</div></div>${i<2?'<div class="step-line"></div>':''}`).join('')}
+    </div>
+    ${r.details ? `<div style="padding:10px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--bd);font-size:10.5px;color:var(--tx2);line-height:1.6;margin-bottom:10px">${r.details}</div>` : ''}
+    ${r.resolution_note ? `<div class="suc-box">✅ הערת מנהל: ${r.resolution_note}</div>` : ''}
+    <button class="btn bno bnsm" onclick="closeM('reqModal')">סגור</button>`;
+  document.getElementById('reqModal').classList.add('on');
+}
+
+// HR PAGE
+async function pgHR(cnt) {
+  const reqs = await API.get('/requests');
+  cnt.innerHTML = `
+<div id="hrWrap">
+<div class="tabs2" id="hrTabs">
+  <div class="tab2 on" onclick="swTab(this,'hr0','hrWrap')">⭐ הערכה שנתית</div>
+  <div class="tab2" onclick="swTab(this,'hr1','hrWrap')">📝 שינוי תנאים</div>
+  <div class="tab2" onclick="swTab(this,'hr2','hrWrap')">📄 אישורים</div>
+  <div class="tab2" onclick="swTab(this,'hr3','hrWrap')">📊 היסטוריה</div>
+</div>
+<div class="tbp on" id="hr0">
+  <div class="g2">
+    <div class="card">
+      <div class="st" style="margin-bottom:12px">הערכה עצמית 2026</div>
+      ${[['ביצועים מקצועיים','r1',4],['עבודת צוות ושיתוף פעולה','r2',5],['יוזמה ויצירתיות','r3',4],['עמידה ביעדים ובזמנים','r4',4],['מיומנויות בין-אישיות','r5',4]].map(([lb,id,def]) => `
+      <div class="fg">
+        <label class="fl" style="display:flex;justify-content:space-between">${lb} <span id="${id}v" style="color:var(--t);font-weight:700">${def}/5</span></label>
+        <input type="range" min="1" max="5" value="${def}" style="width:100%;accent-color:var(--t);margin-top:4px" oninput="document.getElementById('${id}v').textContent=this.value+'/5'">
+        <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--tx3);margin-top:2px"><span>נמוך</span><span>מצוין</span></div>
+      </div>`).join('')}
+      <div class="fg"><label class="fl">משוב מילולי ויעדים לשנה הבאה *</label><textarea class="fta tall" id="evalTxt" placeholder="תאר ישגי השנה, אתגרים שהתמודדת איתם, ויעדים לשנה הבאה..."></textarea></div>
+      <button class="btn bnt" onclick="submitEval()">שלח הערכה למנהל ↗</button>
+    </div>
+    <div>
+      <div class="card mb" style="text-align:center;padding:22px">
+        <div style="font-size:44px;font-weight:900;color:var(--t);text-shadow:0 0 30px rgba(0,229,180,.3)">88%</div>
+        <div style="font-size:9px;color:var(--tx3);margin-top:3px">ציון הערכה 2025</div>
+        <div class="pb" style="margin:12px 0"><div class="pf pT" style="width:88%"></div></div>
+        <div style="font-size:8.5px;color:var(--tx2)">עלייה מ-84% ב-2024</div>
+      </div>
+      <div class="card">
+        <div class="st" style="margin-bottom:10px">היסטוריית ציונים</div>
+        ${[['2025','88%','bt'],['2024','84%','bs'],['2023','80%','bv'],['2022','78%','bgr']].map(([y,sc,cls]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bd)">
+          <span style="font-size:10.5px;color:var(--tx2)">${y}</span>
+          <span class="b ${cls}">${sc}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tbp" id="hr1">
+  <div class="g2">
+    <div class="card">
+      <div class="st" style="margin-bottom:12px">בקשת שינוי תנאי העסקה</div>
+      <div class="fg"><label class="fl">סוג השינוי</label>
+        <select class="fsel" id="condType">
+          <option>שינוי היקף משרה</option><option>עדכון תפקיד/תקן</option>
+          <option>שינוי שעות עבודה</option><option>עבודה מהבית</option>
+          <option>הסכם מיוחד</option><option>אחר</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">תאריך כניסה לתוקף מבוקש</label><input class="fi" type="date" id="condDate"/></div>
+      <div class="fg"><label class="fl">פירוט מלא *</label><textarea class="fta tall" id="condDet" placeholder="פרט את השינוי המבוקש, הנימוק ואת הצפי..."></textarea></div>
+      <button class="btn bnt" onclick="submitCond()">הגש בקשה ↗</button>
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:10px">בקשות קיימות</div>
+      ${reqs.filter(r => r.type === 'conditions').map(r => `
+      <div class="row"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div><div style="font-size:8.5px;color:var(--tx3)">${fmtD(r.created_at)}</div></div><span class="b ${sC(r.status)}">${sL(r.status)}</span></div>`).join('') || empty('אין בקשות קיימות')}
+    </div>
+  </div>
+</div>
+<div class="tbp" id="hr2">
+  <div class="g3">
+    ${[['📄','אישור העסקה','מיידי','להציג לגורמים חיצוניים'],['💳','אישור שכר','3 חודשים אחרונים','לבנק, משכנתא'],['⏱️','אישור ותק','כולל ניסיון','שנות עבודה'],['🏥','לביטוח','לחברות ביטוח','מאושר על ידי HR'],['🏦','אישור לבנק','לפתיחת חשבון','חתום ומחותם'],['📊','יתרת ימי חופשה','נכון להיום','כולל מחלה ומילואים'],['📑','תלוש שכר אחרון','עדכני','תלוש חודש נוכחי'],['🎓','אישור סיום הכשרה','הדרכות','כולל תעודות']].map(([ic,t,sub,desc]) => `
+    <div class="card cl" style="text-align:center;padding:18px 12px">
+      <div style="font-size:28px;margin-bottom:8px">${ic}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--wh);margin-bottom:2px">${t}</div>
+      <div style="font-size:8px;color:var(--tx3);margin-bottom:4px">${sub}</div>
+      <div style="font-size:8.5px;color:var(--tx2);margin-bottom:11px">${desc}</div>
+      <button class="btn bnt bnsm" onclick="toast('אישור ${t} נשלח למייל! 📧')">הפק ↓</button>
+    </div>`).join('')}
+  </div>
+</div>
+<div class="tbp" id="hr3">
+  <div class="card">
+    <div class="sh"><span class="st">היסטוריית פניות HR</span></div>
+    ${reqs.filter(r => ['conditions','eval','welfare','complaint'].includes(r.type)).map(r => `
+    <div class="row"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div><div style="font-size:8.5px;color:var(--tx3)">${fmtD(r.created_at)} · #${r.id}</div></div><span class="b ${sC(r.status)}">${sL(r.status)}</span></div>`).join('') || empty('אין היסטוריה')}
+  </div>
+</div>
+</div>`;
+}
+async function submitEval() {
+  const txt = document.getElementById('evalTxt')?.value.trim();
+  if (!txt) { toast('אנא כתוב משוב מפורט', false); return; }
+  await API.post('/requests', {subject:'הערכה עצמית 2026', type:'eval', dept:'HR', details:txt, priority:'normal'});
+  toast('ההערכה נשלחה למנהל! ⭐');
+}
+async function submitCond() {
+  const det = document.getElementById('condDet')?.value.trim();
+  if (!det) { toast('אנא מלא פרטים', false); return; }
+  await API.post('/requests', {
+    subject:`שינוי תנאים — ${document.getElementById('condType')?.value}`,
+    type:'conditions', dept:'HR', details:det, priority:'high',
+    steps:['emp','manager','hr','committee']
+  });
+  toast('בקשת שינוי תנאים הוגשה!');
+}
+
+// SAL
+async function pgSal(cnt) {
+  const me = await API.get('/me');
+  const reqs = await API.get('/requests');
+  const salReqs = reqs.filter(r => ['salary_raise','reserves','vacation_leave'].includes(r.type));
+  cnt.innerHTML = `
+<div class="mwrap m4">
+  <div class="mc t"><div class="mv">${me.vacation_days||0}</div><div class="ml">ימי חופשה</div><div class="mi">🏖</div><div class="mst mT"></div></div>
+  <div class="mc g"><div class="mv">${me.sick_days||0}</div><div class="ml">ימי מחלה</div><div class="mi">🤒</div><div class="mst mG"></div></div>
+  <div class="mc r"><div class="mv">${me.reserve_days||0}</div><div class="ml">מילואים</div><div class="mi">🪖</div><div class="mst mR"></div></div>
+  <div class="mc v"><div class="mv">${me.salary?'₪'+numFmt(me.salary):'—'}</div><div class="ml">שכר ברוטו</div><div class="mi">💰</div><div class="mst mV"></div></div>
+</div>
+<div id="salWrap">
+<div class="tabs2" id="salTabs">
+  <div class="tab2 on" onclick="swTab(this,'st0','salWrap')">🪖 מילואים</div>
+  <div class="tab2" onclick="swTab(this,'st1','salWrap')">✈️ חל״ד</div>
+  <div class="tab2" onclick="swTab(this,'st2','salWrap')">💰 בקשת העלאה</div>
+  <div class="tab2" onclick="swTab(this,'st3','salWrap')">📄 תלושים</div>
+</div>
+<div class="tbp on" id="st0">
+  <div class="g2">
+    <div class="card">
+      <div class="st" style="margin-bottom:12px">דיווח מילואים 🪖</div>
+      <div class="info-box">ℹ️ שכרך יושלם בהתאם לחוק. הגש תוך 30 יום מסיום השירות.</div>
+      <div class="fr2">
+        <div class="fg"><label class="fl">מספר ימי שירות</label><input class="fi" id="resD" type="number" min="1" placeholder="0"/></div>
+        <div class="fg"><label class="fl">שם היחידה</label><input class="fi" id="resU" placeholder="גדוד / פיקוד..."/></div>
+      </div>
+      <div class="fr2">
+        <div class="fg"><label class="fl">מתאריך</label><input class="fi" id="resF" type="date"/></div>
+        <div class="fg"><label class="fl">עד תאריך</label><input class="fi" id="resT" type="date"/></div>
+      </div>
+      <div class="fg"><label class="fl">מספר צו קריאה</label><input class="fi" id="resOrd" placeholder="מספר הצו מהמסמך"/></div>
+      <div class="fg">
+        <label class="fl">צו קריאה (קובץ)</label>
+        <div class="drag-zone" onclick="toast('העלאת קבצים זמינה לאחר הגדרת שרת')">📎 לחץ להעלאת צו קריאה (PDF/JPG)</div>
+      </div>
+      <button class="btn bnt" onclick="submitRes()">שלח דיווח ↗</button>
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:10px">דיווחי מילואים קודמים</div>
+      ${salReqs.filter(r => r.type === 'reserves').map(r => `
+      <div class="row"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div><div style="font-size:8.5px;color:var(--tx3)">${fmtD(r.created_at)}</div></div><span class="b ${sC(r.status)}">${sL(r.status)}</span></div>`).join('') || empty('אין דיווחים קודמים')}
+    </div>
+  </div>
+</div>
+<div class="tbp" id="st1">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">בקשת חופשה ללא תשלום (חל״ד)</div>
+    <div class="warn-box">⚠️ חל"ד טעונה אישור מנהל ישיר + HR. אין הבטחה לאישור.</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">מתאריך *</label><input class="fi" id="loaF" type="date"/></div>
+      <div class="fg"><label class="fl">עד תאריך *</label><input class="fi" id="loaT" type="date"/></div>
+    </div>
+    <div class="fg"><label class="fl">סיבה מפורטת *</label><textarea class="fta tall" id="loaR" placeholder="פרט את הסיבה לבקשת החל&quot;ד..."></textarea></div>
+    <button class="btn bnt" onclick="submitLoA()">הגש בקשה ↗</button>
+  </div>
+</div>
+<div class="tbp" id="st2">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">בקשת העלאת שכר 💰</div>
+    <div class="sal-compare">
+      <div class="sal-box cur"><div class="sal-amt">₪${numFmt(me.salary)}</div><div class="sal-lbl">שכר נוכחי</div></div>
+      <div style="display:flex;align-items:center;font-size:20px;color:var(--t)">→</div>
+      <div class="sal-box req"><div class="sal-amt" id="reqSalDisp">₪?</div><div class="sal-lbl">שכר מבוקש</div></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">שכר נוכחי ₪</label><input class="fi" id="salC" value="${me.salary||''}"/></div>
+      <div class="fg"><label class="fl">שכר מבוקש ₪ *</label><input class="fi" id="salR" placeholder="0,000" oninput="document.getElementById('reqSalDisp').textContent='₪'+parseInt(this.value||0).toLocaleString()"/></div>
+    </div>
+    <div class="fg"><label class="fl">אחוז בקשת העלאה</label><input class="fi" id="salPct" type="number" placeholder="%" oninput="const c=${me.salary||0};const p=parseFloat(this.value||0);document.getElementById('salR').value=Math.round(c*(1+p/100));document.getElementById('reqSalDisp').textContent='₪'+Math.round(c*(1+p/100)).toLocaleString()"/></div>
+    <div class="fg"><label class="fl">נימוק מפורט *</label><textarea class="fta tall" id="salN" placeholder="פרט: ביצועים, השוואת שוק, ותק, הישגים..."></textarea></div>
+    <div class="info-box">💡 זרימת אישור: מנהל ישיר → HR → ועדת שכר. זמן טיפול: 14-21 ימי עסקים.</div>
+    <button class="btn bng" onclick="submitSal()">הגש בקשת שכר ↗</button>
+  </div>
+</div>
+<div class="tbp" id="st3">
+  <div class="card">
+    <div class="sh"><span class="st">תלושי שכר</span><span style="font-size:9px;color:var(--tx3)">ניתן להוריד PDF</span></div>
+    ${['אפריל 2026','מרץ 2026','פברואר 2026','ינואר 2026','דצמבר 2025','נובמבר 2025'].map(m => `
+    <div class="row">
+      <span style="font-size:11px;font-weight:600;color:var(--wh)">${m}</span>
+      <span style="font-size:9px;color:var(--tx3);flex:1;margin-right:8px">₪${numFmt(me.salary)}</span>
+      <button class="btn bno bnsm" onclick="toast('תלוש ${m} יורד...')">הורד PDF ↓</button>
+    </div>`).join('')}
+  </div>
+  ${salReqs.length ? `<div class="card" style="margin-top:13px">
+    <div class="sh"><span class="st">בקשות שכר בתהליך</span></div>
+    ${salReqs.filter(r=>r.type==='salary_raise').map(r=>`
+    <div class="row"><div style="flex:1">
+      <div style="font-size:11px;font-weight:700;color:var(--wh)">${r.subject}</div>
+      ${r.current_salary&&r.requested_salary?`<div style="font-size:9px;color:var(--tx3)">₪${numFmt(r.current_salary)} → ₪${numFmt(r.requested_salary)}</div>`:''}
+    </div><span class="b ${sC(r.status)}">${sL(r.status)}</span></div>`).join('')}
+  </div>` : ''}
+</div>
+</div>`;
+}
+async function submitRes() {
+  const d=document.getElementById('resD')?.value, u=document.getElementById('resU')?.value;
+  if (!d||!u) { toast('מלא ימים ויחידה', false); return; }
+  await API.post('/requests', {type:'reserves', dept:'שכר', subject:`מילואים — ${d} ימים, ${u}`, details:`מ-${document.getElementById('resF')?.value} עד ${document.getElementById('resT')?.value}. צו: ${document.getElementById('resOrd')?.value||''}`, priority:'normal'});
+  toast('דיווח מילואים נשלח! 🪖');
+}
+async function submitLoA() {
+  const f=document.getElementById('loaF')?.value, t=document.getElementById('loaT')?.value, r=document.getElementById('loaR')?.value;
+  if (!f||!t||!r) { toast('מלא את כל השדות', false); return; }
+  await API.post('/requests', {type:'vacation_leave', dept:'HR', subject:`חל"ד ${fmtD(f)} – ${fmtD(t)}`, details:r, priority:'high', steps:['emp','manager','hr']});
+  await API.post('/vacations', {from_date:f, to_date:t, type:'leave', note:r});
+  toast('בקשת חל"ד הוגשה!');
+}
+async function submitSal() {
+  const r=document.getElementById('salR')?.value, n=document.getElementById('salN')?.value;
+  if (!r||!n) { toast('מלא שכר מבוקש ונימוק', false); return; }
+  const c=parseInt(document.getElementById('salC')?.value)||0;
+  await API.post('/requests', {type:'salary_raise', dept:'שכר', subject:'בקשת העלאת שכר', details:n, priority:'high', current_salary:c, requested_salary:parseInt(r)||0, steps:['emp','manager','hr','committee']});
+  toast('בקשת שכר הוגשה! 💰'); goEmp('sal', null);
+}
+
+// BULK
+async function pgBulk(cnt) {
+  const [users, bc] = await Promise.all([API.get('/users').catch(()=>[]), API.get('/broadcasts').catch(()=>[])]);
+  const depts = [...new Set(users.map(u=>u.dept).filter(Boolean))];
+  cnt.innerHTML = `
+<div class="g2">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">✉️ שליחת הודעה מרוכזת</div>
+    <div class="fg"><label class="fl">שלח אל</label>
+      <select class="fsel" id="bTo"><option value="all">כל העובדים (${users.length})</option>${depts.map(d=>`<option value="${d}">מחלקת ${d}</option>`).join('')}</select>
+    </div>
+    <div class="fg"><label class="fl">ערוצי שליחה</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+        ${[['ch_email','📧 מייל',true],['ch_sms','📱 SMS',false],['ch_portal','🖥 פורטל',true],['ch_wa','💬 WhatsApp',false]].map(([id,lb,chk])=>`<label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--tx2);cursor:pointer"><input type="checkbox" id="${id}" ${chk?'checked':''}> ${lb}</label>`).join('')}
+      </div>
+    </div>
+    <div class="fg"><label class="fl">נושא *</label><input class="fi" id="bSubj" placeholder="נושא ההודעה..."/></div>
+    <div class="fg"><label class="fl">תוכן ההודעה *</label><textarea class="fta tall" id="bBody" placeholder="כתוב את תוכן ההודעה..."></textarea></div>
+    <button class="btn bnt" onclick="submitBulk()">📡 שלח עכשיו</button>
+  </div>
+  <div class="card">
+    <div class="sh"><span class="st">שידורים אחרונים</span><span class="b bgr">${bc.length}</span></div>
+    ${bc.slice(0,6).map(b=>`
+    <div class="row">
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:var(--wh)">${b.subject}</div>
+        <div style="font-size:8.5px;color:var(--tx3)">${b.recipients} · ${ago(b.created_at)}</div>
+      </div>
+      <span class="b bt">נשלח ✓</span>
+    </div>`).join('') || empty('אין שידורים עדיין')}
+  </div>
+</div>`;
+}
+async function submitBulk() {
+  const s=document.getElementById('bSubj')?.value.trim(), b=document.getElementById('bBody')?.value.trim();
+  if (!s||!b) { toast('מלא נושא ותוכן', false); return; }
+  const ch=[];
+  if (document.getElementById('ch_email')?.checked) ch.push('email');
+  if (document.getElementById('ch_sms')?.checked) ch.push('sms');
+  if (document.getElementById('ch_portal')?.checked) ch.push('portal');
+  if (document.getElementById('ch_wa')?.checked) ch.push('whatsapp');
+  await API.post('/broadcasts', {subject:s, body:b, recipients:document.getElementById('bTo')?.value, channels:ch});
+  toast('ההודעה נשלחה! 📡'); goEmp('bulk', null);
+}
+
+// TRAININGS
+async function pgTrain(cnt) {
+  const tr = await API.get('/trainings');
+  const done = tr.filter(t => t.completed_by.includes(ME.id)).length;
+  const mandTotal = tr.filter(t => t.type === 'mandatory').length;
+  const mandDone = tr.filter(t => t.type === 'mandatory' && t.completed_by.includes(ME.id)).length;
+  const pct = tr.length ? Math.round((done / tr.length) * 100) : 0;
+  cnt.innerHTML = `
+<div class="mwrap m4">
+  <div class="mc r"><div class="mv">${mandTotal - mandDone}</div><div class="ml">חובה ממתינות</div><div class="md ${mandTotal-mandDone>0?'mddn':'mdup'}">${mandTotal-mandDone>0?'⚠ דחוף':'הושלמו ✓'}</div><div class="mi">⏳</div><div class="mst mR"></div></div>
+  <div class="mc t"><div class="mv">${done}</div><div class="ml">הושלמו</div><div class="md mdup">✓</div><div class="mi">✅</div><div class="mst mT"></div></div>
+  <div class="mc g"><div class="mv">${pct}%</div><div class="ml">אחוז השלמה</div><div class="md ${pct<70?'mddn':'mdup'}">${pct<70?'שפר':'מצוין'}</div><div class="mi">📊</div><div class="mst mG"></div></div>
+  <div class="mc v"><div class="mv">${mandDone}</div><div class="ml">תעודות זמינות</div><div class="md mdup">🎓</div><div class="mi">🏆</div><div class="mst mV"></div></div>
+</div>
+<div class="g3">
+  ${tr.map(t => {
+    const isDone = t.completed_by.includes(ME.id);
+    const daysLeft = t.deadline ? Math.ceil((new Date(t.deadline) - new Date()) / 86400000) : null;
+    const urgent = !isDone && daysLeft !== null && daysLeft < 14;
+    return `
+    <div class="card ${urgent?'':''}">
+      <div style="height:65px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:11px;background:${isDone?'rgba(0,229,180,.08)':t.type==='mandatory'?'rgba(255,77,109,.08)':'rgba(124,92,252,.08)'};border:1px solid ${isDone?'rgba(0,229,180,.15)':t.type==='mandatory'?'rgba(255,77,109,.15)':'rgba(124,92,252,.15)'}">${isDone?'✅':t.type==='mandatory'?'⚠️':'📚'}</div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--wh);margin-bottom:3px">${t.name}</div>
+      <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;flex-wrap:wrap">
+        <span class="b ${t.type==='mandatory'?'br':'bv'}">${t.type==='mandatory'?'חובה':'רשות'}</span>
+        ${t.duration?`<span class="b bgr">${t.duration}</span>`:''}
+        ${urgent?`<span class="b br">⏰ ${daysLeft} ימים</span>`:''}
+        ${t.deadline&&!urgent?`<span class="b bgr">עד ${fmtD(t.deadline)}</span>`:''}
+      </div>
+      <div class="pb" style="margin-bottom:9px"><div class="pf ${isDone?'pT':t.type==='mandatory'?'pR':'pV'}" style="width:${isDone?100:0}%"></div></div>
+      ${isDone
+        ? `<div style="display:flex;gap:5px"><button class="btn bno bnsm" style="flex:1;justify-content:center" onclick="toast('תעודת ${t.name} נשלחת למייל! 🎓')">הורד תעודה</button></div>`
+        : `<button class="btn bnt bnsm" style="width:100%;justify-content:center" onclick="completeTr(${t.id},this)">התחל הדרכה →</button>`
+      }
+    </div>`;
+  }).join('') || empty('אין הדרכות מוגדרות כרגע')}
+</div>`;
+}
+async function completeTr(id, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '⟳ מסמן...'; }
+  await API.post(`/trainings/${id}/complete`);
+  toast('הדרכה הושלמה! 🎉 תעודה נשלחת למייל.');
+  goEmp('train', null);
+}
+
+// FORMS
+async function pgForms(cnt) {
+  const s = await API.get('/settings').catch(() => ({recruit_bonus:'500'}));
+  cnt.innerHTML = `
+<div id="frmWrap">
+<div class="tabs2" id="frmTabs">
+  <div class="tab2 on" onclick="swTab(this,'ff0','frmWrap')">🎒 טיולים</div>
+  <div class="tab2" onclick="swTab(this,'ff1','frmWrap')">📦 ציוד</div>
+  <div class="tab2" onclick="swTab(this,'ff2','frmWrap')">✈️ חופשה</div>
+  <div class="tab2" onclick="swTab(this,'ff3','frmWrap')">🤒 מחלה</div>
+  <div class="tab2" onclick="swTab(this,'ff4','frmWrap')">🚑 תאונה</div>
+  <div class="tab2" onclick="swTab(this,'ff5','frmWrap')">👥 חבר מביא חבר</div>
+</div>
+<div class="tbp on" id="ff0">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">🎒 טופס אישור טיולים ופעילויות שטח</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">שם הטיול / פעילות *</label><input class="fi" id="tr_n" placeholder="שם הפעילות"/></div>
+      <div class="fg"><label class="fl">תאריך</label><input class="fi" type="date" id="tr_d"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">יעד / מיקום</label><input class="fi" id="tr_dest" placeholder="יעד הטיול"/></div>
+      <div class="fg"><label class="fl">מספר משתתפים</label><input class="fi" type="number" id="tr_cnt" min="1" value="1"/></div>
+    </div>
+    <div class="fg"><label class="fl">תיאור הפעילות</label><textarea class="fta" id="tr_det" placeholder="תאר את הפעילות, מטרותיה ואוכלוסיית היעד..."></textarea></div>
+    <div class="fg"><label class="fl">גורם מממן</label><input class="fi" id="tr_fund" placeholder="תקציב / תורם / עצמי..."/></div>
+    <button class="btn bnt" onclick="subTrip()">שלח לאישור ↗</button>
+  </div>
+</div>
+<div class="tbp" id="ff1">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">📦 הזמנת ציוד / משאבים</div>
+    <div class="fg"><label class="fl">פריט מבוקש *</label><input class="fi" id="eq_i" placeholder="שם הציוד / פריט"/></div>
+    <div class="fr3">
+      <div class="fg"><label class="fl">כמות</label><input class="fi" type="number" id="eq_q" value="1" min="1"/></div>
+      <div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="eq_u"><option value="low">נמוכה</option><option value="normal" selected>רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select></div>
+      <div class="fg"><label class="fl">מחיר משוער ₪</label><input class="fi" type="number" id="eq_p" placeholder="0"/></div>
+    </div>
+    <div class="fg"><label class="fl">נימוק לבקשה *</label><textarea class="fta" id="eq_r" placeholder="למה נדרש הציוד? כיצד ישתמש?"></textarea></div>
+    <div class="fg"><label class="fl">קישור למוצר (אופציונלי)</label><input class="fi" id="eq_link" placeholder="https://..."/></div>
+    <button class="btn bnt" onclick="subEquip()">הגש בקשה ↗</button>
+  </div>
+</div>
+<div class="tbp" id="ff2">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">✈️ בקשת חופשה</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="vf"/></div>
+      <div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="vt"/></div>
+    </div>
+    <div class="fg"><label class="fl">סוג חופשה</label>
+      <select class="fsel" id="vtype">
+        <option value="annual">חופשה שנתית</option>
+        <option value="personal">יום אישי</option>
+        <option value="emergency">חירום משפחתי</option>
+        <option value="marriage">חתונה</option>
+        <option value="mourning">אבל</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">הערות</label><textarea class="fta" id="vn" placeholder="הערות נוספות למנהל..."></textarea></div>
+    <button class="btn bnt" onclick="subVac()">שלח בקשה ↗</button>
+  </div>
+</div>
+<div class="tbp" id="ff3">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">🤒 דיווח ימי מחלה</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="sk_f"/></div>
+      <div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="sk_t"/></div>
+    </div>
+    <div class="fg"><label class="fl">סיבת המחלה (כללי)</label><textarea class="fta" id="sk_r" placeholder="תיאור כללי (לא חובה לפרט)..."></textarea></div>
+    <div class="fg"><label class="fl">אישור רפואי</label><div class="drag-zone" onclick="toast('העלאת קבצים זמינה לאחר הגדרת שרת')">📎 לחץ להעלאת אישור רפואי (PDF/JPG)</div></div>
+    <div class="info-box">ℹ️ עד 3 ימים — ניתן גם ללא אישור רופא. מ-3 ימים ומעלה — אישור חובה.</div>
+    <button class="btn bnt" onclick="subSick()">שלח דיווח ↗</button>
+  </div>
+</div>
+<div class="tbp" id="ff4">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">🚑 דיווח תאונת עבודה</div>
+    <div class="warn-box">🚨 חובה חוקית לדווח תוך 24 שעות מרגע התאונה! דיווח מאוחר עלול לפגוע בזכויות.</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">תאריך התאונה *</label><input class="fi" type="date" id="ac_d"/></div>
+      <div class="fg"><label class="fl">שעה משוערת</label><input class="fi" type="time" id="ac_t"/></div>
+    </div>
+    <div class="fg"><label class="fl">מיקום מדויק *</label><input class="fi" id="ac_l" placeholder="היכן בדיוק קרתה התאונה?"/></div>
+    <div class="fg"><label class="fl">תיאור מה קרה *</label><textarea class="fta tall" id="ac_desc" placeholder="תאר בפירוט: מה קרה, איך, מה הנסיבות. ככל שיותר פרטים — ייטב."></textarea></div>
+    <div class="fg"><label class="fl">פציעות שנגרמו *</label><textarea class="fta" id="ac_inj" placeholder="תאר את הפציעות..."></textarea></div>
+    <div class="fg"><label class="fl">עדים (שמות ופרטי קשר)</label><input class="fi" id="ac_w" placeholder="שמות עדים שראו את התאונה"/></div>
+    <div class="fg"><label class="fl">טופל על ידי</label><input class="fi" id="ac_treat" placeholder="מד"א / קופת חולים / בית חולים..."/></div>
+    <button class="btn bnr" onclick="subAcc()">🚨 דווח מיידית</button>
+  </div>
+</div>
+<div class="tbp" id="ff5">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">👥 חבר מביא חבר</div>
+    <div class="info-box">💰 קבל בונוס ₪${s.recruit_bonus||500} לכל מועמד שיתקבל לעבודה! הפנה מכרים מוכשרים ותרוויח.</div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">שם המועמד *</label><input class="fi" id="rf_n" placeholder="שם מלא"/></div>
+      <div class="fg"><label class="fl">טלפון *</label><input class="fi" id="rf_p" type="tel" placeholder="05x-xxxxxxx"/></div>
+    </div>
+    <div class="fg"><label class="fl">כתובת מייל</label><input class="fi" id="rf_e" type="email" placeholder="email@example.com"/></div>
+    <div class="fg"><label class="fl">תפקיד מתאים</label><input class="fi" id="rf_r" placeholder="לאיזה תפקיד לדעתך מתאים?"/></div>
+    <div class="fg"><label class="fl">הקשר שלך אליו</label><select class="fsel" id="rf_rel"><option>חבר/ה</option><option>עמית לשעבר</option><option>קרוב משפחה</option><option>מכר</option><option>אחר</option></select></div>
+    <div class="fg"><label class="fl">למה הוא/היא מתאים/ה?</label><textarea class="fta" id="rf_w" placeholder="ספר על הניסיון, כישורים, ותכונות רלוונטיות..."></textarea></div>
+    <button class="btn bng" onclick="subRef()">הפן עכשיו ↗</button>
+  </div>
+</div>
+</div>`;
+}
+async function subTrip() {
+  const n=document.getElementById('tr_n')?.value.trim();
+  if (!n) { toast('שם הטיול הוא חובה', false); return; }
+  await API.post('/forms', {form_type:'trip', data:{name:n, date:document.getElementById('tr_d')?.value, dest:document.getElementById('tr_dest')?.value, count:document.getElementById('tr_cnt')?.value, details:document.getElementById('tr_det')?.value, funding:document.getElementById('tr_fund')?.value}});
+  toast('טופס טיול הוגש לאישור!');
+}
+async function subEquip() {
+  const i=document.getElementById('eq_i')?.value.trim(), r=document.getElementById('eq_r')?.value.trim();
+  if (!i||!r) { toast('מלא פריט ונימוק', false); return; }
+  await API.post('/equipment', {item:i, quantity:parseInt(document.getElementById('eq_q')?.value)||1, urgency:document.getElementById('eq_u')?.value, reason:r, price_estimate:parseInt(document.getElementById('eq_p')?.value)||0});
+  toast('בקשת ציוד הוגשה!');
+}
+async function subVac() {
+  const f=document.getElementById('vf')?.value, t=document.getElementById('vt')?.value;
+  if (!f||!t) { toast('בחר תאריכים', false); return; }
+  if (new Date(f) > new Date(t)) { toast('תאריך התחלה לא יכול להיות אחרי תאריך הסיום', false); return; }
+  await API.post('/vacations', {from_date:f, to_date:t, type:document.getElementById('vtype')?.value, note:document.getElementById('vn')?.value});
+  await API.post('/requests', {subject:`חופשה ${fmtD(f)} – ${fmtD(t)}`, type:'vacation', dept:'HR', priority:'normal'});
+  toast('בקשת חופשה הוגשה! ✈️');
+}
+async function subSick() {
+  const f=document.getElementById('sk_f')?.value, t=document.getElementById('sk_t')?.value;
+  if (!f||!t) { toast('בחר תאריכים', false); return; }
+  await API.post('/forms', {form_type:'sick', data:{from:f, to:t, reason:document.getElementById('sk_r')?.value}});
+  toast('דיווח מחלה נשלח!');
+}
+async function subAcc() {
+  const l=document.getElementById('ac_l')?.value.trim(), d=document.getElementById('ac_desc')?.value.trim(), inj=document.getElementById('ac_inj')?.value.trim();
+  if (!l||!d||!inj) { toast('מלא מיקום, תיאור ופציעות — כולם חובה', false); return; }
+  await API.post('/forms', {form_type:'accident', data:{date:document.getElementById('ac_d')?.value, time:document.getElementById('ac_t')?.value, location:l, description:d, injuries:inj, witnesses:document.getElementById('ac_w')?.value, treated_by:document.getElementById('ac_treat')?.value}});
+  toast('תאונה דווחה! צוות HR יצור קשר בהקדם. ⚡');
+}
+async function subRef() {
+  const n=document.getElementById('rf_n')?.value.trim(), p=document.getElementById('rf_p')?.value.trim();
+  if (!n||!p) { toast('שם וטלפון הם חובה', false); return; }
+  await API.post('/projects/referral', {name:n, phone:p, email:document.getElementById('rf_e')?.value, role:document.getElementById('rf_r')?.value, why:document.getElementById('rf_w')?.value, relation:document.getElementById('rf_rel')?.value});
+  toast(`הפנית את ${n} בהצלחה! 🎉 הבונוס ישולם לאחר קבלתו.`);
+}
+
+// PROJECTS
+async function pgProj(cnt) {
+  const [projects, s] = await Promise.all([API.get('/projects'), API.get('/settings').catch(()=>({recruit_bonus:'500'}))]);
+  const recruit = projects.find(p => p.type === 'recruit');
+  const myRefs = recruit?.data?.referrals?.filter(r => r.referrer_id === ME.id) || [];
+  cnt.innerHTML = `
+<div class="g3" style="margin-bottom:15px">
+  ${projects.map(p => `
+  <div class="card cl">
+    <div style="font-size:32px;margin-bottom:10px">${p.type==='recruit'?'👥':p.type==='mentoring'?'🌱':'💡'}</div>
+    <div class="st" style="margin-bottom:4px">${p.name}</div>
+    <div style="font-size:9.5px;color:var(--tx2);margin-bottom:8px;line-height:1.5">${p.description}</div>
+    ${p.bonus ? `<div class="info-box" style="font-size:9px;padding:6px 9px;margin-bottom:8px">💰 בונוס: ₪${numFmt(p.bonus)}</div>` : ''}
+    ${p.type==='recruit'
+      ? `<button class="btn bng bnsm" onclick="goEmp('forms',null)">הפן מועמד →</button>`
+      : p.type==='mentoring'
+      ? `<button class="btn bno bnsm" onclick="toast('פנה ל-HR להצטרפות לתוכנית')">הצטרף לתוכנית</button>`
+      : `<button class="btn bnv bnsm" onclick="toast('הרעיון יועבר לבחינת ועדת חדשנות')">הצע רעיון</button>`
+    }
+  </div>`).join('') || empty('אין פרויקטים פעילים')}
+</div>
+${myRefs.length ? `
+<div class="card">
+  <div class="sh"><span class="st">ההפניות שלי</span><span class="b bgr">${myRefs.length}</span></div>
+  ${myRefs.map(r => `
+  <div class="row">
+    <div style="flex:1">
+      <div style="font-size:11px;font-weight:700;color:var(--wh)">${r.name}</div>
+      <div style="font-size:8.5px;color:var(--tx3)">${r.role||''} · ${fmtD(r.date)}</div>
+    </div>
+    <span class="b ${{new:'bgr',interview:'bg2',hired:'bt',rejected:'br'}[r.status]||'bgr'}">${{new:'חדש',interview:'בראיון',hired:'התקבל! 🎉',rejected:'לא התאים'}[r.status]||r.status}</span>
+  </div>`).join('')}
+</div>` : ''}`;
+}
+
+// INTEGRATIONS
+async function pgInt(cnt) {
+  const s = await API.get('/settings').catch(() => ({}));
+  cnt.innerHTML = `
+<div class="g2">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">🔗 מערכות מחוברות</div>
+    ${[
+      ['🔗','חילנט','שכר ומשאבי אנוש','HilanNet ERP',true,'rgba(34,211,238,.1)'],
+      ['🎁','אתר הטבות','הנחות ורווחה לעובד','EasyCard Benefits',true,'rgba(255,184,0,.1)'],
+      ['📧','Outlook / Gmail','מייל ולוח שנה','Microsoft 365',true,'rgba(0,120,215,.15)'],
+      ['💬','WhatsApp Business',s.whatsapp_num||'לא מוגדר','Meta Business',s.sms_active==='true','rgba(0,229,180,.1)'],
+      ['📊','Power BI','דוחות וניתוח נתונים','Microsoft Analytics',false,'rgba(124,92,252,.1)'],
+      ['🔐','SSO / Active Directory','כניסה אחידה','LDAP',true,'rgba(255,77,109,.1)'],
+    ].map(([ic,nm,dc,sub,on,bg]) => `
+    <div class="irow">
+      <div class="iico" style="background:${bg}">${ic}</div>
+      <div>
+        <div class="inm">${nm}</div>
+        <div class="idc">${dc}</div>
+        <div style="font-size:7.5px;color:var(--tx3);margin-top:1px">${sub}</div>
+      </div>
+      <div class="tog ${on?'on':''}" onclick="this.classList.toggle('on');toast('הגדרה עודכנה')"></div>
+    </div>`).join('')}
+  </div>
+  <div>
+    <div class="card mb" style="text-align:center;padding:24px">
+      <div style="font-size:48px;margin-bottom:13px">📱</div>
+      <div class="st" style="margin-bottom:6px">אפליקציית שלוה Mobile</div>
+      <div style="font-size:10.5px;color:var(--tx2);line-height:1.75;margin-bottom:18px">
+        כל הפורטל בכף היד — iOS וAndroid<br>
+        התראות Push, גישה מכל מקום בכל זמן<br>
+        ביטומטרי: טביעת אצבע ו-Face ID
+      </div>
+      <div style="display:flex;gap:9px;justify-content:center">
+        <button class="btn bnt bnsm" onclick="toast('App Store — בקרוב!')">📲 App Store</button>
+        <button class="btn bno bnsm" onclick="toast('Google Play — בקרוב!')">📲 Google Play</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:10px">ממשקי API זמינים</div>
+      ${[['REST API','v2.1','bt'],['GraphQL','beta','bg2'],['Webhooks','פעיל','bt'],['SDK Python','v1.3','bs']].map(([n,v,c])=>`
+      <div class="row"><span style="font-size:10.5px;color:var(--wh);font-weight:600;flex:1">${n}</span><span class="b ${c}">${v}</span></div>`).join('')}
+    </div>
+  </div>
+</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// ═══════════ ADMIN PAGES ══════════════════════════════
+// ══════════════════════════════════════════════════════
+
+// DASHBOARD
+async function pgDash(cnt) {
+  const [st, reqs] = await Promise.all([API.get('/stats'), API.get('/requests')]);
+  const open = reqs.filter(r => !['approved','rejected'].includes(r.status));
+  _reqs = reqs;
+  cnt.innerHTML = `
+<div style="display:flex;align-items:center;gap:14px;padding:17px 20px;border-radius:var(--rd);background:linear-gradient(135deg,rgba(124,92,252,.1),rgba(124,92,252,.04));border:1px solid rgba(124,92,252,.17);margin-bottom:17px">
+  <div style="font-size:30px">📊</div>
+  <div style="flex:1">
+    <div style="font-size:15px;font-weight:900;color:var(--wh)">דשבורד ניהול</div>
+    <div style="font-size:9.5px;color:var(--tx3)">עדכון: ${new Date().toLocaleString('he-IL')}</div>
+  </div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap">
+    <span class="b bt">🟢 מערכת תקינה</span>
+    <button class="btn bnt bnsm" onclick="goAdm('areq',null)">פניות ממתינות (${open.length})</button>
+    <button class="btn bno bnsm" onclick="document.getElementById('bcModal').classList.add('on')">📡 שדר הודעה</button>
+  </div>
+</div>
+<div class="mwrap m5">
+  <div class="mc t" onclick="goAdm('aemp',null)"><div class="mv">${st.empCount}</div><div class="ml">עובדים פעילים</div><div class="md mdup">▲ פעילים</div><div class="mi">👥</div><div class="mst mT"></div></div>
+  <div class="mc v" onclick="goAdm('areq',null)"><div class="mv">${st.openReqs}</div><div class="ml">פניות פתוחות</div><div class="md ${st.openReqs>5?'mddn':'mdnt'}">${st.openReqs>0?'⚠ ממתינות':'הכל טופל ✓'}</div><div class="mi">📨</div><div class="mst mV"></div></div>
+  <div class="mc g"><div class="mv">${st.approvedReqs}</div><div class="ml">פניות אושרו</div><div class="md mdup">✓ היסטוריה</div><div class="mi">✅</div><div class="mst mG"></div></div>
+  <div class="mc r" onclick="goAdm('atrain',null)"><div class="mv">${st.avgCompletion}%</div><div class="ml">השלמת הדרכות</div><div class="md ${st.avgCompletion<70?'mddn':'mdup'}">${st.avgCompletion<70?'⚠ נמוך':'תקין ✓'}</div><div class="mi">🎓</div><div class="mst mR"></div></div>
+  <div class="mc s"><div class="mv">₪${(st.totalSalary/1000).toFixed(0)}K</div><div class="ml">שכר חודשי כולל</div><div class="md mdnt">ברוטו</div><div class="mi">💰</div><div class="mst mS"></div></div>
+</div>
+<div class="card">
+  <div class="sh">
+    <span class="st">פניות ממתינות לטיפול מיידי</span>
+    <div style="display:flex;gap:7px">
+      <button class="btn bno bnsm" onclick="goAdm('areq',null)">הכל ←</button>
+      <button class="btn bnt bnsm" onclick="exportReqs()">יצוא CSV</button>
+    </div>
+  </div>
+  <table class="tbl">
+    <thead><tr><th>#</th><th>עובד</th><th>נושא</th><th>מחלקה</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+    <tbody>
+      ${open.slice(0,8).map(r => `
+      <tr onclick="viewReq(${r.id})">
+        <td class="mn">${r.id}</td>
+        <td><div style="display:flex;align-items:center;gap:6px">${avEl({color:'#7C5CFC',name:r.user_name||'?'},22)}<span class="b2">${r.user_name||'—'}</span></div></td>
+        <td style="font-size:9.5px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.subject}</td>
+        <td style="font-size:9.5px">${r.dept||'—'}</td>
+        <td class="mn">${fmtD(r.created_at)}</td>
+        <td><span class="b ${pC(r.priority)}">${pL(r.priority)}</span></td>
+        <td><span class="b ${sC(r.status)}">${sL(r.status)}</span></td>
+        <td onclick="event.stopPropagation()">
+          <div style="display:flex;gap:3px">
+            <button class="ab abt" onclick="aprReq(${r.id})">✓ אשר</button>
+            <button class="ab abs" onclick="viewReq(${r.id})">צפה</button>
+            <button class="ab abc" onclick="rejReq(${r.id})">✕ דחה</button>
+          </div>
+        </td>
+      </tr>`).join('') || `<tr><td colspan="8">${empty('אין פניות ממתינות 🎉')}</td></tr>`}
+    </tbody>
+  </table>
+</div>`;
+  // populate broadcast modal departments
+  const users = await API.get('/users').catch(() => []);
+  const sel = document.getElementById('bcTo2');
+  if (sel) {
+    const depts = [...new Set(users.map(u=>u.dept).filter(Boolean))];
+    sel.innerHTML = `<option value="all">כל העובדים (${users.length})</option>` + depts.map(d=>`<option value="${d}">מחלקת ${d}</option>`).join('');
+  }
+}
+
+// EMP MANAGEMENT
+async function pgEmp(cnt) {
+  const users = await API.get('/users');
+  _users = users;
+  cnt.innerHTML = `
+<div class="sh mb">
+  <span class="st" style="font-size:13.5px">עובדים (${users.length})</span>
+  <div style="display:flex;gap:7px">
+    <button class="btn bnt bnsm" onclick="openAddEmp()">+ הוסף עובד</button>
+    <button class="btn bno bnsm" onclick="exportEmps()">יצוא CSV ↓</button>
+  </div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+  <input class="fi" id="empSrch" placeholder="🔍 חיפוש לפי שם, מייל, מחלקה..." style="flex:1;min-width:180px;border-radius:999px" oninput="filtEmps()"/>
+  <select class="fsel" id="dptFlt" style="width:140px" onchange="filtEmps()">
+    <option value="">כל המחלקות</option>
+    ${[...new Set(users.map(u=>u.dept).filter(Boolean))].map(d=>`<option>${d}</option>`).join('')}
+  </select>
+  <select class="fsel" id="roleFlt" style="width:130px" onchange="filtEmps()">
+    <option value="">כל סוגי העסקה</option>
+    <option value="full">מן המניין</option>
+    <option value="part">חלקי</option>
+    <option value="contract">קבלן</option>
+  </select>
+</div>
+<div class="card" style="padding:0;overflow:hidden">
+  <table class="tbl">
+    <thead><tr><th>עובד</th><th>מחלקה</th><th>תפקיד</th><th>שכר</th><th>חופשה</th><th>מחלה</th><th>היקף</th><th>גישה</th><th>פעולות</th></tr></thead>
+    <tbody id="empBody">${rEmpRows(users)}</tbody>
+  </table>
+</div>`;
+}
+function rEmpRows(users) {
+  if (!users.length) return `<tr><td colspan="9">${empty('אין עובדים תואמים')}</td></tr>`;
+  return users.map(u => `
+  <tr>
+    <td>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${avEl(u, 26)}
+        <div>
+          <div class="b2" style="font-size:11px">${u.name}</div>
+          <div style="font-size:8.5px;color:var(--tx3)">${u.email||u.username}</div>
+        </div>
+      </div>
+    </td>
+    <td style="font-size:9.5px">${u.dept||'—'}</td>
+    <td style="font-size:9.5px">${u.title||'—'}</td>
+    <td class="mn">₪${numFmt(u.salary)}</td>
+    <td style="text-align:center;font-size:10px">${u.vacation_days||0}</td>
+    <td style="text-align:center;font-size:10px">${u.sick_days||0}</td>
+    <td style="text-align:center"><span class="b bgr">${u.scope_pct||100}%</span></td>
+    <td>
+      <div style="display:flex;gap:3px;flex-wrap:wrap">
+        ${(u.menu||[]).slice(0,3).map(m=>`<span class="b bgr" style="font-size:7.5px">${m}</span>`).join('')}
+        ${(u.menu||[]).length>3?`<span class="b bgr" style="font-size:7.5px">+${(u.menu||[]).length-3}</span>`:''}
+      </div>
+    </td>
+    <td>
+      <div style="display:flex;gap:4px">
+        <button class="ab abv" onclick="openEditEmp(${u.id})">ערוך</button>
+        <button class="ab abc" onclick="delEmp(${u.id})">מחק</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+function filtEmps() {
+  const v = document.getElementById('empSrch')?.value || '';
+  const d = document.getElementById('dptFlt')?.value || '';
+  const r = document.getElementById('roleFlt')?.value || '';
+  const f = (_users||[]).filter(u =>
+    (!v || (u.name||'').includes(v) || (u.email||'').includes(v) || (u.dept||'').includes(v) || (u.title||'').includes(v)) &&
+    (!d || u.dept === d) &&
+    (!r || u.employment_type === r)
+  );
+  const b = document.getElementById('empBody'); if (b) b.innerHTML = rEmpRows(f);
+}
+function exportEmps() {
+  const u = _users || [];
+  const csv = 'שם,שם משתמש,מחלקה,תפקיד,שכר,חופשה,מחלה,מייל,טלפון,תאריך קבלה\n' +
+    u.map(x => `"${x.name}","${x.username}","${x.dept||''}","${x.title||''}",${x.salary||0},${x.vacation_days||0},${x.sick_days||0},"${x.email||''}","${x.phone||''}","${x.hire_date||''}"`).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = `employees_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('קובץ CSV הורד!');
+}
+
+// ALL REQUESTS
+async function pgAllReq(cnt) {
+  const reqs = await API.get('/requests');
+  _reqs = reqs;
+  cnt.innerHTML = `
+<div class="sh mb">
+  <span class="st" style="font-size:13.5px">כל הפניות (${reqs.length})</span>
+  <div style="display:flex;gap:7px">
+    <span class="b br">${reqs.filter(r=>!['approved','rejected'].includes(r.status)).length} פתוחות</span>
+    <span class="b bt">${reqs.filter(r=>r.status==='approved').length} אושרו</span>
+    <button class="btn bno bnsm" onclick="exportReqs()">יצוא CSV ↓</button>
+  </div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+  <select class="fsel" id="rsFlt" style="width:140px" onchange="filtReqs()">
+    <option value="">כל הסטטוסים</option>
+    <option value="pending">ממתין</option>
+    <option value="manager_review">אצל מנהל</option>
+    <option value="hr_review">אצל HR</option>
+    <option value="committee">ועדה</option>
+    <option value="approved">אושר</option>
+    <option value="rejected">נדחה</option>
+  </select>
+  <select class="fsel" id="rpFlt" style="width:130px" onchange="filtReqs()">
+    <option value="">כל העדיפויות</option>
+    <option value="urgent">דחוף</option>
+    <option value="high">גבוהה</option>
+    <option value="normal">רגיל</option>
+  </select>
+  <select class="fsel" id="rtFlt" style="width:150px" onchange="filtReqs()">
+    <option value="">כל הסוגים</option>
+    <option value="salary_raise">שכר</option>
+    <option value="conditions">תנאים</option>
+    <option value="equipment">ציוד</option>
+    <option value="reserves">מילואים</option>
+    <option value="vacation_leave">חל"ד</option>
+    <option value="general">כללי</option>
+  </select>
+  <input class="fi" id="reqSrch" placeholder="🔍 חיפוש..." style="flex:1;min-width:140px;border-radius:999px" oninput="filtReqs()"/>
+</div>
+<div class="card" style="padding:0;overflow:hidden">
+  <table class="tbl">
+    <thead><tr><th>#</th><th>עובד</th><th>נושא</th><th>מחלקה</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+    <tbody id="reqBody">${rReqRows(reqs)}</tbody>
+  </table>
+</div>`;
+}
+function rReqRows(reqs) {
+  if (!reqs.length) return `<tr><td colspan="8">${empty('אין פניות תואמות')}</td></tr>`;
+  return reqs.map(r => `
+  <tr onclick="viewReq(${r.id})">
+    <td class="mn">${r.id}</td>
+    <td class="b2" style="white-space:nowrap">${r.user_name||'—'}</td>
+    <td style="font-size:9.5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.subject}</td>
+    <td style="font-size:9.5px">${r.dept||'—'}</td>
+    <td class="mn">${fmtD(r.created_at)}</td>
+    <td><span class="b ${pC(r.priority)}">${pL(r.priority)}</span></td>
+    <td><span class="b ${sC(r.status)}">${sL(r.status)}</span></td>
+    <td onclick="event.stopPropagation()">
+      <div style="display:flex;gap:3px">
+        ${!['approved','rejected'].includes(r.status)
+          ? `<button class="ab abt" onclick="aprReq(${r.id})">✓</button><button class="ab abs" onclick="advReq(${r.id})">→</button><button class="ab abc" onclick="rejReq(${r.id})">✕</button>`
+          : `<button class="ab abv" onclick="viewReq(${r.id})">צפה</button>`}
+      </div>
+    </td>
+  </tr>`).join('');
+}
+function filtReqs() {
+  const s=document.getElementById('rsFlt')?.value, p=document.getElementById('rpFlt')?.value, t=document.getElementById('rtFlt')?.value, q=document.getElementById('reqSrch')?.value||'';
+  const f = (_reqs||[]).filter(r =>
+    (!s||r.status===s) && (!p||r.priority===p) && (!t||r.type===t) &&
+    (!q||(r.subject||'').includes(q)||(r.user_name||'').includes(q)||(r.dept||'').includes(q))
+  );
+  const b = document.getElementById('reqBody'); if (b) b.innerHTML = rReqRows(f);
+}
+async function viewReq(id) {
+  let r = (_reqs||[]).find(x => x.id === id);
+  if (!r) { const all = await API.get('/requests'); _reqs = all; r = all.find(x => x.id === id); }
+  if (!r) return;
+  const steps = JSON.parse(r.steps||'["emp","manager","hr"]');
+  document.getElementById('rmTitle').textContent = `${r.subject} #${r.id}`;
+  document.getElementById('rmBody').innerHTML = `
+    <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+      <span class="b ${sC(r.status)}">${sL(r.status)}</span>
+      <span class="b ${pC(r.priority)}">${pL(r.priority)}</span>
+      <span class="b bgr">${r.type||'general'}</span>
+    </div>
+    <div class="steps">
+      ${steps.map((s,i) => `
+      <div class="step ${r.current_step>i?'done':r.current_step===i?'cur':''}">
+        <div class="step-dot">${r.current_step>i?'✓':i+1}</div>
+        <div class="step-lbl">${{emp:'עובד',manager:'מנהל',hr:'HR',committee:'ועדה',adm:'ניהול'}[s]||s}</div>
+      </div>${i<steps.length-1?'<div class="step-line"></div>':''}`).join('')}
+    </div>
+    ${r.current_salary&&r.requested_salary ? `
+    <div class="sal-compare">
+      <div class="sal-box cur"><div class="sal-amt">₪${numFmt(r.current_salary)}</div><div class="sal-lbl">שכר נוכחי</div></div>
+      <div style="display:flex;align-items:center;font-size:18px;color:var(--t)">→</div>
+      <div class="sal-box req"><div class="sal-amt">₪${numFmt(r.requested_salary)}</div><div class="sal-lbl">שכר מבוקש (+${r.current_salary?Math.round((r.requested_salary/r.current_salary-1)*100):0}%)</div></div>
+    </div>` : ''}
+    <div class="fr2" style="margin-bottom:11px">
+      <div><div style="font-size:8.5px;color:var(--tx3)">עובד</div><div style="font-size:11px;font-weight:700;color:var(--wh)">${r.user_name||'—'}</div></div>
+      <div><div style="font-size:8.5px;color:var(--tx3)">מחלקה</div><div style="font-size:11px;color:var(--tx2)">${r.dept||'—'}</div></div>
+    </div>
+    ${r.details ? `<div style="padding:11px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--bd);font-size:10.5px;color:var(--tx2);line-height:1.65;margin-bottom:11px">${r.details}</div>` : ''}
+    ${r.resolution_note ? `<div class="suc-box">✅ הערת מטפל: ${r.resolution_note}</div>` : ''}
+    ${!['approved','rejected'].includes(r.status) ? `
+    <div class="fg"><label class="fl">הערת מנהל (לרשומה)</label><input class="fi" id="reNote" placeholder="הוסף הערה..."/></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn bnt bnsm" onclick="aprReq(${r.id})">✓ אשר</button>
+      <button class="btn bnv bnsm" onclick="advReq(${r.id})">העבר לשלב הבא →</button>
+      <button class="btn bnr bnsm" onclick="rejReq(${r.id})">✕ דחה</button>
+      <button class="btn bno bnsm" onclick="closeM('reqModal')">סגור</button>
+    </div>` :
+    `<button class="btn bno bnsm" onclick="closeM('reqModal')">סגור</button>`}`;
+  document.getElementById('reqModal').classList.add('on');
+}
+async function aprReq(id) {
+  const note = document.getElementById('reNote')?.value || '';
+  await API.put(`/requests/${id}`, {status:'approved', resolved_by:ME.id, resolution_note:note});
+  toast('הפניה אושרה! ✓');
+  closeM('reqModal');
+  if (ME.role==='adm') goAdm('areq', null); else goEmp('req', null);
+}
+async function rejReq(id) {
+  const note = document.getElementById('reNote')?.value || '';
+  await API.put(`/requests/${id}`, {status:'rejected', resolved_by:ME.id, resolution_note:note});
+  toast('הפניה נדחתה', false);
+  closeM('reqModal');
+  if (ME.role==='adm') goAdm('areq', null); else goEmp('req', null);
+}
+async function advReq(id) {
+  const r = (_reqs||[]).find(x => x.id === id);
+  const step = (r?.current_step || 0) + 1;
+  const map = ['pending','manager_review','hr_review','committee','approved'];
+  const ns = map[Math.min(step, map.length-1)];
+  await API.put(`/requests/${id}`, {status:ns, current_step:step});
+  toast(`הועבר לשלב: ${sL(ns)}`);
+  closeM('reqModal');
+  goAdm('areq', null);
+}
+function exportReqs() {
+  const r = _reqs || [];
+  const csv = '#,עובד,מחלקה,נושא,סוג,תאריך,עדיפות,סטטוס\n' +
+    r.map(x => `${x.id},"${x.user_name||''}","${x.dept||''}","${x.subject}","${x.type||''}","${fmtD(x.created_at)}","${pL(x.priority)}","${sL(x.status)}"`).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = `requests_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('קובץ CSV הורד!');
+}
+
+// SALARY ADMIN
+async function pgASal(cnt) {
+  const [users, reqs] = await Promise.all([API.get('/users'), API.get('/requests')]);
+  const salReqs = reqs.filter(r => r.type === 'salary_raise');
+  const total = users.reduce((s,u) => s+(parseInt(u.salary)||0), 0);
+  const avg = users.length ? Math.round(total/users.length) : 0;
+  const open = salReqs.filter(r => !['approved','rejected'].includes(r.status));
+  cnt.innerHTML = `
+<div class="mwrap m4">
+  <div class="mc t"><div class="mv">₪${(total/1000).toFixed(0)}K</div><div class="ml">שכר כולל חודשי</div><div class="mi">💰</div><div class="mst mT"></div></div>
+  <div class="mc v"><div class="mv">${open.length}</div><div class="ml">בקשות שכר פתוחות</div><div class="md ${open.length>0?'mddn':'mdnt'}">${open.length>0?'⚠ ממתינות':'הכל טופל'}</div><div class="mi">📈</div><div class="mst mV"></div></div>
+  <div class="mc g"><div class="mv">₪${numFmt(avg)}</div><div class="ml">שכר ממוצע</div><div class="mi">📊</div><div class="mst mG"></div></div>
+  <div class="mc r"><div class="mv">${reqs.filter(r=>r.type==='reserves').length}</div><div class="ml">דיווחי מילואים</div><div class="mi">🪖</div><div class="mst mR"></div></div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="sh"><span class="st">בקשות שכר לאישור</span><span class="b br">${open.length}</span></div>
+    ${open.map(r => `
+    <div class="row">
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:var(--wh)">${r.user_name||'—'}</div>
+        <div style="font-size:8.5px;color:var(--tx3)">${r.current_salary?`₪${numFmt(r.current_salary)} → ₪${numFmt(r.requested_salary)} (+${Math.round((r.requested_salary/r.current_salary-1)*100)}%)`:r.subject}</div>
+        ${r.details?`<div style="font-size:8px;color:var(--tx3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${r.details.substring(0,60)}...</div>`:''}
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="ab abt" onclick="aprReq(${r.id})">✓ אשר</button>
+        <button class="ab abs" onclick="viewReq(${r.id})">צפה</button>
+        <button class="ab abc" onclick="rejReq(${r.id})">✕ דחה</button>
+      </div>
+    </div>`).join('') || empty('אין בקשות שכר ממתינות ✓')}
+  </div>
+  <div>
+    <div class="card mb">
+      <div class="st" style="margin-bottom:12px">עדכון שכר ידני</div>
+      <div class="fg"><label class="fl">עובד</label>
+        <select class="fsel" id="salEmp">${users.map(u=>`<option value="${u.id}">${u.name} — ₪${numFmt(u.salary)}</option>`).join('')}</select>
+      </div>
+      <div class="fg"><label class="fl">שכר חדש ₪</label><input class="fi" id="salNewVal" type="number" placeholder="0" min="0"/></div>
+      <div class="fg"><label class="fl">או שנה באחוזים</label>
+        <div style="display:flex;gap:7px">
+          <input class="fi" id="salPctAdj" type="number" placeholder="%" style="flex:1" oninput="const u=document.getElementById('salEmp');const cu=(_users||[]).find(x=>x.id==u?.value);if(cu){document.getElementById('salNewVal').value=Math.round((cu.salary||0)*(1+parseFloat(this.value||0)/100))}"/>
+          <span style="font-size:10px;color:var(--tx3);align-self:center">% שינוי</span>
+        </div>
+      </div>
+      <button class="btn bng" onclick="updSal()">עדכן שכר</button>
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:10px">היסטוריית שכר אחרונה</div>
+      ${salReqs.filter(r=>r.status==='approved').slice(0,4).map(r=>`
+      <div class="row"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--wh)">${r.user_name}</div><div style="font-size:8.5px;color:var(--tx3)">${fmtD(r.updated_at||r.created_at)}</div></div><span class="b bt">₪${numFmt(r.requested_salary)}</span></div>`).join('') || empty('אין היסטוריה')}
+    </div>
+  </div>
+</div>`;
+}
+async function updSal() {
+  const id=document.getElementById('salEmp')?.value, s=parseInt(document.getElementById('salNewVal')?.value);
+  if (!id||!s||s<0) { toast('מלא עובד ושכר תקין', false); return; }
+  await API.put(`/users/${id}`, {salary:s});
+  toast(`שכר עודכן ל-₪${numFmt(s)} ✓`);
+  goAdm('asal', null);
+}
+
+// TRAININGS ADMIN
+async function pgATrain(cnt) {
+  const [trainings, users] = await Promise.all([API.get('/trainings'), API.get('/users')]);
+  _trainings = trainings;
+  cnt.innerHTML = `
+<div class="sh mb">
+  <span class="st" style="font-size:13.5px">ניהול הדרכות</span>
+  <button class="btn bnt bnsm" onclick="document.getElementById('trainModal').classList.add('on')">+ הדרכה חדשה</button>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">מצב השלמת הדרכות</div>
+    ${trainings.map(t => {
+      const n = t.completed_by.filter(id => users.find(u => u.id === id)).length;
+      const pct = users.length ? Math.round((n/users.length)*100) : 0;
+      return `
+      <div style="margin-bottom:13px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div>
+            <div style="font-size:10.5px;font-weight:700;color:var(--wh)">${t.name}</div>
+            <div style="font-size:8.5px;color:var(--tx3)">${t.duration||'?'} · ${t.type==='mandatory'?'⚠ חובה':'רשות'}${t.deadline?' · עד '+fmtD(t.deadline):''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:9.5px;font-weight:700;color:${pct>70?'var(--t)':pct>40?'var(--g)':'var(--r)'}">${n}/${users.length} (${pct}%)</span>
+            <button class="ab abc" style="font-size:8px" onclick="delTrain(${t.id})">מחק</button>
+          </div>
+        </div>
+        <div class="pb"><div class="pf ${pct>70?'pT':pct>40?'pG':'pR'}" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('')}
+    <div style="display:flex;gap:7px;margin-top:8px">
+      <button class="btn bnr bnsm" onclick="sendTrainReminders()">📨 שלח תזכורות לכל החסרים</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sh"><span class="st">עובדים שלא השלימו חובה</span><button class="btn bno bnsm" onclick="sendTrainReminders()">שלח לכולם</button></div>
+    ${users.filter(u => trainings.some(t => t.type==='mandatory' && !t.completed_by.includes(u.id))).map(u => {
+      const missing = trainings.filter(t => t.type==='mandatory' && !t.completed_by.includes(u.id));
+      return `
+      <div class="row">
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700;color:var(--wh)">${u.name}</div>
+          <div style="font-size:8.5px;color:var(--tx3)">${missing.map(t=>t.name).join(', ')}</div>
+        </div>
+        <span class="b br">${missing.length} חסרות</span>
+        <button class="ab abt" onclick="toast('תזכורת נשלחה ל-${u.name} ✓')">שלח</button>
+      </div>`;
+    }).join('') || `<div class="suc-box">🎉 כל העובדים השלימו את כל הדרכות החובה!</div>`}
+  </div>
+</div>`;
+}
+async function addTraining() {
+  const n = document.getElementById('tn')?.value.trim();
+  if (!n) { toast('שם הדרכה הוא חובה', false); return; }
+  await API.post('/trainings', {name:n, duration:document.getElementById('tdur')?.value, type:document.getElementById('ttype')?.value, deadline:document.getElementById('tdeadline')?.value, description:document.getElementById('tdesc')?.value});
+  closeM('trainModal');
+  toast('הדרכה נוספה בהצלחה!');
+  goAdm('atrain', null);
+}
+async function delTrain(id) {
+  if (!confirm('למחוק הדרכה זו לצמיתות?')) return;
+  await API.del(`/trainings/${id}`);
+  toast('הדרכה נמחקה');
+  goAdm('atrain', null);
+}
+function sendTrainReminders() { toast('תזכורות נשלחו לכל העובדים החסרים! 📨'); }
+
+// BROADCAST
+async function pgBcast(cnt) {
+  const [users, bc] = await Promise.all([API.get('/users'), API.get('/broadcasts')]);
+  const depts = [...new Set(users.map(u=>u.dept).filter(Boolean))];
+  cnt.innerHTML = `
+<div class="g2">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">📡 שידור הודעה לעובדים</div>
+    <div class="fg"><label class="fl">נמענים</label>
+      <select class="fsel" id="bcTo"><option value="all">כל העובדים (${users.length})</option>${depts.map(d=>`<option value="${d}">מחלקת ${d} (${users.filter(u=>u.dept===d).length})</option>`).join('')}</select>
+    </div>
+    <div class="fg"><label class="fl">ערוצי שליחה</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:5px">
+        ${[['b_email','📧 מייל',true],['b_sms','📱 SMS',false],['b_portal','🖥 פורטל',true],['b_wa','💬 WhatsApp',false]].map(([id,lb,chk])=>`<label style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--tx2);cursor:pointer"><input type="checkbox" id="${id}" ${chk?'checked':''}> ${lb}</label>`).join('')}
+      </div>
+    </div>
+    <div class="fg"><label class="fl">נושא *</label><input class="fi" id="bcSubj" placeholder="נושא ההודעה..."/></div>
+    <div class="fg"><label class="fl">תוכן ההודעה *</label><textarea class="fta tall" id="bcBody" placeholder="כתוב את ההודעה..."></textarea></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn bnt" onclick="sendBc()">📡 שדר עכשיו</button>
+      <button class="btn bno bnsm" onclick="toast('תצוגה מקדימה בפיתוח...')">👁 תצוגה מקדימה</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sh"><span class="st">שידורים אחרונים</span><span class="b bgr">${bc.length}</span></div>
+    ${bc.slice(0,8).map(b => `
+    <div class="row">
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:var(--wh)">${b.subject}</div>
+        <div style="font-size:8.5px;color:var(--tx3)">${b.sender_name||'מנהל'} · ${b.recipients} · ${ago(b.created_at)}</div>
+        <div style="font-size:8px;color:var(--tx3);margin-top:1px">${(JSON.parse(b.channels||'[]')||[]).join(', ')}</div>
+      </div>
+      <span class="b bt">נשלח ✓</span>
+    </div>`).join('') || empty('אין שידורים עדיין')}
+  </div>
+</div>`;
+}
+async function sendBc() {
+  const s=document.getElementById('bcSubj')?.value.trim(), b=document.getElementById('bcBody')?.value.trim();
+  if (!s||!b) { toast('מלא נושא ותוכן', false); return; }
+  const ch=[];
+  if (document.getElementById('b_email')?.checked) ch.push('email');
+  if (document.getElementById('b_sms')?.checked) ch.push('sms');
+  if (document.getElementById('b_portal')?.checked) ch.push('portal');
+  if (document.getElementById('b_wa')?.checked) ch.push('whatsapp');
+  await API.post('/broadcasts', {subject:s, body:b, recipients:document.getElementById('bcTo')?.value, channels:ch});
+  toast('ההודעה שודרה לכולם! 📡');
+  goAdm('abcast', null);
+}
+async function sendBcModal() {
+  const s=document.getElementById('bcSubj2')?.value.trim(), b=document.getElementById('bcBody2')?.value.trim();
+  if (!s||!b) { toast('מלא נושא ותוכן', false); return; }
+  await API.post('/broadcasts', {subject:s, body:b, recipients:document.getElementById('bcTo2')?.value||'all', channels:['portal','email']});
+  toast('ההודעה שודרה! 📡');
+  closeM('bcModal');
+}
+
+// FORMS ADMIN
+async function pgAForms(cnt) {
+  const [forms, eq, vacs] = await Promise.all([API.get('/forms'), API.get('/equipment'), API.get('/vacations')]);
+  const all = [
+    ...forms.map(f => ({...f, _type:f.form_type})),
+    ...eq.map(f => ({...f, _type:'equipment', subject:f.item})),
+    ...vacs.map(f => ({...f, _type:'vacation', subject:`חופשה ${fmtD(f.from_date)}–${fmtD(f.to_date)}`}))
+  ].sort((a,b) => new Date(b.created_at)-new Date(a.created_at));
+  const typeLabels = {trip:'🎒 טיול', sick:'🤒 מחלה', equipment:'📦 ציוד', vacation:'✈️ חופשה', accident:'🚑 תאונה', referral:'👥 הפניה', handover:'🔄 חפיפה'};
+  cnt.innerHTML = `
+<div class="g2">
+  <div class="card">
+    <div class="sh"><span class="st">הגשות אחרונות (${all.length})</span></div>
+    <table class="tbl">
+      <thead><tr><th>סוג</th><th>עובד</th><th>פרטים</th><th>תאריך</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+      <tbody>
+        ${all.slice(0,12).map(s => `
+        <tr>
+          <td style="font-size:9px;white-space:nowrap">${typeLabels[s._type]||s._type}</td>
+          <td class="b2" style="white-space:nowrap">${s.user_name||'—'}</td>
+          <td style="font-size:9px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.subject||s.item||'—'}</td>
+          <td class="mn">${fmtD(s.created_at)}</td>
+          <td><span class="b ${s.status==='approved'?'bt':s.status==='rejected'?'br':'bgr'}">${s.status==='approved'?'אושר':s.status==='rejected'?'נדחה':'ממתין'}</span></td>
+          <td>
+            <div style="display:flex;gap:3px">
+              ${s.status==='pending'?`<button class="ab abt" onclick="aprForm(${s.id})">✓</button><button class="ab abc" onclick="rejForm(${s.id})">✕</button>`:'—'}
+            </div>
+          </td>
+        </tr>`).join('') || `<tr><td colspan="6">${empty('אין הגשות')}</td></tr>`}
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="card mb">
+      <div class="st" style="margin-bottom:10px">סטטיסטיקה</div>
+      ${[['הגשות טפסים',forms.length,'bt'],['בקשות ציוד',eq.length,'bv'],['בקשות חופשה',vacs.length,'bs'],['ממתינות לאישור',forms.filter(s=>s.status==='pending').length,'br'],['אושרו',forms.filter(s=>s.status==='approved').length,'bt']].map(([lb,n,cls])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)">
+        <span style="font-size:10.5px;color:var(--tx2)">${lb}</span>
+        <span class="b ${cls}">${n}</span>
+      </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:10px">פעולות מהירות</div>
+      <button class="btn bno bnsm" style="width:100%;margin-bottom:6px;justify-content:center" onclick="toast('כל הטפסים הממתינים אושרו!')">✓ אשר כל הממתינות</button>
+      <button class="btn bno bnsm" style="width:100%;justify-content:center" onclick="toast('דוח CSV מוכן להורדה')">↓ יצוא לCSV</button>
+    </div>
+  </div>
+</div>`;
+}
+async function aprForm(id) { await API.put(`/forms/${id}`, {status:'approved'}); toast('אושר!'); goAdm('aforms',null); }
+async function rejForm(id) { await API.put(`/forms/${id}`, {status:'rejected'}); toast('נדחה', false); goAdm('aforms',null); }
+
+// REPORTS
+async function pgRep(cnt) {
+  const [users, reqs, trainings] = await Promise.all([API.get('/users'), API.get('/requests'), API.get('/trainings')]);
+  const totalSal = users.reduce((s,u)=>s+(parseInt(u.salary)||0),0);
+  const avgSal = users.length ? Math.round(totalSal/users.length) : 0;
+  const depts = [...new Set(users.map(u=>u.dept).filter(Boolean))];
+  cnt.innerHTML = `
+<div class="mwrap m4">
+  <div class="mc t"><div class="mv">${users.length}</div><div class="ml">עובדים פעילים</div><div class="mi">👥</div><div class="mst mT"></div></div>
+  <div class="mc g"><div class="mv">${reqs.filter(r=>r.status==='approved').length}</div><div class="ml">פניות אושרו</div><div class="mi">✅</div><div class="mst mG"></div></div>
+  <div class="mc v"><div class="mv">₪${(totalSal/1000).toFixed(0)}K</div><div class="ml">שכר חודשי</div><div class="mi">💰</div><div class="mst mV"></div></div>
+  <div class="mc r"><div class="mv">${reqs.filter(r=>r.type==='reserves').length}</div><div class="ml">דיווחי מילואים</div><div class="mi">🪖</div><div class="mst mR"></div></div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">דוחות להורדה</div>
+    ${[
+      ['👥 דוח עובדים מלא','CSV עם כל פרטי העובדים','exportEmps'],
+      ['📨 דוח פניות','CSV עם כל הפניות ועיבוד','exportReqs'],
+    ].map(([t,d,fn])=>`
+    <div class="row">
+      <div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--wh)">${t}</div><div style="font-size:8.5px;color:var(--tx3)">${d}</div></div>
+      <button class="ab abt" onclick="${fn}()">הורד ↓</button>
+    </div>`).join('')}
+    <div class="sep"></div>
+    <div class="st" style="margin-bottom:10px">ייצוא נוסף</div>
+    <button class="btn bno bnsm" style="width:100%;justify-content:center;margin-bottom:6px" onclick="toast('מגיע בגרסה הבאה...')">📊 Excel מלא</button>
+    <button class="btn bno bnsm" style="width:100%;justify-content:center" onclick="toast('PDF בגרסה הבאה...')">📄 PDF מצגת</button>
+  </div>
+  <div class="card">
+    <div class="st" style="margin-bottom:12px">עובדים לפי מחלקה</div>
+    ${depts.map(d => {
+      const n = users.filter(u=>u.dept===d).length;
+      const pct = Math.round((n/users.length)*100);
+      const avgD = users.filter(u=>u.dept===d).reduce((s,u)=>s+(parseInt(u.salary)||0),0)/n;
+      return `
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">
+          <span style="font-weight:700;color:var(--wh)">${d}</span>
+          <span style="color:var(--tx3)">${n} עובדים · ₪${numFmt(avgD)} ממוצע</span>
+        </div>
+        <div class="pb"><div class="pf pT" style="width:${Math.min(pct*2,100)}%"></div></div>
+      </div>`;
+    }).join('')}
+    <div class="sep"></div>
+    <div style="display:flex;justify-content:space-between;font-size:10.5px;padding:4px 0">
+      <span style="color:var(--tx2)">שכר ממוצע כולל</span>
+      <span style="font-weight:700;color:var(--wh)">₪${numFmt(avgSal)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10.5px;padding:4px 0">
+      <span style="color:var(--tx2)">אחוז אישור פניות</span>
+      <span style="font-weight:700;color:var(--t)">${reqs.length?Math.round((reqs.filter(r=>r.status==='approved').length/reqs.length)*100):0}%</span>
+    </div>
+  </div>
+</div>`;
+}
+
+// MENU MANAGEMENT
+async function pgMenus(cnt) {
+  const users = await API.get('/users');
+  const ALL_ML = {home:'⌂ דף הבית',feed:'📢 עדכונים',chat:'🤖 שלומית AI',req:'📨 פניות',hr:'⭐ הערכה',sal:'💰 שכר',bulk:'✉️ שליחה מרוכזת',train:'🎓 הדרכות',forms:'📋 טפסים',proj:'🚀 פרויקטים',int:'🔗 התממשקויות'};
+  cnt.innerHTML = `
+<div class="sh mb">
+  <span class="st" style="font-size:13.5px">ניהול תפריטי גישה לעובדים</span>
+  <div style="display:flex;gap:7px">
+    <button class="btn bnt bnsm" onclick="saveAllMenus()">💾 שמור הכל</button>
+    <button class="btn bno bnsm" onclick="setAllMenus(Object.keys(${JSON.stringify(ALL_ML)}))">בחר הכל לכולם</button>
+  </div>
+</div>
+<div class="info-box">📋 שינויים נכנסים לתוקף בכניסה הבאה של העובד לפורטל.</div>
+${users.map(u => `
+<div class="card mb" id="mc_${u.id}">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:11px">
+    ${avEl(u, 28)}
+    <div style="flex:1">
+      <div style="font-size:11.5px;font-weight:700;color:var(--wh)">${u.name}</div>
+      <div style="font-size:8.5px;color:var(--tx3)">${u.title||''} · ${u.dept||''} · ${u.employment_type||''}</div>
+    </div>
+    <div style="display:flex;gap:5px">
+      <button class="btn bno bnsm" onclick="document.getElementById('mg_${u.id}').querySelectorAll('.chk-it').forEach(c=>c.classList.add('on'))">הכל</button>
+      <button class="btn bno bnsm" onclick="document.getElementById('mg_${u.id}').querySelectorAll('.chk-it').forEach(c=>c.classList.remove('on'))">נקה</button>
+      <button class="btn bnt bnsm" onclick="saveMU(${u.id})">שמור ✓</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px" id="mg_${u.id}">
+    ${Object.entries(ALL_ML).map(([id,lb]) => `<div class="chk-it ${(u.menu||[]).includes(id)?'on':''}" data-m="${id}" onclick="this.classList.toggle('on')">${lb}</div>`).join('')}
+  </div>
+</div>`).join('')}`;
+}
+async function saveMU(uid) {
+  const grid = document.getElementById('mg_' + uid);
+  const menu = [...grid.querySelectorAll('.chk-it.on')].map(c => c.dataset.m);
+  await API.put(`/users/${uid}`, {menu});
+  toast('תפריט עודכן!');
+}
+async function saveAllMenus() {
+  const users = _users || [];
+  for (const u of users) { await saveMU(u.id).catch(()=>{}); }
+  toast('כל התפריטים עודכנו!');
+}
+
+// USERS ADMIN
+async function pgUsers(cnt) {
+  const users = await API.get('/users');
+  _users = users;
+  cnt.innerHTML = `
+<div class="sh mb">
+  <span class="st" style="font-size:13.5px">ניהול משתמשים וסיסמאות</span>
+  <button class="btn bnt bnsm" onclick="openAddEmp()">+ הוסף עובד</button>
+</div>
+<div class="warn-box" style="font-size:9px">🔒 מידע רגיש — נא לשמור בסודיות מוחלטת.</div>
+<div class="card" style="padding:0;overflow:hidden">
+  <table class="tbl">
+    <thead><tr><th>שם</th><th>שם משתמש</th><th>סיסמה</th><th>מחלקה</th><th>מייל</th><th>פעיל</th><th>פעולות</th></tr></thead>
+    <tbody>
+      ${users.map(u => `
+      <tr>
+        <td><div style="display:flex;align-items:center;gap:7px">${avEl(u,24)}<span class="b2" style="font-size:10.5px">${u.name}</span></div></td>
+        <td class="mn">${u.username}</td>
+        <td>
+          <span class="mn" style="background:rgba(255,255,255,.06);padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none" onclick="this.textContent=this.textContent==='••••••'?'1234 (demo)':'••••••'">••••••</span>
+        </td>
+        <td style="font-size:9.5px">${u.dept||'—'}</td>
+        <td style="font-size:9.5px">${u.email||'—'}</td>
+        <td><span class="b ${u.active!==0?'bt':'br'}">${u.active!==0?'פעיל':'מושבת'}</span></td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="ab abv" onclick="openEditEmp(${u.id})">ערוך</button>
+            <button class="ab abc" onclick="delEmp(${u.id})">מחק</button>
+          </div>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+</div>`;
+}
+
+// SETTINGS
+async function pgSet(cnt) {
+  const s = await API.get('/settings');
+  cnt.innerHTML = `
+<div class="g2">
+  <div class="card">
+    <div class="st" style="margin-bottom:13px">פרטי הארגון</div>
+    <div class="fg"><label class="fl">שם הארגון (עברית)</label><input class="fi" id="s_org" value="${s.org_name||''}"/></div>
+    <div class="fg"><label class="fl">שם הארגון (אנגלית)</label><input class="fi" id="s_org_en" value="${s.org_name_en||''}"/></div>
+    <div class="fg"><label class="fl">מייל ארגוני</label><input class="fi" id="s_email" type="email" value="${s.org_email||''}"/></div>
+    <div class="sep"></div>
+    <div class="st" style="margin-bottom:10px">הגדרות SMTP (מייל)</div>
+    <div class="fr2"><div class="fg"><label class="fl">שרת SMTP</label><input class="fi" id="s_smtp" value="${s.smtp_host||'smtp.gmail.com'}"/></div><div class="fg"><label class="fl">פורט</label><input class="fi" id="s_port" value="${s.smtp_port||'587'}"/></div></div>
+    <div class="fr2"><div class="fg"><label class="fl">משתמש SMTP</label><input class="fi" id="s_smtp_u" value="${s.smtp_user||''}"/></div><div class="fg"><label class="fl">סיסמה</label><input class="fi" id="s_smtp_p" type="password" placeholder="••••••"/></div></div>
+    <div class="sep"></div>
+    <div class="st" style="margin-bottom:10px">ערוצי תקשורת</div>
+    <div class="fg"><label class="fl">WhatsApp Business</label><input class="fi" id="s_wa" value="${s.whatsapp_num||''}"/></div>
+    <div class="fr2"><div class="fg"><label class="fl">ספק SMS</label><select class="fsel" id="s_sms"><option value="twilio" ${s.sms_provider==='twilio'?'selected':''}>Twilio</option><option value="messagebird" ${s.sms_provider==='messagebird'?'selected':''}>MessageBird</option><option value="none">ללא</option></select></div><div class="fg"><label class="fl">בונוס חבר מביא חבר ₪</label><input class="fi" id="s_bonus" type="number" value="${s.recruit_bonus||500}"/></div></div>
+    <div class="sep"></div>
+    <div class="fg"><label class="fl">כתובת URL של הפורטל</label><input class="fi" id="s_url" value="${s.portal_url||'https://portal.shalva.org.il'}"/></div>
+    <button class="btn bnt" onclick="saveSets()" style="width:100%;justify-content:center;margin-top:4px">💾 שמור כל ההגדרות</button>
+  </div>
+  <div>
+    <div class="card mb">
+      <div class="st" style="margin-bottom:12px">אוטומציה ותכונות</div>
+      ${[['t_ai','שלומית AI',s.chatbot_active==='true'],['t_sms','התראות SMS',s.sms_active==='true'],['t_rec','חבר מביא חבר',true],['t_maint','מצב תחזוקה',s.maintenance==='true']].map(([id,lb,on])=>`
+      <div class="irow">
+        <div><div class="inm" style="font-size:11px">${lb}</div></div>
+        <div class="tog ${on?'on':''}" id="${id}" onclick="this.classList.toggle('on')"></div>
+      </div>`).join('')}
+    </div>
+    <div class="card mb">
+      <div class="st" style="margin-bottom:10px">העלאת לוגו</div>
+      <input type="file" id="logoFile" accept="image/*,.svg" style="display:none" onchange="uploadLogo(this)"/>
+      <div class="drag-zone" onclick="document.getElementById('logoFile').click()" style="margin-bottom:10px">
+        <img src="${s.logo_url||'/logo.svg'}" style="height:40px;object-fit:contain;display:block;margin:0 auto 8px" onerror="this.style.display='none'"/>
+        📁 לחץ להעלאת לוגו חדש (PNG / SVG / JPG)
+      </div>
+      <div style="font-size:8.5px;color:var(--tx3)">לוגו נוכחי: <code>${s.logo_url||'/logo.svg'}</code></div>
+    </div>
+    <div class="card mb">
+      <div class="st" style="margin-bottom:10px">שינוי סיסמת מנהל</div>
+      <div class="fg"><label class="fl">סיסמה חדשה</label><input class="fi" id="nPw" type="password" placeholder="לפחות 6 תווים"/></div>
+      <div class="fg"><label class="fl">אשר סיסמה</label><input class="fi" id="nPw2" type="password" placeholder="הכנס שוב"/></div>
+      <button class="btn bnt bnsm" onclick="changePw()">עדכן סיסמה</button>
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:8px;color:var(--r)">פעולות מסוכנות</div>
+      <button class="btn bnr bnsm" style="width:100%;justify-content:center" onclick="if(confirm('⚠️ פעולה בלתי הפיכה! זה ימחק כל הנתונים ויאפס. בטוח?'))toast('פנה למנהל שרת לאיפוס מסד הנתונים')">⚠️ אפס מסד נתונים</button>
+    </div>
+  </div>
+</div>`;
+}
+async function saveSets() {
+  const d = {
+    org_name: document.getElementById('s_org')?.value,
+    org_name_en: document.getElementById('s_org_en')?.value,
+    org_email: document.getElementById('s_email')?.value,
+    smtp_host: document.getElementById('s_smtp')?.value,
+    smtp_port: document.getElementById('s_port')?.value,
+    smtp_user: document.getElementById('s_smtp_u')?.value,
+    whatsapp_num: document.getElementById('s_wa')?.value,
+    sms_provider: document.getElementById('s_sms')?.value,
+    recruit_bonus: document.getElementById('s_bonus')?.value,
+    portal_url: document.getElementById('s_url')?.value,
+    chatbot_active: String(document.getElementById('t_ai')?.classList.contains('on')),
+    sms_active: String(document.getElementById('t_sms')?.classList.contains('on')),
+    maintenance: String(document.getElementById('t_maint')?.classList.contains('on')),
+  };
+  const pw = document.getElementById('s_smtp_p')?.value;
+  if (pw) d.smtp_pass = pw;
+  await API.put('/settings', d);
+  toast('כל ההגדרות נשמרו! ✓');
+  await buildSidebar();
+}
+async function changePw() {
+  const n = document.getElementById('nPw')?.value, n2 = document.getElementById('nPw2')?.value;
+  if (!n || n.length < 6) { toast('סיסמה חייבת להיות לפחות 6 תווים', false); return; }
+  if (n !== n2) { toast('הסיסמאות אינן זהות', false); return; }
+  await API.put(`/users/${ME.id}`, {password: n});
+  toast('סיסמה עודכנה בהצלחה! 🔐');
+}
+async function uploadLogo(input) {
+  const file = input.files[0]; if (!file) return;
+  const fd = new FormData(); fd.append('logo', file);
+  try {
+    const r = await fetch('/api/upload/logo', {method:'POST', body:fd, credentials:'include'});
+    const d = await r.json();
+    if (d.ok || d.url) { toast('לוגו עודכן! 🖼'); await buildSidebar(); }
+    else toast(d.error || 'שגיאה בהעלאה', false);
+  } catch(e) { toast('שגיאה בהעלאה', false); }
+}
+
+// ══════════════════════════════════════════════════════
+// EMPLOYEE MODAL FUNCTIONS
+// ══════════════════════════════════════════════════════
+function openAddEmp() {
+  document.getElementById('emTitle').textContent = 'הוספת עובד חדש';
+  document.getElementById('eid').value = '';
+  const fields = {en:'',en_en:'',eu:'',ep:'',ee:'',ephone:'',ed:'',et:'',et_en:'',eid_num:'',ebirth:'',eaddr:'',ecity:'',ebank:'',ebbranch:'',ebacc:'',eagreements:'',eemname:'',eemphone:'',eemrel:'',enotes:''};
+  for (const [id,v] of Object.entries(fields)) { const el=document.getElementById(id); if(el) el.value=v; }
+  document.getElementById('esal').value = '';
+  document.getElementById('evac').value = '16';
+  document.getElementById('esick').value = '10';
+  document.getElementById('eres').value = '0';
+  document.getElementById('escope').value = '100';
+  document.getElementById('eemptype').value = 'full';
+  selCol = '#7C5CFC';
+  document.querySelectorAll('.cp').forEach(c => c.classList.toggle('on', c.dataset.c === selCol));
+  document.querySelectorAll('#menuGrid .chk-it').forEach(c => c.classList.add('on'));
+  empTab(document.querySelector('#empTabs .tab2'), 'et0');
+  document.getElementById('empModal').classList.add('on');
+}
+async function openEditEmp(id) {
+  const u = await API.get(`/users/${id}`);
+  document.getElementById('emTitle').textContent = 'עריכת עובד — ' + u.name;
+  document.getElementById('eid').value = id;
+  const map = {en:u.name,en_en:u.name_en,eu:u.username,ee:u.email,ephone:u.phone,ed:u.dept,et:u.title,et_en:u.title_en,eid_num:u.id_number,ebirth:u.birth_date,eaddr:u.address,ecity:u.city,ebank:u.bank,ebbranch:u.bank_branch,ebacc:u.bank_account,eagreements:'',eemname:u.emergency_name,eemphone:u.emergency_phone,eemrel:'',enotes:u.notes};
+  for (const [k,v] of Object.entries(map)) { const el=document.getElementById(k); if(el) el.value=v||''; }
+  document.getElementById('esal').value = u.salary || '';
+  document.getElementById('evac').value = u.vacation_days || 16;
+  document.getElementById('esick').value = u.sick_days || 10;
+  document.getElementById('eres').value = u.reserve_days || 0;
+  document.getElementById('escope').value = u.scope_pct || 100;
+  document.getElementById('eemptype').value = u.employment_type || 'full';
+  selCol = u.color || '#7C5CFC';
+  document.querySelectorAll('.cp').forEach(c => c.classList.toggle('on', c.dataset.c === selCol));
+  document.querySelectorAll('#menuGrid .chk-it').forEach(c => c.classList.toggle('on', (u.menu||[]).includes(c.dataset.m)));
+  empTab(document.querySelector('#empTabs .tab2'), 'et0');
+  document.getElementById('empModal').classList.add('on');
+}
+async function saveEmp() {
+  const n = document.getElementById('en')?.value.trim();
+  const u = document.getElementById('eu')?.value.trim();
+  if (!n || !u) { toast('שם ושם משתמש הם חובה', false); return; }
+  const eid2 = document.getElementById('eid')?.value;
+  const menu = [...document.querySelectorAll('#menuGrid .chk-it.on')].map(c => c.dataset.m);
+  const data = {
+    name:n, name_en:document.getElementById('en_en')?.value,
+    username:u, email:document.getElementById('ee')?.value,
+    phone:document.getElementById('ephone')?.value,
+    dept:document.getElementById('ed')?.value, title:document.getElementById('et')?.value,
+    title_en:document.getElementById('et_en')?.value,
+    salary:parseInt(document.getElementById('esal')?.value)||0,
+    vacation_days:parseInt(document.getElementById('evac')?.value)||16,
+    sick_days:parseInt(document.getElementById('esick')?.value)||10,
+    reserve_days:parseInt(document.getElementById('eres')?.value)||0,
+    scope_pct:parseInt(document.getElementById('escope')?.value)||100,
+    employment_type:document.getElementById('eemptype')?.value,
+    id_number:document.getElementById('eid_num')?.value,
+    birth_date:document.getElementById('ebirth')?.value,
+    address:document.getElementById('eaddr')?.value,
+    city:document.getElementById('ecity')?.value,
+    bank:document.getElementById('ebank')?.value,
+    bank_branch:document.getElementById('ebbranch')?.value,
+    bank_account:document.getElementById('ebacc')?.value,
+    emergency_name:document.getElementById('eemname')?.value,
+    emergency_phone:document.getElementById('eemphone')?.value,
+    notes:document.getElementById('enotes')?.value,
+    color:selCol, menu
+  };
+  const pw = document.getElementById('ep')?.value;
+  if (pw) data.password = pw;
+  if (eid2) { await API.put(`/users/${eid2}`, data); toast('עובד עודכן בהצלחה! ✓'); }
+  else { await API.post('/users', data); toast('עובד חדש נוסף בהצלחה! ✓'); }
+  closeM('empModal');
+  goAdm('aemp', null);
+}
+async function delEmp(id) {
+  const u = (_users||[]).find(x=>x.id===id);
+  if (!confirm(`למחוק את ${u?.name||'עובד זה'}? הפעולה תשבית את הגישה שלו.`)) return;
+  await API.del(`/users/${id}`);
+  toast('עובד הוסר מהמערכת');
+  goAdm('aemp', null);
+}
+</script>
+</body>
+</html>

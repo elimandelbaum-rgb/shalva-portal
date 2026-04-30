@@ -1,0 +1,122 @@
+const Database = require('better-sqlite3');
+const path = require('path');
+const fs = require('fs');
+let db;
+function getDB() {
+  if (!db) {
+    const dir = path.join(__dirname, 'data');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    db = new Database(path.join(dir, 'shalva.db'));
+    db.pragma('journal_mode = WAL');
+    db.pragma('foreign_keys = ON');
+  }
+  return db;
+}
+function initDB() {
+  const db = getDB();
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL, password TEXT NOT NULL, role TEXT DEFAULT 'emp',
+      name TEXT NOT NULL, name_en TEXT DEFAULT '', email TEXT DEFAULT '', phone TEXT DEFAULT '',
+      dept TEXT DEFAULT '', title TEXT DEFAULT '', title_en TEXT DEFAULT '',
+      salary INTEGER DEFAULT 0, vacation_days INTEGER DEFAULT 16, sick_days INTEGER DEFAULT 10,
+      reserve_days INTEGER DEFAULT 0, hire_date TEXT DEFAULT '', birth_date TEXT DEFAULT '',
+      id_number TEXT DEFAULT '', address TEXT DEFAULT '', city TEXT DEFAULT '',
+      bank TEXT DEFAULT '', bank_branch TEXT DEFAULT '', bank_account TEXT DEFAULT '',
+      emergency_name TEXT DEFAULT '', emergency_phone TEXT DEFAULT '',
+      employment_type TEXT DEFAULT 'full', scope_pct INTEGER DEFAULT 100,
+      avatar TEXT DEFAULT '', color TEXT DEFAULT '#7C5CFC', menu TEXT DEFAULT '[]',
+      notes TEXT DEFAULT '', active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+      type TEXT DEFAULT 'general', dept TEXT DEFAULT '', subject TEXT NOT NULL,
+      details TEXT DEFAULT '', status TEXT DEFAULT 'pending', priority TEXT DEFAULT 'normal',
+      current_salary INTEGER DEFAULT 0, requested_salary INTEGER DEFAULT 0,
+      steps TEXT DEFAULT '[]', current_step INTEGER DEFAULT 0,
+      resolved_by INTEGER DEFAULT 0, resolution_note TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    );
+    CREATE TABLE IF NOT EXISTS feed_posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, author_id INTEGER NOT NULL,
+      author_name TEXT NOT NULL, author_color TEXT DEFAULT '#00C49A',
+      text TEXT NOT NULL, likes TEXT DEFAULT '[]', created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS trainings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL,
+      duration TEXT DEFAULT '', type TEXT DEFAULT 'mandatory', deadline TEXT DEFAULT '',
+      description TEXT DEFAULT '', completed_by TEXT DEFAULT '[]',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS form_submissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+      form_type TEXT NOT NULL, data TEXT DEFAULT '{}', status TEXT DEFAULT 'pending',
+      reviewed_by INTEGER DEFAULT 0, review_note TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS equipment_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+      item TEXT NOT NULL, quantity INTEGER DEFAULT 1, urgency TEXT DEFAULT 'normal',
+      reason TEXT DEFAULT '', price_estimate INTEGER DEFAULT 0, status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS vacations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+      from_date TEXT NOT NULL, to_date TEXT NOT NULL, type TEXT DEFAULT 'annual',
+      note TEXT DEFAULT '', status TEXT DEFAULT 'pending', created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS broadcasts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id INTEGER NOT NULL,
+      recipients TEXT DEFAULT 'all', subject TEXT NOT NULL, body TEXT NOT NULL,
+      channels TEXT DEFAULT '["portal"]', created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL,
+      text TEXT NOT NULL, type TEXT DEFAULT 'info', read INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS projects (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, type TEXT NOT NULL,
+      description TEXT DEFAULT '', bonus INTEGER DEFAULT 0, data TEXT DEFAULT '{}',
+      active INTEGER DEFAULT 1, created_at TEXT DEFAULT (datetime('now'))
+    );
+  `);
+  const ins = db.prepare('INSERT OR IGNORE INTO settings(key,value) VALUES(?,?)');
+  [['org_name','המרכז הלאומי שלוה'],['org_name_en','Shalva National Center'],
+   ['org_email','info@shalva.org.il'],['smtp_host','smtp.gmail.com'],['smtp_port','587'],
+   ['smtp_user',''],['smtp_pass',''],['whatsapp_num','+972501234567'],
+   ['sms_provider','twilio'],['sms_active','true'],['chatbot_active','true'],
+   ['auto_approve','false'],['recruit_bonus','500'],['logo_url','/logo.svg'],['maintenance','false']
+  ].forEach(([k,v]) => ins.run(k,v));
+  if (db.prepare('SELECT COUNT(*) as c FROM users').get().c === 0) {
+    const iu = db.prepare('INSERT INTO users(username,password,role,name,email,dept,title,salary,vacation_days,sick_days,color,avatar,menu,hire_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+    iu.run('מיכל','1234','emp','מיכל כהן','michal@shalva.org.il','תפעול','מנהלת תפעול',18500,22,8,'#7C5CFC','מ.כ',JSON.stringify(['home','feed','chat','req','hr','sal','train','forms','proj','int']),'2018-03-15');
+    iu.run('יוסי','1234','emp','יוסי לוי','yosi@shalva.org.il','שכר','רכז שכר',14200,16,10,'#00C49A','י.ל',JSON.stringify(['home','feed','chat','req','sal','train','forms']),'2021-06-01');
+    iu.run('רות','1234','emp','רות כץ','ruth@shalva.org.il','HR','מנהלת HR',19000,20,5,'#FF4D6D','ר.כ',JSON.stringify(['home','feed','chat','req','hr','sal','bulk','train','forms','proj']),'2016-09-10');
+    iu.run('דן','1234','emp','דן שמיר','dan@shalva.org.il','ביטחון','קצין ביטחון',15000,18,12,'#22D3EE','ד.ש',JSON.stringify(['home','feed','chat','req','sal','train','forms']),'2020-01-20');
+    iu.run('admin','admin123','adm','מנהל מערכת','admin@shalva.org.il','הנהלה','מנהל מערכת',0,0,0,'#FFB800','🛡',JSON.stringify([]),'2015-01-01');
+    const it = db.prepare('INSERT INTO trainings(name,duration,type,deadline,completed_by) VALUES(?,?,?,?,?)');
+    it.run('בטיחות אש 2026','7 דק׳','mandatory','2026-05-15','[]');
+    it.run('ביטחון שנתי','15 דק׳','mandatory','2026-06-01','[]');
+    it.run('מניעת הטרדה מינית','20 דק׳','mandatory','2026-12-31','[1,2,3,4]');
+    it.run('פיתוח מנהלים','6 מפגשים','optional','2026-12-31','[1,3]');
+    const ip = db.prepare('INSERT INTO feed_posts(author_id,author_name,author_color,text) VALUES(?,?,?,?)');
+    ip.run(5,'מחלקת HR','#00C49A','ארוחת צוות קיץ — 20.06.26 🎉 גן החברה 18:00');
+    ip.run(5,'מנהלת אדמין','#7C5CFC','עדכון נהלי חופשה 2026');
+    ip.run(5,'תוכנית חבר מביא חבר','#FFB800','3 עובדים חדשים הצטרפו השבוע! בונוס 500₪ 💰');
+    const ir = db.prepare('INSERT INTO requests(user_id,type,dept,subject,details,status,priority,current_salary,requested_salary) VALUES(?,?,?,?,?,?,?,?,?)');
+    ir.run(1,'salary_raise','שכר','בקשת העלאת שכר','לאחר 3 שנות ביצועים מצוינים','hr_review','high',18500,21000);
+    ir.run(2,'conditions','HR','שינוי היקף משרה','מ-80% ל-100%','manager_review','urgent',0,0);
+    ir.run(3,'equipment','תפעול','הזמנת מחשב נייד','Dell Latitude 5540','approved','normal',0,0);
+    db.prepare('INSERT INTO projects(name,type,description,bonus,data) VALUES(?,?,?,?,?)').run('חבר מביא חבר','recruit','תוכנית הפניות',500,'{"referrals":[]}');
+  }
+  console.log('✅ DB ready');
+  return db;
+}
+module.exports = { getDB, initDB };
