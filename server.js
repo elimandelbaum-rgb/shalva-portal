@@ -21,9 +21,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+
+// SQLite session store — שומר סשנים במסד הנתונים
+const SqliteStore = require('better-sqlite3-session-store')(session);
 app.use(session({
+  store: new SqliteStore({ client: db, expired: { clear: true, intervalMs: 900000 } }),
   secret: process.env.SESSION_SECRET || 'shalva-portal-2026-secret',
-  resave: true,
+  resave: false,
   saveUninitialized: false,
   rolling: true,
   cookie: { 
