@@ -838,37 +838,111 @@ async function pgHome(cnt) {
   </div>
 </div>
 
-<!-- שורה שנייה: חדשות + יתרות -->
-<div class="g2">
-  <div class="card">
-    <div class="sh"><span class="st">📰 חדשות</span><span id="newsTime" style="font-size:8.5px;color:var(--tx3)">טוען...</span></div>
-    <div id="newsBody">
-      <div class="ldg"><span>⟳</span> טוען חדשות...</div>
+<!-- חדשות — רוחב מלא -->
+<div class="card" style="margin-bottom:0">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="st">📰 חדשות בזמן אמת</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:700;background:#FDECEA;color:#C0392B;padding:2px 8px;border-radius:999px;animation:pulse 2s infinite">● חי</span>
+    </div>
+    <div style="display:flex;gap:5px">
+      <button onclick="switchNews('ynet',this)" id="btn-ynet" style="padding:4px 12px;border-radius:999px;font-size:9px;font-weight:700;border:none;background:linear-gradient(135deg,#5C1F6A,#7B2D8B);color:#fff;cursor:pointer;font-family:inherit">ynet</button>
+      <button onclick="switchNews('a7',this)" id="btn-a7" style="padding:4px 12px;border-radius:999px;font-size:9px;font-weight:700;border:1px solid var(--bd);background:#fff;color:var(--tx2);cursor:pointer;font-family:inherit">ערוץ 7</button>
+      <button onclick="switchNews('all',this)" id="btn-all" style="padding:4px 12px;border-radius:999px;font-size:9px;font-weight:700;border:1px solid var(--bd);background:#fff;color:var(--tx2);cursor:pointer;font-family:inherit">הכל</button>
+      <span id="newsTime" style="font-size:8.5px;color:var(--tx3);align-self:center;margin-right:4px"></span>
     </div>
   </div>
 
-  <div>
-    <div class="card mb">
-      <div class="sh"><span class="st">💼 יתרות שלי</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-        ${[['חופשה',me.vacation_days||0,'var(--t)','🏖'],['מחלה',me.sick_days||0,'var(--g)','🤒'],['מילואים',me.reserve_days||0,'var(--s)','🪖']].map(([lb,n,c,ic])=>`
-        <div style="text-align:center;padding:12px 6px;border-radius:10px;background:${c}14;border:1px solid ${c}30">
-          <div style="font-size:20px;margin-bottom:2px">${ic}</div>
-          <div style="font-size:20px;font-weight:900;color:${c}">${n}</div>
-          <div style="font-size:8px;color:var(--tx3);margin-top:2px">${lb}</div>
-        </div>`).join('')}
+  <!-- כתבה ראשית + רשימה -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div id="newsMain" style="border-radius:10px;overflow:hidden;border:1px solid var(--bd);cursor:pointer;transition:transform .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="height:110px;background:linear-gradient(135deg,#EDE4F5,#C9A8E0);display:flex;align-items:center;justify-content:center;font-size:40px">📰</div>
+      <div style="padding:10px 12px">
+        <div style="font-size:11px;font-weight:700;color:var(--wh);line-height:1.5" id="newsMainTitle">טוען...</div>
+        <div style="font-size:8.5px;color:var(--tx3);margin-top:4px" id="newsMainMeta"></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="sh"><span class="st">⚡ פעולות מהירות</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-        <button class="btn bnt bnsm" style="justify-content:center" onclick="goEmp('req',null)">📨 פניה חדשה</button>
-        <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('forms',null)">📋 טפסים</button>
-        <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('train',null)">🎓 הדרכות</button>
-        <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('chat',null)">🤖 שלומית AI</button>
-      </div>
+    <div id="newsBody" style="display:flex;flex-direction:column;gap:0">
+      <div class="ldg">⟳ טוען חדשות...</div>
     </div>
+  </div>
+</div>
+
+<!-- שורה תחתונה: יתרות + ימי הולדת + פעולות -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px">
+  <div class="card">
+    <div class="sh"><span class="st">💼 יתרות שלי</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
+      ${[['חופשה',me.vacation_days||0,'#7B2D8B','🏖'],['מחלה',me.sick_days||0,'#F4813A','🤒'],['מילואים',me.reserve_days||0,'#4BAEE8','🪖']].map(([lb,n,c,ic])=>`
+      <div style="text-align:center;padding:10px 4px;border-radius:9px;background:${c}14;border:1px solid ${c}28">
+        <div style="font-size:18px;margin-bottom:2px">${ic}</div>
+        <div style="font-size:18px;font-weight:900;color:${c}">${n}</div>
+        <div style="font-size:7.5px;color:var(--tx3);margin-top:1px">${lb}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sh"><span class="st">🎂 ימי הולדת</span><span style="font-size:8px;color:var(--tx3)">30 יום</span></div>
+    ${birthdays.slice(0,3).map(u => `
+    <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--bd)">
+      <div style="width:26px;height:26px;border-radius:50%;background:${u.color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${(u.name||'').substring(0,2)}</div>
+      <div style="flex:1">
+        <div style="font-size:10px;font-weight:700;color:var(--wh)">${u.name}</div>
+        <div style="font-size:8px;color:var(--tx3)">${new Date(u.birth_date).toLocaleDateString('he-IL',{day:'numeric',month:'long'})}</div>
+      </div>
+      <span class="b ${u.daysLeft===0?'br':u.daysLeft<=3?'bg2':'bt'}" style="font-size:7.5px">${u.daysLeft===0?'היום!':u.daysLeft===1?'מחר':'עוד '+u.daysLeft}</span>
+    </div>`).join('') || `<div style="text-align:center;padding:14px;font-size:10px;color:var(--tx3)">אין ימי הולדת קרובים 🎈</div>`}
+  </div>
+
+  <div class="card">
+    <div class="sh"><span class="st">⚡ פעולות מהירות</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <button class="btn bnt bnsm" style="justify-content:center" onclick="goEmp('req',null)">📨 פניה</button>
+      <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('forms',null)">📋 טפסים</button>
+      <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('train',null)">🎓 הדרכות</button>
+      <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('chat',null)">🤖 שלומית</button>
+      <button class="btn bno bnsm" style="justify-content:center;grid-column:span 2" onclick="goEmp('sal',null)">💰 תלוש שכר</button>
+    </div>
+  </div>
+</div>
+
+<!-- רשתות חברתיות -->
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="st">📸 שלוה ברשתות החברתיות</span>
+    </div>
+    <div style="display:flex;gap:7px">
+      <a href="https://www.instagram.com/shalvacenter/" target="_blank" style="display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;background:linear-gradient(135deg,#833AB4,#FD1D1D,#F77737);color:#fff;font-size:9px;font-weight:700;text-decoration:none">
+        📸 Instagram
+      </a>
+      <a href="https://www.facebook.com/ShalvaNationalCenter/" target="_blank" style="display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;background:#1877F2;color:#fff;font-size:9px;font-weight:700;text-decoration:none">
+        👍 Facebook
+      </a>
+    </div>
+  </div>
+
+  <!-- גריד תמונות אינסטגרם -->
+  <div id="igGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
+    ${[
+      {emoji:'🏛️',cap:'המרכז הלאומי שלוה — ירושלים'},
+      {emoji:'❤️',cap:'ילדים מיוחדים, משפחות מיוחדות'},
+      {emoji:'🌟',cap:'נותנים תקווה. משנים חיים.'},
+      {emoji:'🎉',cap:'אירוע שנתי — שלוה 2026'},
+      {emoji:'🤝',cap:'מתנדבים יקרים, תודה מהלב'},
+      {emoji:'🎓',cap:'תוכנית ההכשרה החדשה'},
+    ].map((p,i) => `
+    <a href="https://www.instagram.com/shalvacenter/" target="_blank" style="text-decoration:none;aspect-ratio:1;border-radius:9px;overflow:hidden;background:linear-gradient(135deg,#EDE4F5,#C9A8E0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:transform .15s;border:1px solid var(--bd)" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+      <div style="font-size:26px">${p.emoji}</div>
+      <div style="font-size:7px;color:#5C1F6A;font-weight:600;text-align:center;padding:0 4px;line-height:1.3">${p.cap.substring(0,18)}...</div>
+    </a>`).join('')}
+  </div>
+
+  <div style="margin-top:10px;padding:8px 12px;background:rgba(123,45,139,.05);border-radius:8px;border:1px solid var(--bd);font-size:9px;color:var(--tx3);display:flex;align-items:center;gap:8px">
+    <span style="font-size:13px">💡</span>
+    <span>להצגת תמונות אמיתיות מהאינסטגרם — <a href="https://developers.facebook.com/docs/instagram-basic-display-api" target="_blank" style="color:var(--t);font-weight:700;text-decoration:none">הגדר Instagram API Token</a> בהגדרות המערכת.</span>
   </div>
 </div>`;
 
@@ -876,6 +950,8 @@ async function pgHome(cnt) {
   loadWeather();
   // טען חדשות
   loadNews();
+  // טען אינסטגרם
+  loadInstagram();
 }
 
 async function loadWeather() {
@@ -897,36 +973,110 @@ async function loadWeather() {
   }
 }
 
+async function loadInstagram() {
+  const grid = document.getElementById('igGrid');
+  if (!grid) return;
+  try {
+    const s = await API.get('/settings');
+    const token = s.instagram_token;
+    if (!token) return;
+    const r = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&access_token=${token}&limit=6`);
+    const d = await r.json();
+    if (!d.data?.length) return;
+    grid.innerHTML = d.data.map(p => `
+    <a href="${p.permalink}" target="_blank" style="text-decoration:none;aspect-ratio:1;border-radius:9px;overflow:hidden;background:#EDE4F5;display:block;cursor:pointer;transition:transform .15s;border:1px solid var(--bd);position:relative" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+      <img src="${p.media_url||p.thumbnail_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.5));padding:4px;font-size:7px;color:#fff;line-height:1.3">${(p.caption||'').substring(0,30)}</div>
+    </a>`).join('');
+  } catch(e) {}
+}
+let _curSource = 'ynet';
+
 async function loadNews() {
+  await switchNews('ynet', document.getElementById('btn-ynet'));
+}
+
+async function switchNews(src, btn) {
+  _curSource = src;
+  // עדכן כפתורים
+  ['ynet','a7','all'].forEach(s => {
+    const b = document.getElementById('btn-' + s);
+    if (!b) return;
+    if (s === src) { b.style.background = 'linear-gradient(135deg,#5C1F6A,#7B2D8B)'; b.style.color = '#fff'; b.style.border = 'none'; }
+    else { b.style.background = '#fff'; b.style.color = 'rgba(61,31,74,.65)'; b.style.border = '1px solid rgba(123,45,139,.12)'; }
+  });
+
   const nb = document.getElementById('newsBody');
   const nt = document.getElementById('newsTime');
+  const nm = document.getElementById('newsMainTitle');
+  const nmm = document.getElementById('newsMainMeta');
+  const nmEl = document.getElementById('newsMain');
   if (!nb) return;
+  nb.innerHTML = '<div class="ldg">⟳ טוען...</div>';
+
   try {
-    // RSS ynet דרך proxy חינמי
-    const url = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.ynet.co.il/Integration/StoryRss2.xml&api_key=public&count=5';
-    const r = await fetch(url);
-    const d = await r.json();
-    if (d.status !== 'ok' || !d.items?.length) throw new Error('no items');
-    if (nt) nt.textContent = 'ynet · ' + new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
-    nb.innerHTML = d.items.slice(0,5).map(item => `
-    <a href="${item.link}" target="_blank" style="text-decoration:none;display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s" onmouseover="this.style.background='var(--t3)'" onmouseout="this.style.background='transparent'">
-      ${item.thumbnail ? `<img src="${item.thumbnail}" style="width:48px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>` : ''}
+    const API_KEY = 'public';
+    const feeds = {
+      ynet: `https://api.rss2json.com/v1/api.json?rss_url=https://www.ynet.co.il/Integration/StoryRss2.xml&api_key=${API_KEY}&count=8`,
+      a7: `https://api.rss2json.com/v1/api.json?rss_url=https://www.inn.co.il/Rss.aspx&api_key=${API_KEY}&count=8`
+    };
+
+    let items = [];
+    if (src === 'all') {
+      const [ry, ra] = await Promise.all([
+        _newsCache.ynet || fetch(feeds.ynet).then(r=>r.json()),
+        _newsCache.a7 || fetch(feeds.a7).then(r=>r.json())
+      ]);
+      _newsCache.ynet = ry; _newsCache.a7 = ra;
+      const yi = (ry.items||[]).slice(0,5).map(i=>({...i,src:'ynet'}));
+      const ai = (ra.items||[]).slice(0,5).map(i=>({...i,src:'ערוץ 7'}));
+      items = [...yi, ...ai].sort((a,b) => new Date(b.pubDate)-new Date(a.pubDate));
+    } else {
+      const cache = _newsCache[src];
+      const res = cache || await fetch(feeds[src]).then(r=>r.json());
+      _newsCache[src] = res;
+      items = (res.items||[]).map(i=>({...i,src:src==='ynet'?'ynet':'ערוץ 7'}));
+    }
+
+    if (!items.length) throw new Error('no items');
+
+    const srcLabel = src==='ynet'?'ynet':src==='a7'?'ערוץ 7':'ynet + ערוץ 7';
+    if (nt) nt.textContent = srcLabel + ' · ' + new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+
+    // כתבה ראשית
+    const first = items[0];
+    if (nm) nm.textContent = first.title;
+    if (nmm) nmm.innerHTML = `<span style="background:${first.src==='ynet'?'#D32F2F':'#1565C0'};color:#fff;padding:1.5px 7px;border-radius:999px;font-size:7.5px;font-weight:700;margin-left:5px">${first.src}</span> ${new Date(first.pubDate).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}`;
+    if (nmEl) {
+      nmEl.onclick = () => window.open(first.link,'_blank');
+      const imgEl = nmEl.querySelector('div');
+      if (first.thumbnail && imgEl) { imgEl.style.backgroundImage = `url(${first.thumbnail})`; imgEl.style.backgroundSize = 'cover'; imgEl.style.backgroundPosition = 'center'; imgEl.textContent = ''; }
+    }
+
+    // רשימת חדשות
+    nb.innerHTML = items.slice(1,7).map((item,i) => `
+    <a href="${item.link}" target="_blank" style="text-decoration:none;display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(123,45,139,.08);transition:background .12s;cursor:pointer" onmouseover="this.style.background='rgba(123,45,139,.04)'" onmouseout="this.style.background='transparent'">
+      <div style="font-size:11px;font-weight:800;color:rgba(123,45,139,.22);flex-shrink:0;width:16px;margin-top:1px">${i+2}</div>
       <div style="flex:1">
-        <div style="font-size:10.5px;font-weight:700;color:var(--wh);line-height:1.4">${item.title}</div>
-        <div style="font-size:8px;color:var(--tx3);margin-top:2px">${new Date(item.pubDate).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="font-size:10px;font-weight:700;color:#2D0A3A;line-height:1.4">${item.title}</div>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:3px">
+          <span style="background:${item.src==='ynet'?'#FDECEA':'#E8F0FE'};color:${item.src==='ynet'?'#C0392B':'#1565C0'};padding:1px 6px;border-radius:999px;font-size:7.5px;font-weight:700">${item.src}</span>
+          <span style="font-size:7.5px;color:rgba(61,31,74,.38)">${new Date(item.pubDate).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
       </div>
+      ${item.thumbnail?`<img src="${item.thumbnail}" style="width:44px;height:33px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>`:''}
     </a>`).join('');
+
   } catch(e) {
-    // fallback — חדשות לדוגמה
-    if (nt) nt.textContent = 'עדכונים כלליים';
-    nb.innerHTML = [
-      'ועידת שלוה השנתית — תאריכים הוכרזו',
-      'עדכון נהלי חופשות לשנת 2026',
-      'גיבוש צוות מנהלים — חודש הבא',
-      'תוכנית חבר מביא חבר — הרחבה',
-      'עדכון מערכת שכר — אפריל 2026',
-    ].map(t => `
-    <div style="padding:8px 0;border-bottom:1px solid var(--bd);font-size:10.5px;color:var(--wh);line-height:1.45">📌 ${t}</div>`).join('');
+    const srcLabel = src==='ynet'?'ynet':src==='a7'?'ערוץ 7':'חדשות';
+    if (nt) nt.textContent = 'עדכונים פנימיים';
+    const fallback = ['ועידת שלוה השנתית — תאריכים הוכרזו','עדכון נהלי חופשות לשנת 2026','גיבוש צוות מנהלים — חודש הבא','תוכנית חבר מביא חבר — הרחבה','עדכון מערכת שכר — אפריל 2026'];
+    if (document.getElementById('newsMainTitle')) document.getElementById('newsMainTitle').textContent = fallback[0];
+    nb.innerHTML = fallback.slice(1).map((t,i) => `
+    <div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(123,45,139,.08)">
+      <div style="font-size:11px;font-weight:800;color:rgba(123,45,139,.22);flex-shrink:0;width:16px">${i+2}</div>
+      <div style="font-size:10px;color:#2D0A3A;line-height:1.4">📌 ${t}</div>
+    </div>`).join('');
   }
 }
 
@@ -2380,6 +2530,7 @@ async function pgSet(cnt) {
     <div class="fr2"><div class="fg"><label class="fl">משתמש SMTP</label><input class="fi" id="s_smtp_u" value="${s.smtp_user||''}"/></div><div class="fg"><label class="fl">סיסמה</label><input class="fi" id="s_smtp_p" type="password" placeholder="••••••"/></div></div>
     <div class="sep"></div>
     <div class="st" style="margin-bottom:10px">ערוצי תקשורת</div>
+    <div class="fg"><label class="fl">Instagram Access Token</label><input class="fi" id="s_ig_token" value="${s.instagram_token||''}" placeholder="Token מ-Meta Developers..."/></div>
     <div class="fg"><label class="fl">WhatsApp Business</label><input class="fi" id="s_wa" value="${s.whatsapp_num||''}"/></div>
     <div class="fr2"><div class="fg"><label class="fl">ספק SMS</label><select class="fsel" id="s_sms"><option value="twilio" ${s.sms_provider==='twilio'?'selected':''}>Twilio</option><option value="messagebird" ${s.sms_provider==='messagebird'?'selected':''}>MessageBird</option><option value="none">ללא</option></select></div><div class="fg"><label class="fl">בונוס חבר מביא חבר ₪</label><input class="fi" id="s_bonus" type="number" value="${s.recruit_bonus||500}"/></div></div>
     <div class="sep"></div>
@@ -2426,6 +2577,7 @@ async function saveSets() {
     smtp_port: document.getElementById('s_port')?.value,
     smtp_user: document.getElementById('s_smtp_u')?.value,
     whatsapp_num: document.getElementById('s_wa')?.value,
+    instagram_token: document.getElementById('s_ig_token')?.value,
     sms_provider: document.getElementById('s_sms')?.value,
     recruit_bonus: document.getElementById('s_bonus')?.value,
     portal_url: document.getElementById('s_url')?.value,
