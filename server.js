@@ -23,8 +23,15 @@ app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'shalva-portal-2026-secret',
-  resave: false, saveUninitialized: false,
-  cookie: { maxAge: 8*60*60*1000, secure: false }
+  resave: true,
+  saveUninitialized: false,
+  rolling: true,
+  cookie: { 
+    maxAge: 24*60*60*1000,
+    secure: false,
+    httpOnly: true,
+    sameSite: 'lax'
+  }
 }));
 
 const auth = (req,res,next) => req.session.user ? next() : res.status(401).json({error:'Unauthorized'});
