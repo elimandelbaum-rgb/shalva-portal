@@ -1019,7 +1019,7 @@ async function switchNews(src, btn) {
     // fallback: rss2json public
     try {
       const urls = {ynet:'https://www.ynet.co.il/Integration/StoryRss2.xml',a7:'https://www.inn.co.il/Rss.aspx'};
-      const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(urls[s])}&count=8`);
+      const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(urls[s])}`);
       const d = await r.json();
       if (d.items?.length) { const res={items:d.items.map(i=>({title:i.title,link:i.link,pubDate:i.pubDate,thumbnail:i.thumbnail,src:s}))}; _newsCache[s]=res; return res; }
     } catch(e) {}
