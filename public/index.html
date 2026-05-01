@@ -1273,16 +1273,29 @@ function sendChat() {
 
 // REQUESTS
 // קטגוריות פניות
+// קטגוריות פניות HR בלבד
 const REQ_CATS = {
-  hr:       {lb:'👥 HR — משאבי אנוש',      dept:'HR',          steps:['עובד','מנהל ישיר','HR'],      color:'#7B2D8B'},
-  salary:   {lb:'💰 שכר ותנאי העסקה',      dept:'שכר',         steps:['עובד','מנהל ישיר','שכר'],     color:'#F4813A'},
-  equipment:{lb:'📦 ציוד ומשאבים',          dept:'מחשוב',       steps:['עובד','מנהל ישיר','מחשוב'],   color:'#4BAEE8'},
-  maintenance:{lb:'🔧 תחזוקה',             dept:'תחזוקה',      steps:['עובד','מנהל ישיר','תחזוקה'],  color:'#E84040'},
-  marketing:{lb:'📣 שיווק / צילום / וידאו',  dept:'שיווק',       steps:['עובד','מנהל ישיר','שיווק'],   color:'#E84393'},
-  secretary:{lb:'📋 מזכירות שלוה',          dept:'מזכירות',     steps:['עובד','מזכירות'],              color:'#9B59B6'},
-  ceo:      {lb:'🏛️ לשכת מנכ"ל',           dept:'לשכת מנכ"ל', steps:['עובד','מנהל ישיר','מנכ"ל'],   color:'#2C3E50'},
-  welfare:  {lb:'❤️ רווחה ופנאי',           dept:'רווחה',       steps:['עובד','HR'],                   color:'#E74C3C'},
-  security: {lb:'🔒 ביטחון',               dept:'ביטחון',      steps:['עובד','ביטחון'],               color:'#27AE60'},
+  hr:           {lb:'👥 פנייה כללית HR',         dept:'HR',          steps:['עובד','מנהל ישיר','HR'],      color:'#7B2D8B'},
+  salary:       {lb:'💰 שכר ותנאי העסקה',        dept:'שכר',         steps:['עובד','מנהל ישיר','שכר'],     color:'#F4813A'},
+  vacation:     {lb:'✈️ חופשה / ימי היעדרות',    dept:'HR',          steps:['עובד','מנהל ישיר','HR'],      color:'#4BAEE8'},
+  conditions:   {lb:'📋 שינוי תנאי העסקה',        dept:'HR',          steps:['עובד','מנהל ישיר','HR'],      color:'#9B59B6'},
+  eval:         {lb:'⭐ הערכה ופיתוח אישי',       dept:'HR',          steps:['עובד','HR'],                   color:'#E84393'},
+  welfare:      {lb:'❤️ רווחה / קשיים אישיים',   dept:'HR',          steps:['עובד','HR'],                   color:'#E74C3C'},
+  complaint:    {lb:'⚠️ תלונה / פנייה רגישה',    dept:'HR',          steps:['עובד','HR','הנהלה'],           color:'#E84040'},
+  reserves:     {lb:'🪖 מילואים',                 dept:'שכר',         steps:['עובד','שכר'],                  color:'#27AE60'},
+};
+
+// קטגוריות טפסים — כל המחלקות
+const FORM_DEPTS = {
+  hr:           {lb:'👥 HR ומשאבי אנוש',   color:'#7B2D8B'},
+  salary:       {lb:'💰 שכר ותנאים',       color:'#F4813A'},
+  equipment:    {lb:'📦 ציוד ומחשוב',      color:'#4BAEE8'},
+  maintenance:  {lb:'🔧 תחזוקה',           color:'#E84040'},
+  marketing:    {lb:'📣 שיווק וצילום',      color:'#E84393'},
+  secretary:    {lb:'📋 מזכירות',           color:'#9B59B6'},
+  ceo:          {lb:'🏛️ לשכת מנכ"ל',      color:'#2C3E50'},
+  security:     {lb:'🔒 ביטחון',           color:'#27AE60'},
+  welfare:      {lb:'❤️ רווחה ופנאי',      color:'#E74C3C'},
 };
 
 async function pgReq(cnt) {
@@ -1303,11 +1316,11 @@ async function pgReq(cnt) {
 <div class="tbp on" id="rq0">
   <div class="g13">
     <div class="card">
-      <!-- בחירת קטגוריה -->
-      <div class="st" style="margin-bottom:11px">בחר קטגוריה</div>
+      <!-- בחירת קטגוריה HR בלבד -->
+      <div class="st" style="margin-bottom:11px">בחר נושא הפנייה</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px" id="catGrid">
         ${Object.entries(REQ_CATS).map(([k,c]) => `
-        <div class="chk-it" data-cat="${k}" onclick="selCat('${k}',this)" style="gap:7px;border-radius:8px;padding:8px 10px">
+        <div class="chk-it" data-cat="${k}" onclick="selCat('${k}',this)" style="gap:7px;border-radius:8px;padding:8px 10px;border-right:3px solid ${c.color}">
           <div style="font-size:10px;font-weight:700;color:inherit">${c.lb}</div>
         </div>`).join('')}
       </div>
@@ -2039,342 +2052,109 @@ async function pgForms(cnt) {
 
   cnt.innerHTML = `
 <div id="frmWrap">
-<div class="tabs2" id="frmTabs" style="flex-wrap:wrap;gap:3px">
-  <div class="tab2 on"  onclick="swTab(this,'fc0','frmWrap')">👥 HR ומשאבי אנוש</div>
-  <div class="tab2"     onclick="swTab(this,'fc1','frmWrap')">💰 שכר ותנאים</div>
-  <div class="tab2"     onclick="swTab(this,'fc2','frmWrap')">📦 ציוד ומחשוב</div>
-  <div class="tab2"     onclick="swTab(this,'fc3','frmWrap')">🔧 תחזוקה</div>
-  <div class="tab2"     onclick="swTab(this,'fc4','frmWrap')">📣 שיווק וצילום</div>
-  <div class="tab2"     onclick="swTab(this,'fc5','frmWrap')">📋 מזכירות</div>
-  <div class="tab2"     onclick="swTab(this,'fc6','frmWrap')">🏛️ לשכת מנכ"ל</div>
-  <div class="tab2"     onclick="swTab(this,'fc7','frmWrap')">🔒 ביטחון</div>
-  <div class="tab2"     onclick="swTab(this,'fc8','frmWrap')">❤️ רווחה</div>
+<div style="margin-bottom:14px">
+  <div style="font-size:13px;font-weight:800;color:var(--wh);margin-bottom:4px">📋 טפסים לפי מחלקה</div>
+  <div style="font-size:9.5px;color:var(--tx3)">בחר מחלקה למילוי טופס. כל פנייה מקבלת מספר ייחודי ועותק במייל.</div>
 </div>
-
-<!-- HR -->
-<div class="tbp on" id="fc0">
-  <div class="g3">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">✈️ בקשת חופשה</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}
-      <div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="vf"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="vt"/></div></div>
-      <div class="fg"><label class="fl">סוג חופשה</label><select class="fsel" id="vtype"><option value="annual">חופשה שנתית</option><option value="personal">יום אישי</option><option value="emergency">חירום משפחתי</option><option value="marriage">חתונה</option><option value="mourning">אבל</option><option value="reserve">מילואים</option></select></div>
-      <div class="fg"><label class="fl">הערות למנהל</label><textarea class="fta" id="vn" placeholder="הערות נוספות..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('vacation')">שלח ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🤒 דיווח מחלה</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}
-      <div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="sk_f"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="sk_t"/></div></div>
-      <div class="fg"><label class="fl">סיבה כללית</label><textarea class="fta" id="sk_r" placeholder="תיאור כללי (לא חובה לפרט)..."></textarea></div>
-      <div class="info-box" style="font-size:9px">עד 3 ימים — ללא אישור. מ-3 ימים — אישור רופא חובה.</div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('sick')">שלח ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🚑 תאונת עבודה</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}
-      <div class="warn-box" style="font-size:9px">🚨 חובה לדווח תוך 24 שעות!</div>
-      <div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="ac_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="ac_t"/></div></div>
-      <div class="fg"><label class="fl">מיקום *</label><input class="fi" id="ac_l" placeholder="היכן בדיוק?"/></div>
-      <div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="ac_desc" placeholder="מה קרה בפירוט..."></textarea></div>
-      <div class="fg"><label class="fl">פציעות *</label><textarea class="fta" id="ac_inj" placeholder="תאר את הפציעות..."></textarea></div>
-      <div class="fg"><label class="fl">עדים</label><input class="fi" id="ac_w" placeholder="שמות עדים..."/></div>
-      ${copyMailField()}
-      <button class="btn bnr" onclick="subFrm('accident')">🚨 דווח מיידית</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">⭐ הערכה עצמית</div>
-      ${approvalFlow([['👤','אתה'],['👥','HR']])}
-      <div class="fg"><label class="fl">שנת הערכה</label><input class="fi" id="ev_y" value="2026"/></div>
-      ${[['ביצועים מקצועיים','ev1'],['עבודת צוות','ev2'],['יוזמה','ev3'],['עמידה ביעדים','ev4']].map(([lb,id])=>`
-      <div class="fg"><label class="fl" style="display:flex;justify-content:space-between">${lb}<span id="${id}v" style="color:var(--t);font-weight:700">3/5</span></label>
-      <input type="range" min="1" max="5" value="3" style="width:100%;accent-color:var(--t)" oninput="document.getElementById('${id}v').textContent=this.value+'/5'"></div>`).join('')}
-      <div class="fg"><label class="fl">משוב וישגים *</label><textarea class="fta tall" id="ev_txt" placeholder="תאר ישגי השנה, אתגרים ויעדים לשנה הבאה..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('eval')">שלח הערכה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">👥 חבר מביא חבר</div>
-      <div class="info-box" style="font-size:9px">💰 בונוס ₪${bonus} לאחר קבלת המועמד!</div>
-      ${approvalFlow([['👤','אתה'],['👥','HR']])}
-      <div class="fr2"><div class="fg"><label class="fl">שם המועמד *</label><input class="fi" id="rf_n" placeholder="שם מלא"/></div><div class="fg"><label class="fl">טלפון *</label><input class="fi" id="rf_p" type="tel" placeholder="05x-xxxxxxx"/></div></div>
-      <div class="fg"><label class="fl">מייל</label><input class="fi" id="rf_e" type="email" placeholder="email@example.com"/></div>
-      <div class="fg"><label class="fl">תפקיד מתאים</label><input class="fi" id="rf_r" placeholder="לאיזה תפקיד?"/></div>
-      <div class="fg"><label class="fl">למה מתאים/ה?</label><textarea class="fta" id="rf_w" placeholder="ספר על כישורים ורקע..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bng" onclick="subFrm('referral')">הפן עכשיו ↗</button>
-    </div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px" id="frmDeptGrid">
+  ${[
+    ['fc0','👥','HR ומשאבי אנוש','#7B2D8B'],
+    ['fc1','💰','שכר ותנאים','#F4813A'],
+    ['fc2','📦','ציוד ומחשוב','#4BAEE8'],
+    ['fc3','🔧','תחזוקה','#E84040'],
+    ['fc4','📣','שיווק וצילום','#E84393'],
+    ['fc5','📋','מזכירות','#9B59B6'],
+    ['fc6','🏛️','לשכת מנכ"ל','#2C3E50'],
+    ['fc7','🔒','ביטחון','#27AE60'],
+    ['fc8','❤️','רווחה ופנאי','#E74C3C'],
+  ].map(([id,ic,lb,color]) => `
+  <div onclick="showFormDept('${id}')" style="display:flex;align-items:center;gap:9px;padding:12px 13px;background:#fff;border:1.5px solid ${color}22;border-radius:10px;cursor:pointer;transition:all .15s;box-shadow:0 1px 6px rgba(0,0,0,.05)" onmouseover="this.style.borderColor='${color}';this.style.background='${color}11';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${color}22';this.style.background='#fff';this.style.transform='translateY(0)'">
+    <div style="width:36px;height:36px;border-radius:9px;background:${color}18;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${ic}</div>
+    <div style="font-size:10.5px;font-weight:700;color:#2D0A3A;line-height:1.3">${lb}</div>
+  </div>`).join('')}
+</div>
+<div id="frmDeptContent" style="display:none">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+    <button onclick="document.getElementById('frmDeptContent').style.display='none';document.getElementById('frmDeptGrid').style.display='grid'" style="padding:5px 12px;border-radius:7px;border:1px solid var(--bd);background:#fff;font-size:9.5px;font-weight:700;color:var(--tx2);cursor:pointer;font-family:inherit">← חזור</button>
+    <span id="frmDeptTitle" style="font-size:13px;font-weight:800;color:var(--wh)"></span>
   </div>
+  <div class="tabs2" id="frmSubTabs" style="flex-wrap:wrap;gap:3px;margin-bottom:14px"></div>
+  <div id="frmTabsContent"></div>
 </div>
-
-<!-- שכר -->
-<div class="tbp" id="fc1">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">💰 בקשת העלאת שכר</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['💰','שכר'],['🏛️','ועדה']])}
-      <div class="fr2"><div class="fg"><label class="fl">שכר נוכחי ₪</label><input class="fi" id="sal_c" type="number" placeholder="0"/></div><div class="fg"><label class="fl">שכר מבוקש ₪ *</label><input class="fi" id="sal_r" type="number" placeholder="0"/></div></div>
-      <div class="fg"><label class="fl">נימוק מפורט *</label><textarea class="fta tall" id="sal_n" placeholder="ביצועים, השוואת שוק, ותק, ישגים..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bng" onclick="subFrm('salary_raise')">הגש בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🪖 דיווח מילואים</div>
-      ${approvalFlow([['👤','אתה'],['💰','שכר']])}
-      <div class="fr2"><div class="fg"><label class="fl">ימי שירות *</label><input class="fi" id="res_d" type="number" min="1" placeholder="0"/></div><div class="fg"><label class="fl">שם היחידה *</label><input class="fi" id="res_u" placeholder="גדוד / פיקוד..."/></div></div>
-      <div class="fr2"><div class="fg"><label class="fl">מתאריך</label><input class="fi" id="res_f" type="date"/></div><div class="fg"><label class="fl">עד תאריך</label><input class="fi" id="res_t" type="date"/></div></div>
-      <div class="fg"><label class="fl">מספר צו קריאה</label><input class="fi" id="res_ord" placeholder="מספר מהמסמך"/></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('reserves')">שלח דיווח ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">✈️ חופשה ללא תשלום (חל"ד)</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR'],['💰','שכר']])}
-      <div class="warn-box" style="font-size:9px">⚠️ חל"ד טעונה אישור מיוחד. אין הבטחה לאישור.</div>
-      <div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="loa_f"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="loa_t"/></div></div>
-      <div class="fg"><label class="fl">סיבה מפורטת *</label><textarea class="fta tall" id="loa_r" placeholder="פרט את הסיבה לחל&quot;ד..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('vacation_leave')">הגש בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">📊 שינוי תנאי העסקה</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}
-      <div class="fg"><label class="fl">סוג השינוי</label><select class="fsel" id="cond_t"><option>שינוי היקף משרה</option><option>עדכון תפקיד</option><option>שינוי שעות</option><option>עבודה מהבית</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">תאריך כניסה לתוקף</label><input class="fi" type="date" id="cond_d"/></div>
-      <div class="fg"><label class="fl">פירוט מלא *</label><textarea class="fta tall" id="cond_det" placeholder="תאר את השינוי המבוקש..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('conditions')">הגש בקשה ↗</button>
-    </div>
-  </div>
-</div>
-
-<!-- ציוד ומחשוב -->
-<div class="tbp" id="fc2">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">📦 הזמנת ציוד</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['💻','מחשוב']])}
-      <div class="fg"><label class="fl">פריט מבוקש *</label><input class="fi" id="eq_i" placeholder="שם הציוד / פריט"/></div>
-      <div class="fr3"><div class="fg"><label class="fl">כמות</label><input class="fi" type="number" id="eq_q" value="1" min="1"/></div><div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="eq_u"><option value="low">נמוכה</option><option value="normal" selected>רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select></div><div class="fg"><label class="fl">מחיר משוער ₪</label><input class="fi" type="number" id="eq_p" placeholder="0"/></div></div>
-      <div class="fg"><label class="fl">נימוק *</label><textarea class="fta" id="eq_r" placeholder="למה נדרש הציוד?"></textarea></div>
-      <div class="fg"><label class="fl">קישור למוצר</label><input class="fi" id="eq_link" placeholder="https://..."/></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subEquip()">📦 הגש בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">💻 תקלה טכנית / IT</div>
-      ${approvalFlow([['👤','אתה'],['💻','מחשוב']])}
-      <div class="fg"><label class="fl">סוג התקלה</label><select class="fsel" id="it_t"><option>מחשב לא עולה</option><option>בעיית רשת / אינטרנט</option><option>מדפסת</option><option>תוכנה / רישיון</option><option>מייל / Outlook</option><option>טלפון / שלוחה</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">תיאור התקלה *</label><textarea class="fta" id="it_desc" placeholder="תאר את התקלה בפירוט..."></textarea></div>
-      <div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="it_urg"><option value="normal">רגיל</option><option value="high">גבוהה — מונע עבודה</option><option value="urgent">דחוף — פגיעה קריטית</option></select></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('it_issue')">שלח תקלה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🔑 בקשת גישה למערכת</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['💻','מחשוב']])}
-      <div class="fg"><label class="fl">מערכת מבוקשת *</label><input class="fi" id="acc_sys" placeholder="שם המערכת / תוכנה"/></div>
-      <div class="fg"><label class="fl">סוג הרשאה</label><select class="fsel" id="acc_lvl"><option>קריאה בלבד</option><option>קריאה וכתיבה</option><option>מנהל</option></select></div>
-      <div class="fg"><label class="fl">נימוק *</label><textarea class="fta" id="acc_r" placeholder="למה נדרשת הגישה?"></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('system_access')">שלח בקשה ↗</button>
-    </div>
-  </div>
-</div>
-
-<!-- תחזוקה -->
-<div class="tbp" id="fc3">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🔧 קריאת תחזוקה</div>
-      ${approvalFlow([['👤','אתה'],['🔧','תחזוקה']])}
-      <div class="fg"><label class="fl">סוג הקריאה</label><select class="fsel" id="mt_t"><option>תיקון חשמל</option><option>תיקון אינסטלציה</option><option>תיקון ריצוף / קירות</option><option>מיזוג אוויר</option><option>ניקיון מיוחד</option><option>גינון</option><option>ריהוט / מסגרות</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">מיקום *</label><input class="fi" id="mt_loc" placeholder="חדר / קומה / בניין..."/></div>
-      <div class="fg"><label class="fl">תיאור הבעיה *</label><textarea class="fta" id="mt_desc" placeholder="תאר את הבעיה בפירוט..."></textarea></div>
-      <div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="mt_urg"><option value="low">נמוכה</option><option value="normal" selected>רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף — מסכן בטיחות</option></select></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('maintenance')">שלח קריאה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🎒 טופס טיול ופעילות</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['🔧','תחזוקה']])}
-      <div class="fr2"><div class="fg"><label class="fl">שם הפעילות *</label><input class="fi" id="tr_n" placeholder="שם הפעילות"/></div><div class="fg"><label class="fl">תאריך</label><input class="fi" type="date" id="tr_d"/></div></div>
-      <div class="fr2"><div class="fg"><label class="fl">יעד / מיקום</label><input class="fi" id="tr_dest" placeholder="יעד הטיול"/></div><div class="fg"><label class="fl">מספר משתתפים</label><input class="fi" type="number" id="tr_cnt" min="1" value="1"/></div></div>
-      <div class="fg"><label class="fl">תיאור הפעילות</label><textarea class="fta" id="tr_det" placeholder="מטרות ואוכלוסיית יעד..."></textarea></div>
-      <div class="fg"><label class="fl">גורם מממן</label><input class="fi" id="tr_fund" placeholder="תקציב / תורם..."/></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('trip')">שלח לאישור ↗</button>
-    </div>
-  </div>
-</div>
-
-<!-- שיווק -->
-<div class="tbp" id="fc4">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">📸 בקשת צילום</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['📣','שיווק']])}
-      <div class="fg"><label class="fl">סוג הצילום</label><select class="fsel" id="ph_t"><option>אירוע</option><option>תיעוד שוטף</option><option>תוכן לרשתות חברתיות</option><option>צילום קבוצתי</option><option>פורטרט עובד</option><option>אחר</option></select></div>
-      <div class="fr2"><div class="fg"><label class="fl">תאריך מבוקש *</label><input class="fi" type="date" id="ph_d"/></div><div class="fg"><label class="fl">שעה מבוקשת</label><input class="fi" type="time" id="ph_t2"/></div></div>
-      <div class="fg"><label class="fl">מיקום</label><input class="fi" id="ph_loc" placeholder="היכן יתקיים הצילום?"/></div>
-      <div class="fg"><label class="fl">תיאור ומטרה *</label><textarea class="fta" id="ph_desc" placeholder="תאר מה צריך לצלם ולמה..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('photography')">שלח בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🎬 בקשת תוכן וידאו</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['📣','שיווק']])}
-      <div class="fg"><label class="fl">סוג הוידאו</label><select class="fsel" id="vid_t"><option>סרטון홍보 (תדמית)</option><option>סרטון אירוע</option><option>ראיון / עדות</option><option>תוכן לרשתות חברתיות (קצר)</option><option>הדרכה/הסברה</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">אורך משוער</label><select class="fsel" id="vid_len"><option>עד דקה (Reel / TikTok)</option><option>1-3 דקות</option><option>3-10 דקות</option><option>מעל 10 דקות</option></select></div>
-      <div class="fg"><label class="fl">תאריך הפקה מבוקש</label><input class="fi" type="date" id="vid_d"/></div>
-      <div class="fg"><label class="fl">תיאור ומטרה *</label><textarea class="fta" id="vid_desc" placeholder="תאר את תוכן הסרטון, קהל היעד, ומטרתו..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('video')">שלח בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">📢 בקשת קמפיין</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['📣','שיווק']])}
-      <div class="fg"><label class="fl">נושא הקמפיין *</label><input class="fi" id="camp_n" placeholder="שם / נושא הקמפיין"/></div>
-      <div class="fg"><label class="fl">פלטפורמות</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:5px">
-          ${['פייסבוק','אינסטגרם','לינקדאין','מייל','WhatsApp'].map(p=>`<label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--tx2);cursor:pointer"><input type="checkbox" id="camp_${p}"> ${p}</label>`).join('')}
-        </div>
-      </div>
-      <div class="fr2"><div class="fg"><label class="fl">תאריך התחלה</label><input class="fi" type="date" id="camp_f"/></div><div class="fg"><label class="fl">תאריך סיום</label><input class="fi" type="date" id="camp_t"/></div></div>
-      <div class="fg"><label class="fl">תקציב משוער ₪</label><input class="fi" type="number" id="camp_bgt" placeholder="0"/></div>
-      <div class="fg"><label class="fl">מטרות ותוצאות רצויות *</label><textarea class="fta" id="camp_desc" placeholder="מה מטרת הקמפיין? מה נמדוד?"></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('campaign')">שלח בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">✍️ יצירת תוכן כתוב</div>
-      ${approvalFlow([['👤','אתה'],['📣','שיווק']])}
-      <div class="fg"><label class="fl">סוג התוכן</label><select class="fsel" id="cont_t"><option>פוסט לרשתות</option><option>כתבה / בלוג</option><option>ניוזלטר</option><option>מצגת</option><option>תסריט לסרטון</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">נושא *</label><input class="fi" id="cont_n" placeholder="נושא התוכן"/></div>
-      <div class="fg"><label class="fl">תאריך דדליין</label><input class="fi" type="date" id="cont_d"/></div>
-      <div class="fg"><label class="fl">תיאור ובריף *</label><textarea class="fta tall" id="cont_desc" placeholder="תאר בפירוט: מה, למי, מה המסר, טון, דוגמאות..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('content')">שלח בקשה ↗</button>
-    </div>
-  </div>
-</div>
-
-<!-- מזכירות -->
-<div class="tbp" id="fc5">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">📋 בקשה מהמזכירות</div>
-      ${approvalFlow([['👤','אתה'],['📋','מזכירות']])}
-      <div class="fg"><label class="fl">סוג הבקשה</label><select class="fsel" id="sec_t"><option>תיאום פגישה</option><option>הזמנת חדר ישיבות</option><option>הפקת מסמך</option><option>אישור חתימה</option><option>משלוח / שליח</option><option>הזמנת כיבוד</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">תאריך ושעה מבוקשים</label><input class="fi" type="datetime-local" id="sec_dt"/></div>
-      <div class="fg"><label class="fl">פרטים *</label><textarea class="fta tall" id="sec_desc" placeholder="תאר את הבקשה בפירוט..."></textarea></div>
-      <div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="sec_urg"><option value="normal">רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('secretary')">שלח בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🗓️ הזמנת חדר ישיבות</div>
-      ${approvalFlow([['👤','אתה'],['📋','מזכירות']])}
-      <div class="fg"><label class="fl">חדר</label><select class="fsel" id="room_n"><option>חדר ישיבות A (8 מקומות)</option><option>חדר ישיבות B (20 מקומות)</option><option>אולם הרצאות (50+)</option><option>חדר הנהלה</option></select></div>
-      <div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="room_d"/></div><div class="fg"><label class="fl">שעות</label><input class="fi" id="room_h" placeholder="09:00-11:00"/></div></div>
-      <div class="fg"><label class="fl">מספר משתתפים</label><input class="fi" type="number" id="room_cnt" min="1" value="5"/></div>
-      <div class="fg"><label class="fl">ציוד נדרש</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:5px">
-          ${['מקרן','מסך','מיקרופון','כיבוד','לבן לכתיבה'].map(e=>`<label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--tx2);cursor:pointer"><input type="checkbox" id="room_eq_${e}"> ${e}</label>`).join('')}
-        </div>
-      </div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('room_booking')">הזמן חדר ↗</button>
-    </div>
-  </div>
-</div>
-
-<!-- מנכ"ל -->
-<div class="tbp" id="fc6">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🏛️ פנייה ללשכת המנכ"ל</div>
-      ${approvalFlow([['👤','אתה'],['👔','מנהל'],['🏛️','מנכ"ל']])}
-      <div class="warn-box" style="font-size:9px">📌 פנייה זו עוברת תחילה לאישור מנהלך הישיר.</div>
-      <div class="fg"><label class="fl">נושא הפנייה</label><select class="fsel" id="ceo_t"><option>בקשה מיוחדת</option><option>ערעור על החלטת ניהול</option><option>הצעה אסטרטגית</option><option>דיווח בנושא רגיש</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">נושא *</label><input class="fi" id="ceo_subj" placeholder="נושא הפנייה בקצרה"/></div>
-      <div class="fg"><label class="fl">תוכן הפנייה *</label><textarea class="fta tall" id="ceo_desc" placeholder="פרט את הפנייה, הרקע, והפתרון המוצע..."></textarea></div>
-      <div class="fg"><label class="fl">האם מבוקשת פגישה?</label><select class="fsel" id="ceo_mtg"><option value="no">לא — טיפול בכתב</option><option value="yes">כן — מבוקשת פגישה</option></select></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('ceo')">שלח פנייה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">💡 הצעת רעיון / חדשנות</div>
-      ${approvalFlow([['👤','אתה'],['🏛️','ועדת חדשנות']])}
-      <div class="fg"><label class="fl">שם הרעיון *</label><input class="fi" id="idea_n" placeholder="שם הרעיון / הצעה"/></div>
-      <div class="fg"><label class="fl">תחום</label><select class="fsel" id="idea_cat"><option>תהליכי עבודה</option><option>חיסכון עלויות</option><option>שיפור שירות</option><option>טכנולוגיה</option><option>רווחת עובדים</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">תיאור הרעיון *</label><textarea class="fta" id="idea_desc" placeholder="תאר את הרעיון, הבעיה שהוא פותר, ואיך מיישמים..."></textarea></div>
-      <div class="fg"><label class="fl">תועלת צפויה</label><textarea class="fta" id="idea_ben" placeholder="מה הארגון ירוויח?"></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnv" onclick="subFrm('innovation')">שלח רעיון 💡</button>
-    </div>
-  </div>
-</div>
-
-<!-- ביטחון -->
-<div class="tbp" id="fc7">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🔒 בקשת אמצעי ביטחון</div>
-      ${approvalFlow([['👤','אתה'],['🔒','ביטחון']])}
-      <div class="fg"><label class="fl">סוג הבקשה</label><select class="fsel" id="sec2_t"><option>כרטיס כניסה / מגנט</option><option>בקשת תגית</option><option>גישה לאזור מוגבל</option><option>רישום רכב</option><option>הכנסת אורח חיצוני</option><option>בקשת מנעול / מפתח</option></select></div>
-      <div class="fg"><label class="fl">פרטים *</label><textarea class="fta" id="sec2_desc" placeholder="תאר את הבקשה בפירוט..."></textarea></div>
-      <div class="fg"><label class="fl">תאריך נדרש</label><input class="fi" type="date" id="sec2_d"/></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('security_req')">שלח בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">⚠️ דיווח אירוע ביטחוני</div>
-      ${approvalFlow([['👤','אתה'],['🔒','ביטחון']])}
-      <div class="warn-box" style="font-size:9px">🚨 במקרה חירום — התקשר מיד לקצין הביטחון!</div>
-      <div class="fg"><label class="fl">סוג האירוע</label><select class="fsel" id="sec_inc_t"><option>חשד לפריצה</option><option>אובדן/גניבת ציוד</option><option>אדם חשוד בשטח</option><option>פגיעה בנכס</option><option>אחר</option></select></div>
-      <div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="sec_inc_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="sec_inc_h"/></div></div>
-      <div class="fg"><label class="fl">מיקום *</label><input class="fi" id="sec_inc_l" placeholder="היכן בדיוק?"/></div>
-      <div class="fg"><label class="fl">תיאור האירוע *</label><textarea class="fta tall" id="sec_inc_desc" placeholder="תאר מה קרה בפירוט..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnr" onclick="subFrm('security_incident')">🚨 דווח מיידית</button>
-    </div>
-  </div>
-</div>
-
-<!-- רווחה -->
-<div class="tbp" id="fc8">
-  <div class="g2">
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">❤️ בקשת סיוע / רווחה</div>
-      ${approvalFlow([['👤','אתה'],['❤️','רווחה']])}
-      <div class="info-box" style="font-size:9px">💜 כל פנייה מטופלת בסודיות מלאה ובאמפתיה.</div>
-      <div class="fg"><label class="fl">נושא הפנייה</label><select class="fsel" id="wlf_t"><option>קשיים אישיים / משפחתיים</option><option>קשיי עבודה / שחיקה</option><option>קשיים כלכליים</option><option>בקשה לייעוץ</option><option>בקשה לגמישות מיוחדת</option><option>אחר</option></select></div>
-      <div class="fg"><label class="fl">פרטים (אופציונלי)</label><textarea class="fta tall" id="wlf_desc" placeholder="שתף ככל שתרצה. הכל חסוי."></textarea></div>
-      <div class="fg"><label class="fl">כיצד ניצור קשר?</label><select class="fsel" id="wlf_contact"><option>מייל</option><option>טלפון</option><option>פגישה פרונטלית</option><option>זום / שיחה מרחוק</option></select></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('welfare')">שלח בקשה ↗</button>
-    </div>
-    <div class="card">
-      <div class="st" style="margin-bottom:10px">🎉 הצעת אירוע / גיבוש</div>
-      ${approvalFlow([['👤','אתה'],['❤️','רווחה'],['👔','מנהל']])}
-      <div class="fg"><label class="fl">סוג האירוע</label><select class="fsel" id="evt_t"><option>גיבוש צוות</option><option>ימי הולדת קבוצתיים</option><option>ערב חברתי</option><option>הרצאה / סדנה</option><option>פעילות ספורט</option><option>חגיגת הצלחה</option></select></div>
-      <div class="fg"><label class="fl">שם האירוע *</label><input class="fi" id="evt_n" placeholder="שם / תיאור האירוע"/></div>
-      <div class="fr2"><div class="fg"><label class="fl">תאריך מבוקש</label><input class="fi" type="date" id="evt_d"/></div><div class="fg"><label class="fl">מספר משתתפים</label><input class="fi" type="number" id="evt_cnt" min="1" value="10"/></div></div>
-      <div class="fg"><label class="fl">תקציב מבוקש ₪</label><input class="fi" type="number" id="evt_bgt" placeholder="0"/></div>
-      <div class="fg"><label class="fl">תיאור ופרטים</label><textarea class="fta" id="evt_desc" placeholder="תאר את האירוע ומה דרוש להפקתו..."></textarea></div>
-      ${copyMailField()}
-      <button class="btn bnt" onclick="subFrm('event')">שלח הצעה ↗</button>
-    </div>
-  </div>
-</div>
-
 </div>`;
 
-  // טען היסטוריית ציוד אם פתוח
-  loadEquipHist();
+  window._frmDepts = {};
+  _buildFrmDepts(approvalFlow, copyMailField, bonus);
+}
+
+function _buildFrmDepts(approvalFlow, copyMailField, bonus) {
+  window._frmDepts = {
+    fc0: { title:'👥 HR ומשאבי אנוש', tabs:[
+      {lb:'✈️ חופשה', id:'fd0', html:`<div class="g2"><div class="card"><div class="st" style="margin-bottom:10px">✈️ בקשת חופשה</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}<div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="vf"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="vt"/></div></div><div class="fg"><label class="fl">סוג חופשה</label><select class="fsel" id="vtype"><option value="annual">חופשה שנתית</option><option value="personal">יום אישי</option><option value="emergency">חירום משפחתי</option><option value="marriage">חתונה</option><option value="mourning">אבל</option><option value="reserve">מילואים</option></select></div><div class="fg"><label class="fl">הערות</label><textarea class="fta" id="vn"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('vacation')">שלח ↗</button></div></div>`},
+      {lb:'🤒 מחלה', id:'fd1', html:`<div class="card"><div class="st" style="margin-bottom:10px">🤒 דיווח מחלה</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}<div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="sk_f"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="sk_t"/></div></div><div class="fg"><label class="fl">סיבה</label><textarea class="fta" id="sk_r"></textarea></div><div class="info-box" style="font-size:9px">עד 3 ימים — ללא אישור. מ-3 ימים — אישור חובה.</div>${copyMailField()}<button class="btn bnt" onclick="subFrm('sick')">שלח ↗</button></div>`},
+      {lb:'🚑 תאונה', id:'fd2', html:`<div class="card"><div class="st" style="margin-bottom:10px">🚑 תאונת עבודה</div><div class="warn-box" style="font-size:9px">🚨 חובה לדווח תוך 24 שעות!</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}<div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="ac_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="ac_t"/></div></div><div class="fg"><label class="fl">מיקום *</label><input class="fi" id="ac_l" placeholder="היכן בדיוק?"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="ac_desc"></textarea></div><div class="fg"><label class="fl">פציעות *</label><textarea class="fta" id="ac_inj"></textarea></div><div class="fg"><label class="fl">עדים</label><input class="fi" id="ac_w"/></div>${copyMailField()}<button class="btn bnr" onclick="subFrm('accident')">🚨 דווח</button></div>`},
+      {lb:'⭐ הערכה', id:'fd3', html:`<div class="card"><div class="st" style="margin-bottom:10px">⭐ הערכה עצמית</div>${approvalFlow([['👤','אתה'],['👥','HR']])}<div class="fg"><label class="fl">שנת הערכה</label><input class="fi" id="ev_y" value="2026"/></div>${[['ביצועים','ev1'],['עבודת צוות','ev2'],['יוזמה','ev3'],['עמידה ביעדים','ev4']].map(([lb,id])=>`<div class="fg"><label class="fl" style="display:flex;justify-content:space-between">${lb}<span id="${id}v" style="color:var(--t);font-weight:700">3/5</span></label><input type="range" min="1" max="5" value="3" style="width:100%;accent-color:var(--t)" oninput="document.getElementById('${id}v').textContent=this.value+'/5'"></div>`).join('')}<div class="fg"><label class="fl">משוב *</label><textarea class="fta tall" id="ev_txt"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('eval')">שלח ↗</button></div>`},
+      {lb:'👥 חבר מביא חבר', id:'fd4', html:`<div class="card"><div class="st" style="margin-bottom:10px">👥 חבר מביא חבר</div><div class="info-box" style="font-size:9px">💰 בונוס ₪${bonus}!</div>${approvalFlow([['👤','אתה'],['👥','HR']])}<div class="fr2"><div class="fg"><label class="fl">שם *</label><input class="fi" id="rf_n"/></div><div class="fg"><label class="fl">טלפון *</label><input class="fi" id="rf_p" type="tel"/></div></div><div class="fg"><label class="fl">מייל</label><input class="fi" id="rf_e" type="email"/></div><div class="fg"><label class="fl">תפקיד מתאים</label><input class="fi" id="rf_r"/></div><div class="fg"><label class="fl">למה מתאים/ה?</label><textarea class="fta" id="rf_w"></textarea></div>${copyMailField()}<button class="btn bng" onclick="subFrm('referral')">הפן ↗</button></div>`},
+    ]},
+    fc1: { title:'💰 שכר ותנאים', tabs:[
+      {lb:'💰 העלאת שכר', id:'fs0', html:`<div class="card"><div class="st" style="margin-bottom:10px">💰 בקשת העלאת שכר</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['💰','שכר'],['🏛️','ועדה']])}<div class="fr2"><div class="fg"><label class="fl">שכר נוכחי ₪</label><input class="fi" id="sal_c" type="number"/></div><div class="fg"><label class="fl">שכר מבוקש ₪ *</label><input class="fi" id="sal_r" type="number"/></div></div><div class="fg"><label class="fl">נימוק *</label><textarea class="fta tall" id="sal_n"></textarea></div>${copyMailField()}<button class="btn bng" onclick="subFrm('salary_raise')">הגש ↗</button></div>`},
+      {lb:'🪖 מילואים', id:'fs1', html:`<div class="card"><div class="st" style="margin-bottom:10px">🪖 דיווח מילואים</div>${approvalFlow([['👤','אתה'],['💰','שכר']])}<div class="fr2"><div class="fg"><label class="fl">ימים *</label><input class="fi" id="res_d" type="number" min="1"/></div><div class="fg"><label class="fl">יחידה *</label><input class="fi" id="res_u"/></div></div><div class="fr2"><div class="fg"><label class="fl">מתאריך</label><input class="fi" id="res_f" type="date"/></div><div class="fg"><label class="fl">עד תאריך</label><input class="fi" id="res_t" type="date"/></div></div><div class="fg"><label class="fl">מספר צו</label><input class="fi" id="res_ord"/></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('reserves')">שלח ↗</button></div>`},
+      {lb:'✈️ חל"ד', id:'fs2', html:`<div class="card"><div class="st" style="margin-bottom:10px">✈️ חופשה ללא תשלום</div><div class="warn-box" style="font-size:9px">⚠️ טעון אישור מיוחד.</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR'],['💰','שכר']])}<div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="loa_f"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="loa_t"/></div></div><div class="fg"><label class="fl">סיבה *</label><textarea class="fta tall" id="loa_r"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('vacation_leave')">הגש ↗</button></div>`},
+      {lb:'📋 שינוי תנאים', id:'fs3', html:`<div class="card"><div class="st" style="margin-bottom:10px">📋 שינוי תנאי העסקה</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['👥','HR']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="cond_t"><option>שינוי היקף משרה</option><option>עדכון תפקיד</option><option>שינוי שעות</option><option>עבודה מהבית</option><option>אחר</option></select></div><div class="fg"><label class="fl">תאריך כניסה לתוקף</label><input class="fi" type="date" id="cond_d"/></div><div class="fg"><label class="fl">פירוט *</label><textarea class="fta tall" id="cond_det"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('conditions')">הגש ↗</button></div>`},
+    ]},
+    fc2: { title:'📦 ציוד ומחשוב', tabs:[
+      {lb:'📦 הזמנת ציוד', id:'fe0', html:`<div class="g2"><div class="card"><div class="st" style="margin-bottom:10px">📦 הזמנת ציוד</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['💻','מחשוב']])}<div class="fg"><label class="fl">פריט *</label><input class="fi" id="eq_i"/></div><div class="fr3"><div class="fg"><label class="fl">כמות</label><input class="fi" type="number" id="eq_q" value="1" min="1"/></div><div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="eq_u"><option value="normal" selected>רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select></div><div class="fg"><label class="fl">מחיר ₪</label><input class="fi" type="number" id="eq_p"/></div></div><div class="fg"><label class="fl">נימוק *</label><textarea class="fta" id="eq_r"></textarea></div><div class="fg"><label class="fl">קישור</label><input class="fi" id="eq_link" placeholder="https://..."/></div>${copyMailField()}<button class="btn bnt" onclick="subEquip()">📦 הגש ↗</button></div><div class="card"><div class="sh"><span class="st">📋 הזמנות קודמות</span></div><div id="equipHist"><div class="ldg">⟳</div></div></div></div>`},
+      {lb:'💻 תקלת IT', id:'fe1', html:`<div class="card"><div class="st" style="margin-bottom:10px">💻 תקלה טכנית</div>${approvalFlow([['👤','אתה'],['💻','מחשוב']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="it_t"><option>מחשב</option><option>רשת</option><option>מדפסת</option><option>תוכנה</option><option>מייל</option><option>טלפון</option><option>אחר</option></select></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="it_desc"></textarea></div><div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="it_urg"><option value="normal">רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('it_issue')">שלח ↗</button></div>`},
+      {lb:'🔑 גישה למערכת', id:'fe2', html:`<div class="card"><div class="st" style="margin-bottom:10px">🔑 בקשת גישה</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['💻','מחשוב']])}<div class="fg"><label class="fl">מערכת *</label><input class="fi" id="acc_sys"/></div><div class="fg"><label class="fl">הרשאה</label><select class="fsel" id="acc_lvl"><option>קריאה</option><option>קריאה וכתיבה</option><option>מנהל</option></select></div><div class="fg"><label class="fl">נימוק *</label><textarea class="fta" id="acc_r"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('system_access')">שלח ↗</button></div>`},
+    ]},
+    fc3: { title:'🔧 תחזוקה', tabs:[
+      {lb:'🔧 קריאת תחזוקה', id:'fm0', html:`<div class="card"><div class="st" style="margin-bottom:10px">🔧 קריאת תחזוקה</div>${approvalFlow([['👤','אתה'],['🔧','תחזוקה']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="mt_t"><option>חשמל</option><option>אינסטלציה</option><option>ריצוף / קירות</option><option>מיזוג</option><option>ניקיון</option><option>גינון</option><option>ריהוט</option><option>אחר</option></select></div><div class="fg"><label class="fl">מיקום *</label><input class="fi" id="mt_loc"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="mt_desc"></textarea></div><div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="mt_urg"><option value="normal" selected>רגיל</option><option value="high">גבוהה</option><option value="urgent">סכנת בטיחות</option></select></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('maintenance')">שלח ↗</button></div>`},
+      {lb:'🎒 טיול/פעילות', id:'fm1', html:`<div class="card"><div class="st" style="margin-bottom:10px">🎒 אישור טיול/פעילות</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['🔧','תחזוקה']])}<div class="fr2"><div class="fg"><label class="fl">שם *</label><input class="fi" id="tr_n"/></div><div class="fg"><label class="fl">תאריך</label><input class="fi" type="date" id="tr_d"/></div></div><div class="fr2"><div class="fg"><label class="fl">יעד</label><input class="fi" id="tr_dest"/></div><div class="fg"><label class="fl">משתתפים</label><input class="fi" type="number" id="tr_cnt" value="1"/></div></div><div class="fg"><label class="fl">תיאור</label><textarea class="fta" id="tr_det"></textarea></div><div class="fg"><label class="fl">מימון</label><input class="fi" id="tr_fund"/></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('trip')">שלח ↗</button></div>`},
+    ]},
+    fc4: { title:'📣 שיווק וצילום', tabs:[
+      {lb:'📸 צילום', id:'fp0', html:`<div class="card"><div class="st" style="margin-bottom:10px">📸 בקשת צילום</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['📣','שיווק']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="ph_t"><option>אירוע</option><option>תוכן לרשתות</option><option>צילום קבוצתי</option><option>פורטרט</option><option>אחר</option></select></div><div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="ph_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="ph_t2"/></div></div><div class="fg"><label class="fl">מיקום</label><input class="fi" id="ph_loc"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="ph_desc"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('photography')">שלח ↗</button></div>`},
+      {lb:'🎬 וידאו', id:'fp1', html:`<div class="card"><div class="st" style="margin-bottom:10px">🎬 בקשת וידאו</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['📣','שיווק']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="vid_t"><option>תדמית</option><option>אירוע</option><option>ראיון</option><option>Reel</option><option>הדרכה</option><option>אחר</option></select></div><div class="fg"><label class="fl">אורך</label><select class="fsel" id="vid_len"><option>עד דקה</option><option>1-3 דקות</option><option>3-10 דקות</option><option>מעל 10 דקות</option></select></div><div class="fg"><label class="fl">תאריך הפקה</label><input class="fi" type="date" id="vid_d"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="vid_desc"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('video')">שלח ↗</button></div>`},
+      {lb:'📢 קמפיין', id:'fp2', html:`<div class="card"><div class="st" style="margin-bottom:10px">📢 בקשת קמפיין</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['📣','שיווק']])}<div class="fg"><label class="fl">נושא *</label><input class="fi" id="camp_n"/></div><div class="fr2"><div class="fg"><label class="fl">התחלה</label><input class="fi" type="date" id="camp_f"/></div><div class="fg"><label class="fl">סיום</label><input class="fi" type="date" id="camp_t"/></div></div><div class="fg"><label class="fl">תקציב ₪</label><input class="fi" type="number" id="camp_bgt"/></div><div class="fg"><label class="fl">מטרות *</label><textarea class="fta" id="camp_desc"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('campaign')">שלח ↗</button></div>`},
+      {lb:'✍️ תוכן כתוב', id:'fp3', html:`<div class="card"><div class="st" style="margin-bottom:10px">✍️ בקשת תוכן</div>${approvalFlow([['👤','אתה'],['📣','שיווק']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="cont_t"><option>פוסט</option><option>כתבה</option><option>ניוזלטר</option><option>מצגת</option><option>תסריט</option><option>אחר</option></select></div><div class="fg"><label class="fl">נושא *</label><input class="fi" id="cont_n"/></div><div class="fg"><label class="fl">דדליין</label><input class="fi" type="date" id="cont_d"/></div><div class="fg"><label class="fl">בריף *</label><textarea class="fta tall" id="cont_desc"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('content')">שלח ↗</button></div>`},
+    ]},
+    fc5: { title:'📋 מזכירות', tabs:[
+      {lb:'📋 בקשה כללית', id:'fsc0', html:`<div class="card"><div class="st" style="margin-bottom:10px">📋 בקשה מהמזכירות</div>${approvalFlow([['👤','אתה'],['📋','מזכירות']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="sec_t"><option>תיאום פגישה</option><option>הזמנת חדר</option><option>הפקת מסמך</option><option>אישור חתימה</option><option>משלוח</option><option>כיבוד</option><option>אחר</option></select></div><div class="fg"><label class="fl">תאריך ושעה</label><input class="fi" type="datetime-local" id="sec_dt"/></div><div class="fg"><label class="fl">פרטים *</label><textarea class="fta tall" id="sec_desc"></textarea></div><div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="sec_urg"><option value="normal">רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('secretary')">שלח ↗</button></div>`},
+      {lb:'🗓️ הזמנת חדר', id:'fsc1', html:`<div class="card"><div class="st" style="margin-bottom:10px">🗓️ הזמנת חדר ישיבות</div>${approvalFlow([['👤','אתה'],['📋','מזכירות']])}<div class="fg"><label class="fl">חדר</label><select class="fsel" id="room_n"><option>חדר A (8 מקומות)</option><option>חדר B (20 מקומות)</option><option>אולם (50+)</option><option>חדר הנהלה</option></select></div><div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="room_d"/></div><div class="fg"><label class="fl">שעות</label><input class="fi" id="room_h" placeholder="09:00-11:00"/></div></div><div class="fg"><label class="fl">משתתפים</label><input class="fi" type="number" id="room_cnt" value="5" min="1"/></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('room_booking')">הזמן ↗</button></div>`},
+    ]},
+    fc6: { title:'🏛️ לשכת מנכ"ל', tabs:[
+      {lb:'🏛️ פנייה למנכ"ל', id:'fceo0', html:`<div class="g2"><div class="card"><div class="st" style="margin-bottom:10px">🏛️ פנייה ללשכת המנכ"ל</div><div class="warn-box" style="font-size:9px">📌 עוברת תחילה לאישור מנהלך.</div>${approvalFlow([['👤','אתה'],['👔','מנהל'],['🏛️','מנכ"ל']])}<div class="fg"><label class="fl">נושא</label><select class="fsel" id="ceo_t"><option>בקשה מיוחדת</option><option>ערעור</option><option>הצעה אסטרטגית</option><option>דיווח רגיש</option><option>אחר</option></select></div><div class="fg"><label class="fl">כותרת *</label><input class="fi" id="ceo_subj"/></div><div class="fg"><label class="fl">תוכן *</label><textarea class="fta tall" id="ceo_desc"></textarea></div><div class="fg"><label class="fl">פגישה?</label><select class="fsel" id="ceo_mtg"><option value="no">לא</option><option value="yes">כן</option></select></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('ceo')">שלח ↗</button></div><div class="card"><div class="st" style="margin-bottom:10px">💡 הצעת רעיון</div>${approvalFlow([['👤','אתה'],['🏛️','ועדת חדשנות']])}<div class="fg"><label class="fl">שם הרעיון *</label><input class="fi" id="idea_n"/></div><div class="fg"><label class="fl">תחום</label><select class="fsel" id="idea_cat"><option>תהליכים</option><option>חיסכון</option><option>שיפור שירות</option><option>טכנולוגיה</option><option>רווחת עובדים</option><option>אחר</option></select></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="idea_desc"></textarea></div><div class="fg"><label class="fl">תועלת</label><textarea class="fta" id="idea_ben"></textarea></div>${copyMailField()}<button class="btn bnv" onclick="subFrm('innovation')">שלח 💡</button></div></div>`},
+    ]},
+    fc7: { title:'🔒 ביטחון', tabs:[
+      {lb:'🔒 בקשות ביטחון', id:'fsec0', html:`<div class="g2"><div class="card"><div class="st" style="margin-bottom:10px">🔒 בקשת אמצעי ביטחון</div>${approvalFlow([['👤','אתה'],['🔒','ביטחון']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="sec2_t"><option>כרטיס כניסה</option><option>תגית</option><option>גישה לאזור מוגבל</option><option>רישום רכב</option><option>הכנסת אורח</option><option>מנעול / מפתח</option></select></div><div class="fg"><label class="fl">פרטים *</label><textarea class="fta" id="sec2_desc"></textarea></div><div class="fg"><label class="fl">תאריך נדרש</label><input class="fi" type="date" id="sec2_d"/></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('security_req')">שלח ↗</button></div><div class="card"><div class="st" style="margin-bottom:10px">⚠️ דיווח אירוע ביטחוני</div><div class="warn-box" style="font-size:9px">🚨 חירום — התקשר לקצין הביטחון!</div>${approvalFlow([['👤','אתה'],['🔒','ביטחון']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="sec_inc_t"><option>חשד לפריצה</option><option>גניבה</option><option>אדם חשוד</option><option>פגיעה בנכס</option><option>אחר</option></select></div><div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="sec_inc_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="sec_inc_h"/></div></div><div class="fg"><label class="fl">מיקום *</label><input class="fi" id="sec_inc_l"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta tall" id="sec_inc_desc"></textarea></div>${copyMailField()}<button class="btn bnr" onclick="subFrm('security_incident')">🚨 דווח</button></div></div>`},
+    ]},
+    fc8: { title:'❤️ רווחה ופנאי', tabs:[
+      {lb:'❤️ סיוע', id:'fw0', html:`<div class="g2"><div class="card"><div class="st" style="margin-bottom:10px">❤️ בקשת סיוע</div><div class="info-box" style="font-size:9px">💜 חסוי לחלוטין.</div>${approvalFlow([['👤','אתה'],['❤️','רווחה']])}<div class="fg"><label class="fl">נושא</label><select class="fsel" id="wlf_t"><option>קשיים אישיים</option><option>שחיקה</option><option>קשיים כלכליים</option><option>ייעוץ</option><option>גמישות מיוחדת</option><option>אחר</option></select></div><div class="fg"><label class="fl">פרטים</label><textarea class="fta tall" id="wlf_desc" placeholder="שתף ככל שתרצה. הכל חסוי."></textarea></div><div class="fg"><label class="fl">כיצד ליצור קשר?</label><select class="fsel" id="wlf_contact"><option>מייל</option><option>טלפון</option><option>פגישה</option><option>זום</option></select></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('welfare')">שלח ↗</button></div><div class="card"><div class="st" style="margin-bottom:10px">🎉 הצעת אירוע</div>${approvalFlow([['👤','אתה'],['❤️','רווחה'],['👔','מנהל']])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="evt_t"><option>גיבוש</option><option>ימי הולדת</option><option>ערב חברתי</option><option>סדנה</option><option>ספורט</option><option>חגיגה</option></select></div><div class="fg"><label class="fl">שם *</label><input class="fi" id="evt_n"/></div><div class="fr2"><div class="fg"><label class="fl">תאריך</label><input class="fi" type="date" id="evt_d"/></div><div class="fg"><label class="fl">משתתפים</label><input class="fi" type="number" id="evt_cnt" value="10"/></div></div><div class="fg"><label class="fl">תקציב ₪</label><input class="fi" type="number" id="evt_bgt"/></div><div class="fg"><label class="fl">פרטים</label><textarea class="fta" id="evt_desc"></textarea></div>${copyMailField()}<button class="btn bnt" onclick="subFrm('event')">שלח ↗</button></div></div>`},
+    ]},
+  };
+}
+
+function showFormDept(id) {
+  document.getElementById('frmDeptGrid').style.display = 'none';
+  document.getElementById('frmDeptContent').style.display = 'block';
+  const dept = window._frmDepts?.[id];
+  if (!dept) return;
+  document.getElementById('frmDeptTitle').textContent = dept.title;
+  const subTabs = document.getElementById('frmSubTabs');
+  const content = document.getElementById('frmTabsContent');
+  subTabs.innerHTML = dept.tabs.map((t,i) =>
+    `<div class="tab2 ${i===0?'on':''}" onclick="swSubTab(this,'${t.id}')">${t.lb}</div>`
+  ).join('');
+  content.innerHTML = dept.tabs.map((t,i) =>
+    `<div class="tbp ${i===0?'on':''}" id="${t.id}">${t.html}</div>`
+  ).join('');
+  if (id === 'fc2') setTimeout(loadEquipHist, 100);
+}
+
+function swSubTab(btn, tid) {
+  btn.closest('.tabs2').querySelectorAll('.tab2').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#frmTabsContent .tbp').forEach(t => t.classList.remove('on'));
+  document.getElementById(tid)?.classList.add('on');
 }
 
 // שליחה גנרית לפי טופס
