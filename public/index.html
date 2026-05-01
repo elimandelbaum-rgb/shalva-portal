@@ -457,10 +457,6 @@ html,body{height:100%;font-family:"Heebo",sans-serif;background:#F7F4FA;color:va
     <img src="/logo.png" id="loginLogo" style="background:transparent" onerror="this.style.display='none';document.getElementById('loginFb').style.display='block'"/>
     <div id="loginFb" style="display:none"><div class="llogo-fb">שלוה</div><div class="llogo-sub">EMPLOYEE PORTAL · המרכז הלאומי</div></div>
   </div>
-  <div class="rtabs">
-    <div class="rtab on" id="rt-e" onclick="selRole('emp')">👤 עובד</div>
-    <div class="rtab" id="rt-a" onclick="selRole('adm')">🛡 מנהל</div>
-  </div>
   <div class="lerr" id="lerr">שם משתמש או סיסמה שגויים</div>
   <label class="lfl">שם משתמש</label>
   <input class="lfi" id="lun" placeholder="הכנס שם משתמש..." autocomplete="username"/>
@@ -468,8 +464,10 @@ html,body{height:100%;font-family:"Heebo",sans-serif;background:#F7F4FA;color:va
   <input class="lfi" id="lpw" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
   <button class="lbtn" id="loginBtn" onclick="doLogin()">כניסה לפורטל ←</button>
   <div class="lhint">
-    <b>עובד:</b> מיכל / 1234 &nbsp;·&nbsp; יוסי / 1234 &nbsp;·&nbsp; רות / 1234<br>
-    <b>מנהל:</b> admin / admin123
+    <b>עובד:</b> מיכל / 1234 &nbsp;·&nbsp; דן / 1234<br>
+    <b>מנהל מחלקה:</b> יוסי / 1234<br>
+    <b>HR:</b> רות / 1234<br>
+    <b>מנהל ראשי:</b> admin / admin123
   </div>
 </div>
 </div>
@@ -672,7 +670,7 @@ function isMobile() { return window.innerWidth <= 768; }
 
 function buildMobileNav() {
   if (!ME) return;
-  const isAdm = ME.role === 'adm';
+  const isAdm = ['adm','super','hr','mgr'].includes(ME.role);
 
   // תפריט תחתון — 5 כפתורים ראשיים
   const mainNav = isAdm
@@ -824,14 +822,14 @@ async function doLogin() {
   if (!un || !pw) { err.textContent = 'אנא מלא שם משתמש וסיסמה'; err.style.display = 'block'; return; }
   btn.disabled = true; btn.textContent = '⟳ מתחבר...';
   try {
-    const res = await API.post('/login', {username: un, password: pw, role: curRole});
+    const res = await API.post('/login', {username: un, password: pw});
     ME = res.user;
     document.getElementById('loginScr').classList.remove('on');
     document.getElementById('shellScr').classList.add('on');
     await buildSidebar();
     buildMobileNav();
     loadNotifs();
-    if (ME.role === 'adm') goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
+    if (['adm','super','hr','mgr'].includes(ME.role)) goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
   } catch(e) {
     err.textContent = 'שם משתמש או סיסמה שגויים';
     err.style.display = 'block';
@@ -856,7 +854,7 @@ window.addEventListener('load', async () => {
     await buildSidebar();
     buildMobileNav();
     loadNotifs();
-    if (ME.role === 'adm') goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
+    if (['adm','super','hr','mgr'].includes(ME.role)) goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
   } catch(e) { /* not logged in */ }
 });
 
@@ -902,7 +900,8 @@ const ADM_M = [
   {ic:'📨', lb:'כל הפניות',      id:'areq', pill:true},
   {ic:'💰', lb:'ניהול שכר',      id:'asal'},
   {ic:'🎓', lb:'הדרכות',         id:'atrain'},
-  {gr:'תקשורת ומידע'},
+  {gr:'מחלקות ותקשורת'},
+  {ic:'🏢', lb:'ניהול מחלקות',   id:'adepts'},
   {ic:'📡', lb:'שידור הודעות',   id:'abcast'},
   {ic:'📋', lb:'ניהול טפסים',    id:'aforms'},
   {ic:'📈', lb:'דוחות',          id:'arep'},
@@ -912,14 +911,14 @@ const ADM_M = [
   {ic:'⚙️', lb:'הגדרות',         id:'aset'},
 ];
 const E_TITLES = {home:'דף הבית',feed:'עדכוני צוות',chat:'שלומית AI',req:'פניות לHR',hr:'הערכה ותנאים',sal:'שכר ומילואים',bulk:'שליחה מרוכזת',train:'הדרכות',forms:'פניה למחלקות',proj:'פרויקטים',int:'התממשקויות',personal:'האזור האישי שלי'};
-const A_TITLES = {adash:'דשבורד',aemp:'ניהול עובדים',areq:'כל הפניות',asal:'ניהול שכר',atrain:'ניהול הדרכות',abcast:'שידור הודעות',aforms:'ניהול טפסים',arep:'דוחות',amenus:'ניהול תפריטים',ausers:'ניהול משתמשים',aset:'הגדרות מערכת'};
+const A_TITLES = {adash:'דשבורד',aemp:'ניהול עובדים',areq:'כל הפניות',asal:'ניהול שכר',atrain:'ניהול הדרכות',abcast:'שידור הודעות',aforms:'ניהול טפסים',arep:'דוחות',amenus:'ניהול תפריטים',ausers:'ניהול משתמשים',aset:'הגדרות מערכת',adepts:'ניהול מחלקות'};
 
 async function buildSidebar() {
   const sb = document.getElementById('sbEl');
   const s = await API.get('/settings').catch(() => ({}));
   const logo = s.logo_url || '/logo.png';
   const orgName = s.org_name || 'שלוה';
-  const isAdm = ME.role === 'adm';
+  const isAdm = ['adm','super','hr','mgr'].includes(ME.role);
   let openReqs = 0;
   if (isAdm) {
     try { const st = await API.get('/stats'); openReqs = st.openReqs || 0; } catch {}
@@ -974,7 +973,7 @@ function goAdm(id, el) {
   if (ni) ni.classList.add('aon');
   document.getElementById('ptitle').textContent = A_TITLES[id] || id;
   const cnt = document.getElementById('cntEl'); ld(cnt);
-  const pages = {adash:pgDash, aemp:pgEmp, areq:pgAllReq, asal:pgASal, atrain:pgATrain, abcast:pgBcast, aforms:pgAForms, arep:pgRep, amenus:pgMenus, ausers:pgUsers, aset:pgSet};
+  const pages = {adash:pgDash, aemp:pgEmp, areq:pgAllReq, asal:pgASal, atrain:pgATrain, abcast:pgBcast, aforms:pgAForms, arep:pgRep, amenus:pgMenus, ausers:pgUsers, aset:pgSet, adepts:pgDepts};
   pages[id] ? pages[id](cnt) : (cnt.innerHTML = `<div class="card"><div class="st">הדף "${id}" בקרוב</div></div>`);
 }
 
@@ -2868,22 +2867,171 @@ async function pgInt(cnt) {
 // ═══════════ ADMIN PAGES ══════════════════════════════
 // ══════════════════════════════════════════════════════
 
+// DEPARTMENTS MANAGEMENT
+async function pgDepts(cnt) {
+  const [depts, users] = await Promise.all([API.get('/departments'), API.get('/users')]);
+  const managers = users.filter(u => ['mgr','hr','super','adm'].includes(u.role));
+  const isSuperOrAdm = ['super','adm'].includes(ME.role);
+
+  cnt.innerHTML = `
+<div class="sh mb">
+  <span class="st" style="font-size:13.5px">🏢 ניהול מחלקות (${depts.length})</span>
+  ${isSuperOrAdm ? `<button class="btn bnt bnsm" onclick="openAddDept()">+ מחלקה חדשה</button>` : ''}
+</div>
+
+<div class="info-box">
+  👑 כאן תגדיר מנהל לכל מחלקה. מנהל מחלקה יראה את כל הפניות של עובדי מחלקתו ויוכל לאשר/לדחות אותן.
+</div>
+
+<div class="g3" id="deptsGrid">
+  ${depts.map(d => {
+    const deptUsers = users.filter(u => u.dept === d.name);
+    const mgr = managers.find(u => u.id === d.manager_id);
+    return `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:${d.color||'#7B2D8B'}22;border:1.5px solid ${d.color||'#7B2D8B'}44;display:flex;align-items:center;justify-content:center;font-size:18px">🏢</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:var(--wh)">${d.name}</div>
+          <div style="font-size:8.5px;color:var(--tx3)">${deptUsers.length} עובדים</div>
+        </div>
+        ${isSuperOrAdm ? `<button class="ab abv" onclick="editDept(${d.id},'${d.name}','${d.manager_id||0}','${d.color||'#7B2D8B'}')">ערוך</button>` : ''}
+      </div>
+
+      <!-- מנהל מחלקה -->
+      <div style="padding:9px;background:#F7F4FA;border-radius:8px;margin-bottom:10px;border:1px solid var(--bd)">
+        <div style="font-size:8.5px;color:var(--tx3);margin-bottom:5px;font-weight:700">👔 מנהל מחלקה</div>
+        ${mgr ? `
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:26px;height:26px;border-radius:50%;background:${mgr.color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff">${(mgr.name||'').substring(0,2)}</div>
+          <div>
+            <div style="font-size:10.5px;font-weight:700;color:var(--wh)">${mgr.name}</div>
+            <div style="font-size:8px;color:var(--tx3)">${mgr.email||''}</div>
+          </div>
+          <span class="b bv" style="margin-right:auto">${{mgr:'מנהל מחלקה',hr:'HR',super:'מנהל ראשי',adm:'אדמין'}[mgr.role]||mgr.role}</span>
+        </div>` : `<div style="font-size:10px;color:var(--tx3)">⚠️ לא הוגדר מנהל</div>`}
+        ${isSuperOrAdm ? `
+        <div style="margin-top:7px">
+          <select class="fsel" style="font-size:9.5px" onchange="setDeptManager(${d.id},this.value)">
+            <option value="0">-- בחר מנהל --</option>
+            ${managers.map(u=>`<option value="${u.id}" ${u.id===d.manager_id?'selected':''}>${u.name} (${u.dept||''})</option>`).join('')}
+          </select>
+        </div>` : ''}
+      </div>
+
+      <!-- עובדי המחלקה -->
+      <div style="font-size:8.5px;color:var(--tx3);margin-bottom:6px;font-weight:700">👥 עובדים (${deptUsers.length})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">
+        ${deptUsers.slice(0,6).map(u=>`
+        <div style="display:flex;align-items:center;gap:4px;padding:3px 7px;background:${u.color||'#7B2D8B'}15;border-radius:999px;border:1px solid ${u.color||'#7B2D8B'}25">
+          <div style="width:16px;height:16px;border-radius:50%;background:${u.color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff">${(u.name||'').substring(0,1)}</div>
+          <span style="font-size:8.5px;color:var(--wh);font-weight:600">${u.name.split(' ')[0]}</span>
+        </div>`).join('')}
+        ${deptUsers.length>6?`<span style="font-size:8.5px;color:var(--tx3)">+${deptUsers.length-6} עוד</span>`:''}
+        ${!deptUsers.length?`<span style="font-size:8.5px;color:var(--tx3)">אין עובדים</span>`:''}
+      </div>
+    </div>`;
+  }).join('') || empty('אין מחלקות. לחץ "מחלקה חדשה" להוספה.')}
+</div>
+
+<!-- מודל הוספה/עריכה -->
+<div class="modal-bg" id="deptModal">
+<div class="modal sm">
+  <div class="mc-x" onclick="closeM('deptModal')">✕</div>
+  <div class="mt" id="deptModalTitle">מחלקה חדשה</div>
+  <div class="ms2" style="margin-bottom:14px">הגדר שם, מנהל וצבע מחלקה</div>
+  <input type="hidden" id="deptId"/>
+  <div class="fg"><label class="fl">שם המחלקה *</label><input class="fi" id="deptName" placeholder="שם המחלקה"/></div>
+  <div class="fg"><label class="fl">מנהל מחלקה</label>
+    <select class="fsel" id="deptMgr">
+      <option value="0">-- ללא מנהל --</option>
+      ${managers.map(u=>`<option value="${u.id}">${u.name} (${u.dept||''})</option>`).join('')}
+    </select>
+  </div>
+  <div class="fg"><label class="fl">תיאור</label><input class="fi" id="deptDesc" placeholder="תיאור קצר של המחלקה"/></div>
+  <div class="fg"><label class="fl">צבע</label>
+    <div class="cp-row" id="deptCpRow">
+      ${['#7B2D8B','#F4813A','#E84393','#4BAEE8','#27AE60','#E84040','#2C3E50','#9B59B6','#E74C3C'].map(c=>`<div class="cp" style="background:${c}" data-c="${c}" onclick="pickDeptC(this)"></div>`).join('')}
+    </div>
+  </div>
+  <input type="hidden" id="deptColor" value="#7B2D8B"/>
+  <div style="display:flex;gap:8px">
+    <button class="btn bnt" onclick="saveDept()" style="flex:1;justify-content:center">שמור מחלקה</button>
+    <button class="btn bno" onclick="closeM('deptModal')">ביטול</button>
+  </div>
+</div>
+</div>`;
+}
+
+function openAddDept() {
+  document.getElementById('deptModalTitle').textContent = 'מחלקה חדשה';
+  document.getElementById('deptId').value = '';
+  document.getElementById('deptName').value = '';
+  document.getElementById('deptDesc').value = '';
+  document.getElementById('deptMgr').value = '0';
+  document.getElementById('deptColor').value = '#7B2D8B';
+  document.querySelectorAll('#deptCpRow .cp').forEach(c => c.classList.remove('on'));
+  document.getElementById('deptModal').classList.add('on');
+}
+
+function editDept(id, name, mgr, color) {
+  document.getElementById('deptModalTitle').textContent = 'עריכת מחלקה — ' + name;
+  document.getElementById('deptId').value = id;
+  document.getElementById('deptName').value = name;
+  document.getElementById('deptMgr').value = mgr;
+  document.getElementById('deptColor').value = color;
+  document.querySelectorAll('#deptCpRow .cp').forEach(c => c.classList.toggle('on', c.dataset.c===color));
+  document.getElementById('deptModal').classList.add('on');
+}
+
+function pickDeptC(el) {
+  document.querySelectorAll('#deptCpRow .cp').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('deptColor').value = el.dataset.c;
+}
+
+async function saveDept() {
+  const name = document.getElementById('deptName')?.value.trim();
+  if (!name) { toast('שם המחלקה חובה', false); return; }
+  const id = document.getElementById('deptId')?.value;
+  const data = {
+    name,
+    manager_id: parseInt(document.getElementById('deptMgr')?.value)||0,
+    description: document.getElementById('deptDesc')?.value||'',
+    color: document.getElementById('deptColor')?.value||'#7B2D8B'
+  };
+  if (id) { await API.put(`/departments/${id}`, data); toast('מחלקה עודכנה!'); }
+  else { await API.post('/departments', data); toast('מחלקה נוספה!'); }
+  closeM('deptModal');
+  goAdm('adepts', null);
+}
+
+async function setDeptManager(deptId, managerId) {
+  await API.put(`/departments/${deptId}`, {manager_id: parseInt(managerId)||0});
+  toast('מנהל מחלקה עודכן! ✓');
+}
+
 // DASHBOARD
 async function pgDash(cnt) {
   const [st, reqs] = await Promise.all([API.get('/stats'), API.get('/requests')]);
   const open = reqs.filter(r => !['approved','rejected'].includes(r.status));
   _reqs = reqs;
+
+  // דשבורד מנהל מחלקה — מותאם
+  const isMgr = ME.role === 'mgr';
+  const deptLabel = isMgr ? ` — ${ME.dept}` : '';
+
   cnt.innerHTML = `
-<div style="display:flex;align-items:center;gap:14px;padding:17px 20px;border-radius:var(--rd);background:linear-gradient(135deg,rgba(124,92,252,.1),rgba(124,92,252,.04));border:1px solid rgba(124,92,252,.17);margin-bottom:17px">
-  <div style="font-size:30px">📊</div>
+<div style="display:flex;align-items:center;gap:14px;padding:17px 20px;border-radius:var(--rd);background:linear-gradient(135deg,${isMgr?'rgba(124,92,252,.1)':'rgba(123,45,139,.1)'},rgba(0,0,0,.03));border:1px solid var(--bd);margin-bottom:17px">
+  <div style="font-size:30px">${isMgr?'👔':'📊'}</div>
   <div style="flex:1">
-    <div style="font-size:15px;font-weight:900;color:var(--wh)">דשבורד ניהול</div>
+    <div style="font-size:15px;font-weight:900;color:var(--wh)">דשבורד ${isMgr?'מנהל מחלקה':'ניהול'}${deptLabel}</div>
     <div style="font-size:9.5px;color:var(--tx3)">עדכון: ${new Date().toLocaleString('he-IL')}</div>
   </div>
   <div style="display:flex;gap:7px;flex-wrap:wrap">
     <span class="b bt">🟢 מערכת תקינה</span>
     <button class="btn bnt bnsm" onclick="goAdm('areq',null)">פניות ממתינות (${open.length})</button>
-    <button class="btn bno bnsm" onclick="document.getElementById('bcModal').classList.add('on')">📡 שדר הודעה</button>
+    ${!isMgr ? `<button class="btn bno bnsm" onclick="document.getElementById('bcModal').classList.add('on')">📡 שדר הודעה</button>` : ''}
   </div>
 </div>
 <div class="mwrap m5">
