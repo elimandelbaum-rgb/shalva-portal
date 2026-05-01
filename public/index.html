@@ -241,11 +241,213 @@ html,body{height:100%;font-family:"Heebo",sans-serif;background:#F7F4FA;color:va
 /* DRAG ZONE */
 .drag-zone{border:2px dashed var(--bd);border-radius:9px;padding:16px;text-align:center;cursor:pointer;color:var(--tx3);font-size:10.5px;transition:all .15s}
 .drag-zone:hover{border-color:var(--t);color:var(--t);background:var(--t3)}
+/* ══════════════════════════════════════
+   MOBILE RESPONSIVE — עד 768px
+   ══════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* הסתר סיידבר רגיל */
+  .sb { display: none !important; }
+
+  /* תפריט תחתון */
+  #mobileNav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 58px;
+    background: #fff;
+    border-top: 1px solid var(--bd);
+    z-index: 300;
+    box-shadow: 0 -4px 20px rgba(123,45,139,.1);
+    padding: 0 4px;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .mn-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .14s;
+    min-width: 44px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+  }
+  .mn-btn.on { background: var(--t3); }
+  .mn-btn .mn-ic { font-size: 18px; }
+  .mn-btn .mn-lb { font-size: 8.5px; font-weight: 600; color: var(--tx3); }
+  .mn-btn.on .mn-lb { color: var(--t); }
+
+  /* כפתור מנו פתיחה */
+  #mobileMenuBtn {
+    display: flex !important;
+    position: fixed;
+    top: 8px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--t3);
+    border: 1px solid rgba(123,45,139,.2);
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 400;
+  }
+
+  /* מגירת מנו מלאה */
+  #mobileDrawer {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .22s;
+  }
+  #mobileDrawer.open {
+    pointer-events: all;
+    opacity: 1;
+  }
+  #mobileDrawer .drawer-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(61,31,74,.5);
+    backdrop-filter: blur(3px);
+  }
+  #mobileDrawer .drawer-panel {
+    position: absolute;
+    top: 0; right: 0;
+    width: 260px;
+    height: 100%;
+    background: #fff;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform .25s cubic-bezier(.4,0,.2,1);
+    box-shadow: -8px 0 32px rgba(123,45,139,.2);
+  }
+  #mobileDrawer.open .drawer-panel {
+    transform: translateX(0);
+  }
+  .drawer-head {
+    padding: 16px 14px 12px;
+    background: linear-gradient(135deg,#5C1F6A,#7B2D8B);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .drawer-ni {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--tx2);
+    cursor: pointer;
+    border-bottom: 1px solid var(--bd);
+    transition: background .12s;
+  }
+  .drawer-ni:hover, .drawer-ni.on { background: var(--t3); color: var(--t); }
+  .drawer-ni .nic { font-size: 16px; }
+
+  /* Layout מובייל */
+  #shellScr { flex-direction: column; }
+  .main { height: calc(100vh - 58px); }
+  .topbar {
+    height: 48px;
+    padding: 0 50px 0 12px;
+  }
+  .ttt { font-size: 12px; }
+  .tsrch { display: none !important; }
+  .cnt { padding: 12px 10px 12px; }
+
+  /* גריד — 2 עמודות במובייל */
+  .m5 { grid-template-columns: repeat(2,1fr) !important; }
+  .m4 { grid-template-columns: repeat(2,1fr) !important; }
+  .g2, .g3, .g13 { grid-template-columns: 1fr !important; }
+  .fr2, .fr3 { grid-template-columns: 1fr !important; }
+
+  /* כרטיסים */
+  .card { padding: 12px; }
+  .mc { padding: 11px; }
+  .mv { font-size: 22px; }
+
+  /* טבלאות — גלילה אופקית */
+  .tbl { font-size: 9.5px; }
+  .card > .tbl, [style*="overflow:hidden"] > .tbl {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hero banner */
+  .hero { flex-direction: column !important; text-align: center; padding: 14px 12px; }
+  .hero .hero-txt { text-align: center; }
+  .hero .wbox { width: 100%; }
+
+  /* tabs scroll */
+  .tabs2 { overflow-x: auto; flex-wrap: nowrap !important; padding-bottom: 2px; }
+  .tabs2::-webkit-scrollbar { height: 0; }
+  .tab2 { white-space: nowrap; flex-shrink: 0; }
+
+  /* modal */
+  .modal { max-width: 100% !important; margin: 0; border-radius: 16px 16px 0 0; max-height: 92vh; }
+  .modal-bg { align-items: flex-end !important; padding: 0 !important; }
+
+  /* form dept grid */
+  #frmDeptGrid { grid-template-columns: repeat(2,1fr) !important; gap: 7px; }
+
+  /* news grid */
+  .news-grid, [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+
+  /* buttons */
+  .btn { font-size: 11px; padding: 8px 12px; }
+  .bnsm { font-size: 10px; padding: 6px 10px; }
+
+  /* topbar icons */
+  .tib { width: 28px; height: 28px; font-size: 12px; }
+
+  /* personal page metrics */
+  [style*="grid-template-columns:1fr 1fr;gap:8px"] { grid-template-columns: repeat(2,1fr) !important; }
+}
+
+/* טבלט */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sb { width: 180px; }
+  .m5 { grid-template-columns: repeat(3,1fr); }
+  .g3 { grid-template-columns: repeat(2,1fr); }
+}
 </style>
 </head>
 <body>
 <div class="orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
 <div class="toast" id="toast"></div>
+
+<!-- מובייל: כפתור מנו -->
+<div id="mobileMenuBtn" style="display:none" onclick="toggleDrawer()">☰</div>
+
+<!-- מובייל: מגירת ניווט -->
+<div id="mobileDrawer" style="display:none">
+  <div class="drawer-bg" onclick="toggleDrawer()"></div>
+  <div class="drawer-panel" id="drawerPanel">
+    <div class="drawer-head">
+      <img src="/logo.png" style="height:36px;object-fit:contain" onerror="this.style.display='none'"/>
+      <div>
+        <div style="font-size:12px;font-weight:800;color:#fff">שלוה</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.7)">פורטל עובדים</div>
+      </div>
+      <div onclick="toggleDrawer()" style="margin-right:auto;cursor:pointer;color:rgba(255,255,255,.8);font-size:18px;padding:4px">✕</div>
+    </div>
+    <div id="drawerItems"></div>
+  </div>
+</div>
+
+<!-- מובייל: תפריט תחתון -->
+<div id="mobileNav" style="display:none" id="mobileNavBar"></div>
 
 <div id="app">
 <!-- ══════════ LOGIN SCREEN ══════════ -->
@@ -400,7 +602,7 @@ html,body{height:100%;font-family:"Heebo",sans-serif;background:#F7F4FA;color:va
       <div class="chk-it on" data-m="sal" onclick="this.classList.toggle('on')">💰 שכר ומילואים</div>
       <div class="chk-it" data-m="bulk" onclick="this.classList.toggle('on')">✉️ שליחה מרוכזת</div>
       <div class="chk-it on" data-m="train" onclick="this.classList.toggle('on')">🎓 הדרכות</div>
-      <div class="chk-it on" data-m="forms" onclick="this.classList.toggle('on')">📋 טפסים</div>
+      <div class="chk-it on" data-m="forms" onclick="this.classList.toggle('on')">📋 פניה למחלקות</div>
       <div class="chk-it" data-m="proj" onclick="this.classList.toggle('on')">🚀 פרויקטים</div>
       <div class="chk-it" data-m="int" onclick="this.classList.toggle('on')">🔗 התממשקויות</div>
     </div>
@@ -464,8 +666,71 @@ html,body{height:100%;font-family:"Heebo",sans-serif;background:#F7F4FA;color:va
 <script>
 'use strict';
 // ══════════════════════════════════════════════════════
-// CORE API CLIENT
+// MOBILE NAVIGATION
 // ══════════════════════════════════════════════════════
+function isMobile() { return window.innerWidth <= 768; }
+
+function buildMobileNav() {
+  if (!ME) return;
+  const isAdm = ME.role === 'adm';
+
+  // תפריט תחתון — 5 כפתורים ראשיים
+  const mainNav = isAdm
+    ? [['⌂','דשבורד','adash'],['👥','עובדים','aemp'],['📨','פניות','areq'],['🎓','הדרכות','atrain'],['☰','עוד',null]]
+    : [['⌂','בית','home'],['📨','פניות','req'],['📋','מחלקות','forms'],['🎓','הדרכות','train'],['☰','עוד',null]];
+
+  const nav = document.getElementById('mobileNav');
+  if (nav) {
+    nav.innerHTML = mainNav.map(([ic,lb,id]) => `
+    <button class="mn-btn" onclick="${id?`mobileGo('${id}',this)`:'toggleDrawer()'}" id="${id?'mn_'+id:'mn_more'}">
+      <span class="mn-ic">${ic}</span>
+      <span class="mn-lb">${lb}</span>
+    </button>`).join('');
+  }
+
+  // מגירה — כל הדפים
+  const drawerItems = document.getElementById('drawerItems');
+  if (drawerItems) {
+    const allPages = isAdm
+      ? [['📊','דשבורד','adash'],['👥','ניהול עובדים','aemp'],['📨','כל הפניות','areq'],['💰','ניהול שכר','asal'],['🎓','הדרכות','atrain'],['📡','שידור','abcast'],['📋','ניהול טפסים','aforms'],['📈','דוחות','arep'],['⚙️','הגדרות','aset']]
+      : [['⌂','דף הבית','home'],['📢','עדכוני צוות','feed'],['🤖','שלומית AI','chat'],['📨','פניות לHR','req'],['📋','פניה למחלקות','forms'],['⭐','הערכה ותנאים','hr'],['💰','שכר ומילואים','sal'],['🎓','הדרכות','train'],['🚀','פרויקטים','proj'],['👤','האזור האישי','personal']];
+
+    drawerItems.innerHTML = allPages.map(([ic,lb,id]) => `
+    <div class="drawer-ni" onclick="mobileGo('${id}');toggleDrawer()">
+      <span class="nic">${ic}</span>
+      <span style="font-size:13px;font-weight:600">${lb}</span>
+    </div>`).join('') + `
+    <div class="drawer-ni" onclick="doLogout()" style="color:var(--r);margin-top:8px">
+      <span class="nic">🚪</span>
+      <span style="font-size:13px;font-weight:600">יציאה</span>
+    </div>`;
+  }
+}
+
+function mobileGo(id, btn) {
+  // עדכן כפתור פעיל
+  document.querySelectorAll('.mn-btn').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  const mnBtn = document.getElementById('mn_' + id);
+  if (mnBtn) mnBtn.classList.add('on');
+  // נווט
+  if (ME?.role === 'adm') goAdm(id, null);
+  else goEmp(id, null);
+}
+
+function toggleDrawer() {
+  const drawer = document.getElementById('mobileDrawer');
+  if (!drawer) return;
+  drawer.classList.toggle('open');
+}
+
+// Close drawer on outside click
+document.addEventListener('click', e => {
+  const drawer = document.getElementById('mobileDrawer');
+  if (drawer?.classList.contains('open') && e.target.classList.contains('drawer-bg')) {
+    drawer.classList.remove('open');
+  }
+});
 const API = {
   async req(method, path, body) {
     try {
@@ -564,6 +829,7 @@ async function doLogin() {
     document.getElementById('loginScr').classList.remove('on');
     document.getElementById('shellScr').classList.add('on');
     await buildSidebar();
+    buildMobileNav();
     loadNotifs();
     if (ME.role === 'adm') goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
   } catch(e) {
@@ -588,6 +854,7 @@ window.addEventListener('load', async () => {
     document.getElementById('loginScr').classList.remove('on');
     document.getElementById('shellScr').classList.add('on');
     await buildSidebar();
+    buildMobileNav();
     loadNotifs();
     if (ME.role === 'adm') goAdm('adash'); else goEmp(ME.menu?.[0] || 'home');
   } catch(e) { /* not logged in */ }
@@ -624,7 +891,7 @@ const ALL_M = {
   sal:   {ic:'💰', lb:'שכר ומילואים', gr:'ניהול אישי'},
   bulk:  {ic:'✉️', lb:'שליחה מרוכזת', gr:'ניהול אישי'},
   train: {ic:'🎓', lb:'הדרכות', gr:'ידע ופיתוח'},
-  forms: {ic:'📋', lb:'טפסים', gr:'ידע ופיתוח'},
+  forms: {ic:'📋', lb:'פניה למחלקות', gr:'פניות'},
   proj:  {ic:'🚀', lb:'פרויקטים', gr:'נוסף'},
   int:   {ic:'🔗', lb:'התממשקויות', gr:'נוסף'},
 };
@@ -644,7 +911,7 @@ const ADM_M = [
   {ic:'🔑', lb:'משתמשים',        id:'ausers'},
   {ic:'⚙️', lb:'הגדרות',         id:'aset'},
 ];
-const E_TITLES = {home:'דף הבית',feed:'עדכוני צוות',chat:'שלומית AI',req:'פניות לHR',hr:'הערכה ותנאים',sal:'שכר ומילואים',bulk:'שליחה מרוכזת',train:'הדרכות',forms:'טפסים',proj:'פרויקטים',int:'התממשקויות',personal:'האזור האישי שלי'};
+const E_TITLES = {home:'דף הבית',feed:'עדכוני צוות',chat:'שלומית AI',req:'פניות לHR',hr:'הערכה ותנאים',sal:'שכר ומילואים',bulk:'שליחה מרוכזת',train:'הדרכות',forms:'פניה למחלקות',proj:'פרויקטים',int:'התממשקויות',personal:'האזור האישי שלי'};
 const A_TITLES = {adash:'דשבורד',aemp:'ניהול עובדים',areq:'כל הפניות',asal:'ניהול שכר',atrain:'ניהול הדרכות',abcast:'שידור הודעות',aforms:'ניהול טפסים',arep:'דוחות',amenus:'ניהול תפריטים',ausers:'ניהול משתמשים',aset:'הגדרות מערכת'};
 
 async function buildSidebar() {
@@ -903,7 +1170,7 @@ async function pgHome(cnt) {
     <div class="sh"><span class="st">⚡ פעולות מהירות</span></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
       <button class="btn bnt bnsm" style="justify-content:center" onclick="goEmp('req',null)">📨 פניה</button>
-      <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('forms',null)">📋 טפסים</button>
+      <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('forms',null)">📋 פניה למחלקות</button>
       <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('train',null)">🎓 הדרכות</button>
       <button class="btn bno bnsm" style="justify-content:center" onclick="goEmp('chat',null)">🤖 שלומית</button>
       <button class="btn bno bnsm" style="justify-content:center;grid-column:span 2" onclick="goEmp('sal',null)">💰 תלוש שכר</button>
@@ -927,25 +1194,9 @@ async function pgHome(cnt) {
     </div>
   </div>
 
-  <!-- גריד תמונות אינסטגרם -->
-  <div id="igGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
-    ${[
-      {emoji:'🏛️',cap:'המרכז הלאומי שלוה — ירושלים'},
-      {emoji:'❤️',cap:'ילדים מיוחדים, משפחות מיוחדות'},
-      {emoji:'🌟',cap:'נותנים תקווה. משנים חיים.'},
-      {emoji:'🎉',cap:'אירוע שנתי — שלוה 2026'},
-      {emoji:'🤝',cap:'מתנדבים יקרים, תודה מהלב'},
-      {emoji:'🎓',cap:'תוכנית ההכשרה החדשה'},
-    ].map((p,i) => `
-    <a href="https://www.instagram.com/shalvacenter/" target="_blank" style="text-decoration:none;aspect-ratio:1;border-radius:9px;overflow:hidden;background:linear-gradient(135deg,#EDE4F5,#C9A8E0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:transform .15s;border:1px solid var(--bd)" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-      <div style="font-size:26px">${p.emoji}</div>
-      <div style="font-size:7px;color:#5C1F6A;font-weight:600;text-align:center;padding:0 4px;line-height:1.3">${p.cap.substring(0,18)}...</div>
-    </a>`).join('')}
-  </div>
-
-  <div style="margin-top:10px;padding:8px 12px;background:rgba(123,45,139,.05);border-radius:8px;border:1px solid var(--bd);font-size:9px;color:var(--tx3);display:flex;align-items:center;gap:8px">
-    <span style="font-size:13px">💡</span>
-    <span>להצגת תמונות אמיתיות מהאינסטגרם — <a href="https://developers.facebook.com/docs/instagram-basic-display-api" target="_blank" style="color:var(--t);font-weight:700;text-decoration:none">הגדר Instagram API Token</a> בהגדרות המערכת.</span>
+  <!-- גריד תמונות אינסטגרם אמיתיות -->
+  <div id="igGrid" style="min-height:200px;border-radius:10px;overflow:hidden">
+    <div class="ldg" id="igLoading">⟳ טוען תמונות מאינסטגרם...</div>
   </div>
 </div>`;
 
@@ -979,19 +1230,83 @@ async function loadWeather() {
 async function loadInstagram() {
   const grid = document.getElementById('igGrid');
   if (!grid) return;
+
+  // נסה קודם Instagram Basic Display API אם יש Token
   try {
-    const s = await API.get('/settings');
+    const s = await API.get('/settings').catch(()=>({}));
     const token = s.instagram_token;
-    if (!token) return;
-    const r = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&access_token=${token}&limit=6`);
-    const d = await r.json();
-    if (!d.data?.length) return;
-    grid.innerHTML = d.data.map(p => `
-    <a href="${p.permalink}" target="_blank" style="text-decoration:none;aspect-ratio:1;border-radius:9px;overflow:hidden;background:#EDE4F5;display:block;cursor:pointer;transition:transform .15s;border:1px solid var(--bd);position:relative" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-      <img src="${p.media_url||p.thumbnail_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>
-      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.5));padding:4px;font-size:7px;color:#fff;line-height:1.3">${(p.caption||'').substring(0,30)}</div>
-    </a>`).join('');
+    if (token) {
+      const r = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&access_token=${token}&limit=6`);
+      const d = await r.json();
+      if (d.data?.length) {
+        renderIgGrid(grid, d.data.map(p=>({url:p.media_url||p.thumbnail_url, link:p.permalink, caption:p.caption||''})));
+        return;
+      }
+    }
   } catch(e) {}
+
+  // fallback — RSS של אינסטגרם דרך rsshub
+  try {
+    const rssUrl = 'https://rsshub.app/instagram/user/shalvacenter';
+    const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+    const d = await r.json();
+    if (d.items?.length) {
+      const items = d.items.slice(0,6).map(item => {
+        // חפש תמונה בתוכן
+        const imgMatch = item.content?.match(/<img[^>]+src="([^"]+)"/i) || item.description?.match(/<img[^>]+src="([^"]+)"/i);
+        return { url: imgMatch?.[1] || item.thumbnail, link: item.link, caption: item.title || '' };
+      }).filter(i => i.url);
+      if (items.length) { renderIgGrid(grid, items); return; }
+    }
+  } catch(e) {}
+
+  // fallback שני — Picuki embed (מציג פוסטים ציבוריים)
+  try {
+    const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://www.instagram.com/shalvacenter/?__a=1&__d=dis')}`;
+    const r = await fetch(proxyUrl);
+    const d = await r.json();
+    if (d.items?.length) {
+      renderIgGrid(grid, d.items.slice(0,6).map(i=>({url:i.thumbnail,link:i.link,caption:i.title})));
+      return;
+    }
+  } catch(e) {}
+
+  // fallback סופי — כרטיסי קישור יפים
+  renderIgFallback(grid);
+}
+
+function renderIgGrid(grid, items) {
+  grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
+    ${items.map(p => `
+    <a href="${p.link||'https://www.instagram.com/shalvacenter/'}" target="_blank"
+       style="text-decoration:none;aspect-ratio:1;border-radius:9px;overflow:hidden;background:#EDE4F5;display:block;cursor:pointer;transition:transform .15s;border:1px solid var(--bd);position:relative"
+       onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+      <img src="${p.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='linear-gradient(135deg,#EDE4F5,#C9A8E0)'"/>
+      ${p.caption ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));padding:5px 4px;font-size:7px;color:#fff;line-height:1.3">${p.caption.substring(0,25)}...</div>` : ''}
+    </a>`).join('')}
+  </div>`;
+}
+
+function renderIgFallback(grid) {
+  // הצג embed ישיר של אינסטגרם
+  grid.innerHTML = `
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+    ${['p/C1','p/C2','p/C3','p/C4','p/C5','p/C6'].map((_,i) => `
+    <a href="https://www.instagram.com/shalvacenter/" target="_blank"
+       style="text-decoration:none;aspect-ratio:1;border-radius:9px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,${['#EDE4F5,#C9A8E0','#FEF0F7,#F4C0D1','#FEF3EC,#FAC775','#EDE4F5,#AFA9EC','#E1F5EE,#9FE1CB','#EBF6FE,#B5D4F4'][i]});border:1px solid var(--bd);cursor:pointer;transition:transform .15s"
+       onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+      <div style="font-size:24px;margin-bottom:4px">${['🏛️','❤️','🌟','🎉','🤝','🎓'][i]}</div>
+      <div style="font-size:8px;font-weight:700;color:#7B2D8B">shalvacenter</div>
+    </a>`).join('')}
+  </div>
+  <div style="margin-top:9px;text-align:center;font-size:9px;color:var(--tx3)">
+    לחץ על תמונה לפתיחת האינסטגרם של שלוה
+    <span style="display:block;margin-top:4px;font-size:8px">
+      💡 להצגת תמונות אמיתיות — 
+      <a href="https://developers.facebook.com/docs/instagram-basic-display-api" target="_blank" style="color:var(--t);font-weight:700;text-decoration:none">הגדר Instagram Token</a>
+      בהגדרות Admin
+    </span>
+  </div>`;
 }
 let _newsCache = {ynet:null, a7:null};
 let _curSource = 'ynet';
@@ -3155,7 +3470,7 @@ async function pgRep(cnt) {
 // MENU MANAGEMENT
 async function pgMenus(cnt) {
   const users = await API.get('/users');
-  const ALL_ML = {home:'⌂ דף הבית',feed:'📢 עדכונים',chat:'🤖 שלומית AI',req:'📨 פניות',hr:'⭐ הערכה',sal:'💰 שכר',bulk:'✉️ שליחה מרוכזת',train:'🎓 הדרכות',forms:'📋 טפסים',proj:'🚀 פרויקטים',int:'🔗 התממשקויות'};
+  const ALL_ML = {home:'⌂ דף הבית',feed:'📢 עדכונים',chat:'🤖 שלומית AI',req:'📨 פניות',hr:'⭐ הערכה',sal:'💰 שכר',bulk:'✉️ שליחה מרוכזת',train:'🎓 הדרכות',forms:'📋 פניה למחלקות',proj:'🚀 פרויקטים',int:'🔗 התממשקויות'};
   cnt.innerHTML = `
 <div class="sh mb">
   <span class="st" style="font-size:13.5px">ניהול תפריטי גישה לעובדים</span>
