@@ -22,10 +22,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 
-// SQLite session store — שומר סשנים במסד הנתונים
-const SqliteStore = require('better-sqlite3-session-store')(session);
+// Session store פשוט
 app.use(session({
-  store: new SqliteStore({ client: db, expired: { clear: true, intervalMs: 900000 } }),
   secret: process.env.SESSION_SECRET || 'shalva-portal-2026-secret',
   resave: false,
   saveUninitialized: false,
@@ -39,7 +37,9 @@ app.use(session({
 }));
 
 const auth = (req,res,next) => req.session.user ? next() : res.status(401).json({error:'Unauthorized'});
-const admin = (req,res,next) => req.session.user?.role==='adm' ? next() : res.status(403).json({error:'Forbidden'});
+const admin = (req,res,next) => ['adm','super'].includes(req.session.user?.role) ? next() : res.status(403).json({error:'Forbidden'});
+const superOnly = (req,res,next) => req.session.user?.role==='super' ? next() : res.status(403).json({error:'Super admin only'});
+const isManager = (u) => ['adm','super','mgr','hr'].includes(u?.role);
 
 function safeUser(u) {
   const {password:_,...s} = u;
@@ -47,10 +47,41 @@ function safeUser(u) {
   return s;
 }
 
+// ── DEPARTMENTS ──
+app.get('/api/departments', auth, (req,res) => {
+  const depts = db.prepare('SELECT d.*, u.name as manager_name FROM departments d LEFT JOIN users u ON d.manager_id=u.id').all();
+  res.json(depts);
+});
+
+app.post('/api/departments', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const {name,manager_id,description,color} = req.body;
+  if (!name) return res.status(400).json({error:'שם חובה'});
+  try {
+    const r = db.prepare('INSERT INTO departments(name,manager_id,description,color) VALUES(?,?,?,?)').run(name,manager_id||0,description||'',color||'#7B2D8B');
+    res.json({id:r.lastInsertRowid,name,manager_id,description,color});
+  } catch(e) { res.status(400).json({error:'מחלקה קיימת'}); }
+});
+
+app.put('/api/departments/:id', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const {name,manager_id,description,color} = req.body;
+  db.prepare('UPDATE departments SET name=?,manager_id=?,description=?,color=? WHERE id=?').run(name,manager_id||0,description||'',color||'#7B2D8B',req.params.id);
+  // עדכן dept של כל עובדי המחלקה
+  if (name) db.prepare('UPDATE users SET dept=? WHERE dept=(SELECT name FROM departments WHERE id=?)').run(name,req.params.id);
+  res.json({ok:true});
+});
+
+app.delete('/api/departments/:id', auth, (req,res) => {
+  if (req.session.user?.role!=='super') return res.status(403).json({error:'Super admin only'});
+  db.prepare('DELETE FROM departments WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+
 // ── AUTH ──
 app.post('/api/login', (req,res) => {
-  const {username,password,role='emp'} = req.body;
-  const u = db.prepare('SELECT * FROM users WHERE username=? AND role=? AND active=1').get(username, role);
+  const {username,password} = req.body;
+  const u = db.prepare('SELECT * FROM users WHERE username=? AND active=1').get(username);
   if (!u || u.password !== password) return res.status(401).json({error:'Invalid credentials'});
   req.session.user = safeUser(u);
   res.json({user: safeUser(u)});
@@ -65,8 +96,13 @@ app.get('/api/me', auth, (req,res) => {
 // ── USERS ──
 app.get('/api/users', auth, (req,res) => {
   const me = req.session.user;
-  if (me.role !== 'adm') return res.json([safeUser(db.prepare('SELECT * FROM users WHERE id=?').get(me.id))]);
-  res.json(db.prepare("SELECT * FROM users WHERE role='emp' AND active=1 ORDER BY name").all().map(safeUser));
+  if (['super','adm','hr'].includes(me.role)) {
+    res.json(db.prepare("SELECT * FROM users WHERE active=1 ORDER BY name").all().map(safeUser));
+  } else if (me.role === 'mgr') {
+    res.json(db.prepare("SELECT * FROM users WHERE dept=? AND active=1 ORDER BY name").all(me.dept).map(safeUser));
+  } else {
+    res.json([safeUser(db.prepare('SELECT * FROM users WHERE id=?').get(me.id))]);
+  }
 });
 app.get('/api/users/:id', auth, (req,res) => {
   const id = parseInt(req.params.id);
@@ -113,8 +149,10 @@ app.delete('/api/users/:id', admin, (req,res) => {
 // ── REQUESTS ──
 app.get('/api/requests', auth, (req,res) => {
   const me = req.session.user;
-  if (me.role==='adm') {
+  if (['super','adm','hr'].includes(me.role)) {
     res.json(db.prepare('SELECT r.*,u.name as user_name,u.dept as user_dept FROM requests r JOIN users u ON r.user_id=u.id ORDER BY r.created_at DESC').all());
+  } else if (me.role === 'mgr') {
+    res.json(db.prepare('SELECT r.*,u.name as user_name,u.dept as user_dept FROM requests r JOIN users u ON r.user_id=u.id WHERE u.dept=? ORDER BY r.created_at DESC').all(me.dept));
   } else {
     res.json(db.prepare('SELECT r.*,u.name as user_name FROM requests r JOIN users u ON r.user_id=u.id WHERE r.user_id=? ORDER BY r.created_at DESC').all(me.id));
   }
@@ -127,7 +165,9 @@ app.post('/api/requests', auth, (req,res) => {
     .run(me.id,f.type||'general',f.dept||'',f.subject,f.details||'','pending',f.priority||'normal',parseInt(f.current_salary)||0,parseInt(f.requested_salary)||0,JSON.stringify(f.steps||['emp','manager','hr']),0);
   res.json({id:info.lastInsertRowid,ok:true});
 });
-app.put('/api/requests/:id', admin, (req,res) => {
+app.put('/api/requests/:id', auth, (req,res) => {
+  const me = req.session.user;
+  if (!['super','adm','hr','mgr'].includes(me.role)) return res.status(403).json({error:'Forbidden'});
   const f = req.body; const id = parseInt(req.params.id);
   const sets=[],vals=[];
   ['status','priority','current_step','resolution_note'].forEach(k=>{ if(f[k]!==undefined){sets.push(`${k}=?`);vals.push(f[k]);} });
