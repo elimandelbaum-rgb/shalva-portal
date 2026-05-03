@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>שלוה | פורטל עובדים</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+(() => {
+  const d=document,s=d.createElement("script");
+  s.type="module";
+  s.src="https://w.behold.so/widget.js";
+  d.head.append(s);
+})();
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -1193,9 +1201,9 @@ async function pgHome(cnt) {
     </div>
   </div>
 
-  <!-- גריד תמונות אינסטגרם אמיתיות -->
-  <div id="igGrid" style="min-height:200px;border-radius:10px;overflow:hidden">
-    <div class="ldg" id="igLoading">⟳ טוען תמונות מאינסטגרם...</div>
+  <!-- Behold Instagram Widget -->
+  <div style="border-radius:10px;overflow:hidden">
+    <behold-widget feed-id="E7rDEhEWT53BokZP2c4Y"></behold-widget>
   </div>
 </div>`;
 
@@ -1203,8 +1211,6 @@ async function pgHome(cnt) {
   loadWeather();
   // טען חדשות
   loadNews();
-  // טען אינסטגרם
-  loadInstagram();
 }
 
 async function loadWeather() {
