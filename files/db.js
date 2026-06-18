@@ -92,6 +92,21 @@ function initDB() {
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now'))
     );
+    CREATE TABLE IF NOT EXISTS posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL, sub TEXT DEFAULT '', body TEXT DEFAULT '',
+      img TEXT DEFAULT '', tag TEXT DEFAULT '', link TEXT DEFAULT '',
+      author TEXT DEFAULT 'מערכת שלוה',
+      featured INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS announcements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL, body TEXT DEFAULT '',
+      color TEXT DEFAULT '#7B2D8B',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, type TEXT NOT NULL,
       description TEXT DEFAULT '', bonus INTEGER DEFAULT 0, data TEXT DEFAULT '{}',
@@ -103,6 +118,8 @@ function initDB() {
   const migrations = [
     `ALTER TABLE requests ADD COLUMN copy_email TEXT DEFAULT ''`,
     `ALTER TABLE equipment_requests ADD COLUMN current_step INTEGER DEFAULT 0`,
+    `ALTER TABLE posts ADD COLUMN body TEXT DEFAULT ''`,
+    `ALTER TABLE posts ADD COLUMN author TEXT DEFAULT 'מערכת שלוה'`,
   ];
   migrations.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
@@ -113,6 +130,55 @@ function initDB() {
    ['sms_provider','twilio'],['sms_active','true'],['chatbot_active','true'],
    ['auto_approve','false'],['recruit_bonus','500'],['logo_url','/logo.png'],['maintenance','false']
   ].forEach(([k,v]) => ins.run(k,v));
+
+  // כתבות שלוה לדוגמה (רק אם הטבלה ריקה)
+  try {
+    if (db.prepare('SELECT COUNT(*) as c FROM posts').get().c === 0) {
+      const ipost = db.prepare('INSERT INTO posts(title,sub,body,img,tag,link,author,featured) VALUES(?,?,?,?,?,?,?,?)');
+      ipost.run(
+        'ילדים מיוחדים, הישגים מיוחדים',
+        'תוכנית הקיץ של שלוה 2026 — פתיחה בקרוב',
+        'תוכנית הקיץ השנתית של המרכז הלאומי שלוה יוצאת לדרך גם השנה, עם מגוון פעילויות חווייתיות המותאמות לילדים ובוגרים עם צרכים מיוחדים.\n\nהתוכנית כוללת סדנאות יצירה, פעילויות ספורט מותאמות, חוגי מוזיקה ותרפיה, וטיולים בטבע. צוות המדריכים המקצועי שלנו עבר הכשרה ייעודית כדי להבטיח חוויה בטוחה ומעצימה לכל משתתף.\n\nההרשמה תיפתח בשבועות הקרובים. למידע נוסף ולפרטי הרשמה ניתן לפנות למשרדי המרכז.',
+        'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800','חינוך','','מערכת שלוה',1);
+      ipost.run(
+        'מתנדבים יקרים — תודה מהלב',
+        'מעל 500 מתנדבים חדשים בשנת 2026',
+        'השנה זכינו לקבל לשורותינו מעל 500 מתנדבים חדשים, אשר תורמים מזמנם ומליבם למען חניכי שלוה.\n\nהמתנדבים שלנו הם עמוד התווך של הפעילות במרכז — הם מלווים את החניכים בפעילויות היומיום, מסייעים בסדנאות, ומעניקים חום ואהבה.\n\nאנו מודים לכל אחת ואחד מהם על המסירות והנתינה ללא גבול.',
+        'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800','קהילה','','מערכת שלוה',0);
+      ipost.run(
+        'מרכז שלוה החדש באשקלון',
+        'פתיחה רשמית בספטמבר',
+        'אנו גאים להכריז על הקמת מרכז שלוה החדש בעיר אשקלון, אשר ייפתח רשמית בחודש ספטמבר הקרוב.\n\nהמרכז החדש יעניק שירותים לעשרות משפחות באזור הדרום, ויכלול חדרי טיפול, אולם פעילות, גן חושים (סנוזלן), ומרחבים ירוקים.\n\nהקמת המרכז התאפשרה הודות לתרומה נדיבה שגויסה במשלחת ההתרמה לאירופה.',
+        'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800','פיתוח','','מערכת שלוה',0);
+      ipost.run(
+        'גיוס תרומות — הצלחה גדולה!',
+        '170,000 אירו נאספו במשלחת הולנד ושוודיה',
+        'משלחת ההתרמה של שלוה להולנד ושוודיה הסתיימה בהצלחה מרשימה, עם גיוס של כ-170,000 אירו למען פעילות המרכז.\n\nהמשלחת ביקרה באמסטרדם, ניימכן, שטוקהולם וערים נוספות, ונפגשה עם תורמים, ידידים וקהילות התומכות בפעילות שלוה לאורך שנים.\n\nבין ההתחייבויות הבולטות — תרומה משמעותית להקמת המרכז החדש באשקלון. תודה לכל השותפים והתורמים!',
+        'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=800','גיוס','','מערכת שלוה',0);
+      ipost.run(
+        'הדרכות קיץ 2026',
+        'הירשמו עכשיו לתוכנית ההדרכה השנתית',
+        'תוכנית ההדרכה השנתית לצוותי שלוה נפתחת לרישום. התוכנית מיועדת לעובדים, מדריכים ומתנדבים, ומטרתה להעשיר את הכלים המקצועיים בעבודה עם אנשים עם צרכים מיוחדים.\n\nההדרכות יכללו נושאים כגון תקשורת מותאמת, ניהול התנהגות, עזרה ראשונה, ובטיחות.\n\nההשתתפות חינם לכלל עובדי המרכז.',
+        'https://images.unsplash.com/photo-1544717305-2782549b5136?w=800','הדרכה','','מערכת שלוה',0);
+      ipost.run(
+        'אירועי צוות קרובים',
+        'גן החברה — יוני 2026',
+        'אנו שמחים להזמין את כל עובדי המרכז לאירוע גיבוש צוות קיצי שיתקיים בגן החברה.\n\nבאירוע יהיו פעילויות, הפעלות, אוכל טוב ואווירה משפחתית. זו הזדמנות מצוינת להכיר עמיתים ממחלקות אחרות ולחזק את הקשרים בין הצוותים.\n\nפרטים מלאים יישלחו בקרוב במייל ובפורטל.',
+        'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=800','קהילה','','מערכת שלוה',0);
+    }
+  } catch(e) { console.error('posts seed error:', e.message); }
+
+  // הודעות לרולר לדוגמה (רק אם הטבלה ריקה)
+  try {
+    if (db.prepare('SELECT COUNT(*) as c FROM announcements').get().c === 0) {
+      const iann = db.prepare('INSERT INTO announcements(title,body,color) VALUES(?,?,?)');
+      iann.run('ארוחת צוות קיץ 🎉','20.06 בגן החברה 18:00','#27AE60');
+      iann.run('עדכון נהלי חופשה','אנא קראו את העדכון החדש','#1565C0');
+      iann.run('ישיבת צוות שלישי','10:00 בחדר ישיבות A','#9B59B6');
+      iann.run('יום כיף שנתי 🌳','15.07 — פרטים בקרוב','#16A085');
+    }
+  } catch(e) { console.error('announcements seed error:', e.message); }
+
 
   if (db.prepare('SELECT COUNT(*) as c FROM users').get().c === 0) {
     const iu = db.prepare('INSERT INTO users(username,password,role,name,email,dept,title,salary,vacation_days,sick_days,color,avatar,menu,hire_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)');

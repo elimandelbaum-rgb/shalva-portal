@@ -465,24 +465,29 @@ app.get('/api/news', auth, async (req, res) => {
   }
 });
 
-app.get('*', (req,res) => res.sendFile(path.join(__dirname,'public','index.html')));
-
 
 // ── POSTS (כתבות שלוה) ──
 app.get('/api/posts', (req,res) => {
   try { res.json(db.prepare('SELECT * FROM posts ORDER BY featured DESC, created_at DESC').all()); } catch(e){ res.json([]); }
 });
+app.get('/api/posts/:id', (req,res) => {
+  try {
+    const p = db.prepare('SELECT * FROM posts WHERE id=?').get(req.params.id);
+    if (!p) return res.status(404).json({error:'Not found'});
+    res.json(p);
+  } catch(e){ res.status(500).json({error:e.message}); }
+});
 app.post('/api/posts', auth, (req,res) => {
   if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
-  const {title,sub,img,tag,link,featured} = req.body;
+  const {title,sub,body,img,tag,link,author,featured} = req.body;
   if (!title) return res.status(400).json({error:'Title required'});
-  const r = db.prepare('INSERT INTO posts(title,sub,img,tag,link,featured) VALUES(?,?,?,?,?,?)').run(title,sub||'',img||'',tag||'',link||'',featured?1:0);
+  const r = db.prepare('INSERT INTO posts(title,sub,body,img,tag,link,author,featured) VALUES(?,?,?,?,?,?,?,?)').run(title,sub||'',body||'',img||'',tag||'',link||'',author||'מערכת שלוה',featured?1:0);
   res.json({id:r.lastInsertRowid});
 });
 app.put('/api/posts/:id', auth, (req,res) => {
   if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
-  const {title,sub,img,tag,link,featured} = req.body;
-  db.prepare('UPDATE posts SET title=?,sub=?,img=?,tag=?,link=?,featured=?,updated_at=datetime("now") WHERE id=?').run(title,sub||'',img||'',tag||'',link||'',featured?1:0,req.params.id);
+  const {title,sub,body,img,tag,link,author,featured} = req.body;
+  db.prepare('UPDATE posts SET title=?,sub=?,body=?,img=?,tag=?,link=?,author=?,featured=?,updated_at=datetime("now") WHERE id=?').run(title,sub||'',body||'',img||'',tag||'',link||'',author||'מערכת שלוה',featured?1:0,req.params.id);
   res.json({ok:true});
 });
 app.put('/api/posts/:id/feature', auth, (req,res) => {
@@ -528,6 +533,9 @@ app.delete('/api/announcements/:id', auth, (req,res) => {
   db.prepare('DELETE FROM announcements WHERE id=?').run(req.params.id);
   res.json({ok:true});
 });
+
+// ── SPA fallback — חייב להיות אחרון, אחרי כל ה-API routes ──
+app.get('*', (req,res) => res.sendFile(path.join(__dirname,'public','index.html')));
 
 app.listen(PORT, () => {
   console.log(`\n🚀 פורטל שלוה פעיל!`);

@@ -551,6 +551,8 @@ function buildNav() {
     {ic:'📊', lb:'דשבורד ניהול', id:'adash'},
     {ic:'👥', lb:'עובדים', id:'aemp'},
     {ic:'📨', lb:'כל הפניות', id:'areq'},
+    {ic:'📣', lb:'כתבות שלוה', id:'aposts'},
+    {ic:'🎂', lb:'רולר הודעות', id:'aroller'},
     {ic:'🏢', lb:'מחלקות', id:'adepts'},
     {ic:'⚙️', lb:'הגדרות', id:'aset'},
   ] : [];
@@ -818,9 +820,9 @@ async function pgHome(cnt) {
   </div>
 </div>
 
-<!-- חדשות ישראל — רשימה קומפקטית -->
+<!-- חדשות ישראל — שורת רולר רצה -->
 <div style="background:#fff;border-radius:16px;margin-bottom:16px;box-shadow:var(--sh);overflow:hidden">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px 9px">
     <div style="display:flex;align-items:center;gap:7px">
       <div style="width:4px;height:16px;background:#1565C0;border-radius:999px"></div>
       <span style="font-size:12px;font-weight:800;color:var(--tx)">📰 חדשות ישראל</span>
@@ -830,10 +832,19 @@ async function pgHome(cnt) {
       <span id="hn-ynet" onclick="switchHomeNews('ynet',this)" style="font-size:8px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--tx3);cursor:pointer;border:1px solid var(--bd)">ynet</span>
     </div>
   </div>
-  <div id="newsCompact" style="padding:0 0 6px">
-    <div class="ldg" style="padding:12px 14px">⟳ טוען...</div>
+  <!-- פס רולר רץ -->
+  <div style="position:relative;background:#F7F9FC;border-top:1px solid var(--bd2);overflow:hidden;height:38px;display:flex;align-items:center">
+    <div id="newsTickerLabel" style="position:absolute;right:0;top:0;bottom:0;z-index:2;background:#1565C0;color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;padding:0 12px;box-shadow:-6px 0 10px rgba(0,0,0,.12)">חדשות ⚡</div>
+    <div id="newsTicker" style="display:flex;align-items:center;white-space:nowrap;will-change:transform;padding-right:90px">
+      <span style="font-size:10px;color:var(--tx3);padding:0 14px">⟳ טוען חדשות...</span>
+    </div>
   </div>
 </div>
+<style>
+@keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes slideUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
+#newsTicker a:hover { color:#1565C0 !important; }
+</style>
 
 <!-- כתבות שלוה -->
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 2px">
@@ -883,32 +894,49 @@ async function loadWeatherHome() {
 async function loadRoller() {
   const el = document.getElementById('roller');
   if (!el) return;
-  // טען מה-API אם קיים, אחרת הדגמה
+  // טען מה-API (ימי הולדת אוטומטיים + הודעות מהניהול)
   let items = [];
   try { items = await API.get('/announcements'); } catch(e) {}
-  if (!items.length) items = [
+  // הודעות ברירת מחדל להדגמה אם אין מספיק תוכן
+  const demo = [
     {type:'bday',name:'רחל כהן',date:'היום 🎂',dept:'HR',color:'#E84393'},
     {type:'bday',name:'משה לוי',date:'מחר 🎂',dept:'תפעול',color:'#7B2D8B'},
     {type:'msg',title:'ארוחת צוות קיץ 🎉',body:'20.06 בגן החברה 18:00',color:'#27AE60'},
     {type:'bday',name:'שרה אברהם',date:'23/06 🎂',dept:'שיווק',color:'#F4813A'},
     {type:'msg',title:'עדכון נהלי חופשה',body:'אנא קראו את העדכון החדש',color:'#1565C0'},
     {type:'bday',name:'דוד שמיר',date:'25/06 🎂',dept:'ביטחון',color:'#E84040'},
-    {type:'msg',title:'ישיבת צוות שלישי',body:'ב-10:00 בחדר ישיבות A',color:'#9B59B6'},
+    {type:'msg',title:'ישיבת צוות שלישי',body:'10:00 בחדר ישיבות A',color:'#9B59B6'},
+    {type:'msg',title:'יום כיף שנתי 🌳',body:'15.07 — פרטים בקרוב',color:'#16A085'},
+    {type:'bday',name:'נועה ברק',date:'28/06 🎂',dept:'חינוך',color:'#E67E22'},
+    {type:'msg',title:'ברוכים הבאים 👋',body:'3 עובדים חדשים הצטרפו',color:'#2980B9'},
   ];
-  el.innerHTML = items.map(item => item.type==='bday'
-    ? '<div style="flex-shrink:0;width:120px;background:'+item.color+'10;border:1.5px solid '+item.color+'22;border-radius:14px;padding:11px 12px;cursor:pointer"><div style="width:32px;height:32px;border-radius:50%;background:'+item.color+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:6px">'+item.name.substring(0,2)+'</div><div style="font-size:10px;font-weight:800;color:var(--tx)">'+item.name+'</div><div style="font-size:8.5px;color:'+item.color+';font-weight:700;margin-top:2px">'+item.date+'</div><div style="font-size:8px;color:var(--tx3)">'+item.dept+'</div></div>'
-    : '<div style="flex-shrink:0;width:150px;background:'+item.color+'10;border:1.5px solid '+item.color+'22;border-radius:14px;padding:11px 12px"><div style="font-size:16px;margin-bottom:5px">📢</div><div style="font-size:10px;font-weight:800;color:var(--tx)">'+item.title+'</div><div style="font-size:8.5px;color:var(--tx2);margin-top:3px;line-height:1.4">'+item.body+'</div></div>'
-  ).join('');
-  // גלילה אוטומטית
+  // אם אין נתונים — הצג הדגמה. אם יש מעט — השלם מהדגמה כדי שהרולר יגלוש
+  if (!items.length) items = demo;
+  else if (items.length < 5) items = [...items, ...demo.slice(0, 6)];
+
+  const card = (item) => item.type==='bday'
+    ? '<div style="flex-shrink:0;width:120px;background:'+item.color+'10;border:1.5px solid '+item.color+'22;border-radius:14px;padding:11px 12px;cursor:pointer"><div style="width:32px;height:32px;border-radius:50%;background:'+item.color+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:6px">'+(item.name||'').substring(0,2)+'</div><div style="font-size:10px;font-weight:800;color:var(--tx)">'+item.name+'</div><div style="font-size:8.5px;color:'+item.color+';font-weight:700;margin-top:2px">'+item.date+'</div><div style="font-size:8px;color:var(--tx3)">'+(item.dept||'')+'</div></div>'
+    : '<div style="flex-shrink:0;width:150px;background:'+item.color+'10;border:1.5px solid '+item.color+'22;border-radius:14px;padding:11px 12px"><div style="font-size:16px;margin-bottom:5px">📢</div><div style="font-size:10px;font-weight:800;color:var(--tx)">'+item.title+'</div><div style="font-size:8.5px;color:var(--tx2);margin-top:3px;line-height:1.4">'+(item.body||'')+'</div></div>';
+
+  // שכפל את התוכן כדי שהרולר יהיה רציף ואינסופי
+  const html = items.map(card).join('');
+  el.innerHTML = html + html;
+
+  // גלילה אוטומטית חלקה ורציפה
   clearInterval(window._rollerT);
+  window._rollerPaused = false;
+  el.onmouseenter = ()=>{ window._rollerPaused = true; };
+  el.onmouseleave = ()=>{ window._rollerPaused = false; };
+  const half = el.scrollWidth / 2;
   window._rollerT = setInterval(()=>{
-    if(!el.parentNode)return clearInterval(window._rollerT);
-    el.scrollLeft += 140;
-    if(el.scrollLeft+el.clientWidth >= el.scrollWidth-10) el.scrollLeft=0;
-  }, 3000);
+    if(!el.parentNode) return clearInterval(window._rollerT);
+    if(window._rollerPaused) return;
+    el.scrollLeft += 1;
+    if(el.scrollLeft >= half) el.scrollLeft = 0; // לולאה רציפה
+  }, 25);
 }
 
-// ── רולר חדשות ──
+// ── רולר חדשות רץ ──
 let _hnCache={};
 async function switchHomeNews(src, btn) {
   ['a7','ynet'].forEach(s=>{
@@ -917,9 +945,13 @@ async function switchHomeNews(src, btn) {
     if(s===src){b.style.background=s==='a7'?'#1565C0':'#C0392B';b.style.color='#fff';b.style.border='none';}
     else{b.style.background='var(--bg)';b.style.color='var(--tx3)';b.style.border='1px solid var(--bd)';}
   });
-  const el=document.getElementById('newsCompact');
-  if(!el)return;
-  el.innerHTML='<div class="ldg" style="padding:12px 14px">⟳</div>';
+  const ticker=document.getElementById('newsTicker');
+  const label=document.getElementById('newsTickerLabel');
+  if(!ticker)return;
+  const srcC=src==='ynet'?'#C0392B':'#1565C0';
+  const srcL=src==='ynet'?'ynet':'ערוץ 7';
+  if(label){label.style.background=srcC;label.textContent=srcL+' ⚡';}
+  ticker.innerHTML='<span style="font-size:10px;color:var(--tx3);padding:0 14px">⟳ טוען...</span>';
   try {
     if(!_hnCache[src]){
       const urls={ynet:'https://www.ynet.co.il/Integration/StoryRss2.xml',a7:'https://www.inn.co.il/Rss.aspx'};
@@ -927,19 +959,43 @@ async function switchHomeNews(src, btn) {
       const d=await r.json();
       _hnCache[src]=d.items||[];
     }
-    const items=_hnCache[src];
-    const srcC=src==='ynet'?'#C0392B':'#1565C0';
-    const srcL=src==='ynet'?'ynet':'ערוץ 7';
-    el.innerHTML=items.slice(0,7).map((item,i)=>`
-    <a href="${item.link}" target="_blank" style="display:flex;align-items:flex-start;gap:10px;padding:9px 14px;border-bottom:1px solid var(--bd2);text-decoration:none;transition:background .12s" onmouseover="this.style.background='#F7F4FA'" onmouseout="this.style.background='transparent'">
-      <div style="font-size:11px;font-weight:800;color:${srcC};flex-shrink:0;width:18px;margin-top:1px">${i+1}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:10px;font-weight:700;color:var(--tx);line-height:1.45;margin-bottom:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${item.title}</div>
-        <div style="font-size:7.5px;color:var(--tx3)">${new Date(item.pubDate||'').toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</div>
-      </div>
-      ${item.thumbnail?`<img src="${item.thumbnail}" style="width:44px;height:36px;object-fit:cover;border-radius:7px;flex-shrink:0" onerror="this.style.display='none'"/>`:''}
-    </a>`).join('')+'<div style="text-align:center;padding:8px"><a href="'+(src==='a7'?'https://www.inn.co.il':'https://www.ynet.co.il')+'" target="_blank" style="font-size:9px;font-weight:700;color:'+srcC+';text-decoration:none">לכל הכתבות ← '+srcL+'</a></div>';
-  } catch(e){el.innerHTML='<div style="padding:12px 14px;font-size:10px;color:var(--tx3)">לא ניתן לטעון חדשות</div>';}
+    const items=_hnCache[src].slice(0,12);
+    if(!items.length) throw new Error('empty');
+    // בנה כל ידיעה כפריט בשורה
+    const itemHtml = items.map(item=>`
+      <a href="${item.link}" target="_blank" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;padding:0 18px;border-left:1px solid var(--bd2)">
+        <span style="width:5px;height:5px;border-radius:50%;background:${srcC};flex-shrink:0"></span>
+        <span style="font-size:10.5px;font-weight:600;color:var(--tx)">${item.title}</span>
+        <span style="font-size:8px;color:var(--tx3)">${new Date(item.pubDate||'').toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</span>
+      </a>`).join('');
+    // שכפול כדי שהרולר יהיה רציף ולא ייגמר
+    ticker.innerHTML = itemHtml + itemHtml;
+    // הפעל אנימציית רולר רצה — מהירות לפי כמות התוכן
+    startNewsTicker();
+  } catch(e){
+    ticker.innerHTML='<span style="font-size:10px;color:var(--tx3);padding:0 14px">לא ניתן לטעון חדשות כעת</span>';
+  }
+}
+
+function startNewsTicker() {
+  const ticker=document.getElementById('newsTicker');
+  if(!ticker)return;
+  clearInterval(window._tickerInt);
+  let pos = 0;
+  const halfWidth = ticker.scrollWidth/2;
+  ticker.style.transform='translateX(0)';
+  window._tickerPaused=false;
+  // עצור בריחוף
+  ticker.onmouseenter = ()=>{ window._tickerPaused=true; };
+  ticker.onmouseleave = ()=>{ window._tickerPaused=false; };
+  // גלילה רציפה (RTL — התוכן זז שמאלה ולולאה)
+  window._tickerInt = setInterval(()=>{
+    if(!ticker.parentNode){clearInterval(window._tickerInt);return;}
+    if(window._tickerPaused)return;
+    pos -= 0.6;
+    if(Math.abs(pos) >= halfWidth) pos = 0;
+    ticker.style.transform=`translateX(${pos}px)`;
+  }, 16);
 }
 
 // ── כתבות שלוה — ריבוע גדול + 5 ריבועים בגריד 2 עמודות ──
@@ -949,15 +1005,17 @@ async function loadShalvaPosts() {
   let posts = [];
   try { posts = await API.get('/posts'); } catch(e) {}
   if (!posts.length) posts = [
-    {img:'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600',title:'ילדים מיוחדים, הישגים מיוחדים',sub:'תוכנית הקיץ של שלוה 2026 — פתיחה בקרוב',tag:'חינוך',featured:true,link:'#'},
-    {img:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400',title:'מתנדבים יקרים — תודה מהלב',sub:'מעל 500 מתנדבים חדשים',tag:'קהילה',featured:false,link:'#'},
-    {img:'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400',title:'מרכז שלוה החדש באשקלון',sub:'פתיחה בספטמבר',tag:'פיתוח',featured:false,link:'#'},
-    {img:'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=400',title:'גיוס תרומות — הצלחה!',sub:'170,000 אירו במשלחת הולנד',tag:'גיוס',featured:false,link:'#'},
-    {img:'https://images.unsplash.com/photo-1544717305-2782549b5136?w=400',title:'הדרכות קיץ 2026',sub:'הירשמו עכשיו',tag:'הדרכה',featured:false,link:'#'},
-    {img:'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=400',title:'אירועי צוות קרובים',sub:'גן החברה — יוני 2026',tag:'קהילה',featured:false,link:'#'},
+    {id:0,img:'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600',title:'ילדים מיוחדים, הישגים מיוחדים',sub:'תוכנית הקיץ של שלוה 2026 — פתיחה בקרוב',body:'תוכנית הקיץ השנתית של המרכז הלאומי שלוה יוצאת לדרך גם השנה.',tag:'חינוך',featured:true},
+    {id:0,img:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400',title:'מתנדבים יקרים — תודה מהלב',sub:'מעל 500 מתנדבים חדשים',body:'השנה זכינו לקבל לשורותינו מעל 500 מתנדבים חדשים.',tag:'קהילה',featured:false},
+    {id:0,img:'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400',title:'מרכז שלוה החדש באשקלון',sub:'פתיחה בספטמבר',body:'אנו גאים להכריז על הקמת מרכז שלוה החדש בעיר אשקלון.',tag:'פיתוח',featured:false},
+    {id:0,img:'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=400',title:'גיוס תרומות — הצלחה!',sub:'170,000 אירו במשלחת הולנד',body:'משלחת ההתרמה של שלוה הסתיימה בהצלחה מרשימה.',tag:'גיוס',featured:false},
+    {id:0,img:'https://images.unsplash.com/photo-1544717305-2782549b5136?w=400',title:'הדרכות קיץ 2026',sub:'הירשמו עכשיו',body:'תוכנית ההדרכה השנתית לצוותי שלוה נפתחת לרישום.',tag:'הדרכה',featured:false},
+    {id:0,img:'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=400',title:'אירועי צוות קרובים',sub:'גן החברה — יוני 2026',body:'אנו שמחים להזמין את כל עובדי המרכז לאירוע גיבוש צוות.',tag:'קהילה',featured:false},
   ];
+  window._posts = posts; // שמירה גלובלית לפתיחת כתבה
   const featured = posts.find(p=>p.featured) || posts[0];
   const rest = posts.filter(p=>p!==featured).slice(0,5);
+  const idxOf = (p) => posts.indexOf(p);
 
   el.style.display = 'grid';
   el.style.gridTemplateColumns = '1fr 1fr';
@@ -965,7 +1023,7 @@ async function loadShalvaPosts() {
 
   el.innerHTML = `
   <!-- ריבוע גדול — פורס 2 עמודות -->
-  <div style="grid-column:span 2;border-radius:18px;overflow:hidden;background:#fff;box-shadow:var(--sh);cursor:pointer;transition:transform .15s" onclick="window.open('${featured.link||'#'}','_blank')" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+  <div style="grid-column:span 2;border-radius:18px;overflow:hidden;background:#fff;box-shadow:var(--sh);cursor:pointer;transition:transform .15s" onclick="openArticle(${idxOf(featured)})" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
     <div style="height:200px;background-image:url(${featured.img});background-size:cover;background-position:center;position:relative">
       <div style="position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(26,10,46,.88))"></div>
       <div style="position:absolute;top:12px;right:12px">
@@ -974,12 +1032,13 @@ async function loadShalvaPosts() {
       <div style="position:absolute;bottom:0;padding:16px 18px">
         <div style="font-size:16px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:4px">${featured.title}</div>
         <div style="font-size:10px;color:rgba(255,255,255,.82)">${featured.sub||''}</div>
+        <div style="font-size:9px;color:#F5C842;font-weight:700;margin-top:8px">קרא עוד ←</div>
       </div>
     </div>
   </div>
   <!-- 5 ריבועים קטנים ב-2 עמודות -->
   ${rest.map(p=>`
-  <div style="border-radius:14px;overflow:hidden;background:#fff;box-shadow:var(--sh);cursor:pointer;transition:transform .15s" onclick="window.open('${p.link||'#'}','_blank')" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+  <div style="border-radius:14px;overflow:hidden;background:#fff;box-shadow:var(--sh);cursor:pointer;transition:transform .15s" onclick="openArticle(${idxOf(p)})" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
     <div style="height:88px;background-image:url(${p.img});background-size:cover;background-position:center;position:relative">
       <span style="position:absolute;top:6px;right:6px;background:rgba(26,10,46,.65);color:#fff;font-size:7px;font-weight:700;padding:2px 7px;border-radius:999px">${p.tag||''}</span>
     </div>
@@ -988,6 +1047,54 @@ async function loadShalvaPosts() {
       <div style="font-size:8px;color:var(--tx3);line-height:1.4">${p.sub||''}</div>
     </div>
   </div>`).join('')}`;
+}
+
+// ── פתיחת כתבה מלאה ──
+function openArticle(idx) {
+  const posts = window._posts || [];
+  const p = posts[idx];
+  if (!p) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'articleOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(26,10,46,.6);z-index:9999;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:0;backdrop-filter:blur(3px)';
+  overlay.onclick = (e)=>{ if(e.target===overlay) closeArticle(); };
+  const bodyHtml = (p.body||p.sub||'אין תוכן זמין לכתבה זו.')
+    .split('\n').filter(x=>x.trim()).map(par=>`<p style="font-size:13px;color:var(--tx2);line-height:1.9;margin-bottom:14px">${par}</p>`).join('');
+  overlay.innerHTML = `
+  <div style="background:#fff;width:100%;max-width:680px;min-height:100vh;animation:slideUp .3s ease" onclick="event.stopPropagation()">
+    <!-- תמונת כותרת -->
+    <div style="height:280px;background-image:url(${p.img});background-size:cover;background-position:center;position:relative">
+      <div style="position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(26,10,46,.9))"></div>
+      <button onclick="closeArticle()" style="position:absolute;top:16px;left:16px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.92);border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.2)">✕</button>
+      <div style="position:absolute;bottom:0;padding:24px 28px;width:100%">
+        <span style="background:var(--t);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:999px;display:inline-block;margin-bottom:10px">${p.tag||'כללי'}</span>
+        <h1 style="font-size:24px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:6px">${p.title}</h1>
+        <div style="font-size:12px;color:rgba(255,255,255,.8)">${p.sub||''}</div>
+      </div>
+    </div>
+    <!-- תוכן -->
+    <div style="padding:24px 28px 60px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--bd)">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:14px">📰</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--tx)">${p.author||'מערכת שלוה'}</div>
+          <div style="font-size:10px;color:var(--tx3)">${p.created_at?fmtD(p.created_at):'כתבה'}</div>
+        </div>
+      </div>
+      ${bodyHtml}
+      ${p.link?`<a href="${p.link}" target="_blank" class="btn bnt" style="margin-top:10px;text-decoration:none">למקור המלא ←</a>`:''}
+      <div style="margin-top:30px;padding-top:20px;border-top:1px solid var(--bd);text-align:center">
+        <button onclick="closeArticle()" class="btn bno">← חזרה לדף הבית</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  document.body.style.overflow='hidden';
+}
+function closeArticle() {
+  const o = document.getElementById('articleOverlay');
+  if(o) o.remove();
+  document.body.style.overflow='';
 }
 
 async function loadWeatherHome() {
@@ -2089,39 +2196,86 @@ async function pgAposts(cnt) {
   cnt.innerHTML = `
 <div class="card mb">
   <div class="sh"><span class="st">📣 ניהול כתבות שלוה</span><span class="b bgr">${posts.length} כתבות</span></div>
+  <div class="info-box">כתבה ראשית מוצגת בריבוע הגדול בדף הבית. שאר הכתבות מוצגות בריבועים הקטנים.</div>
   <div class="sep"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
+  <input type="hidden" id="pt_edit_id" value=""/>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
     <div class="fg"><label class="fl">כותרת *</label><input class="fi" id="pt_title" placeholder="כותרת הכתבה"/></div>
-    <div class="fg"><label class="fl">תת-כותרת</label><input class="fi" id="pt_sub" placeholder="תיאור קצר"/></div>
+    <div class="fg"><label class="fl">תת-כותרת</label><input class="fi" id="pt_sub" placeholder="תיאור קצר שמופיע מתחת לכותרת"/></div>
     <div class="fg"><label class="fl">URL תמונה</label><input class="fi" id="pt_img" placeholder="https://..."/></div>
-    <div class="fg"><label class="fl">תגית</label><input class="fi" id="pt_tag" placeholder="חינוך / קהילה..."/></div>
-    <div class="fg"><label class="fl">קישור</label><input class="fi" id="pt_link" placeholder="https://..."/></div>
-    <div class="fg" style="display:flex;align-items:center;gap:8px;padding-top:18px"><label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer"><input type="checkbox" id="pt_feat"/> כתבה ראשית</label></div>
+    <div class="fg"><label class="fl">תגית</label><input class="fi" id="pt_tag" placeholder="חינוך / קהילה / גיוס..."/></div>
   </div>
-  <button class="btn bnt bnsm" onclick="addPost()">➕ הוסף כתבה</button>
+  <div class="fg"><label class="fl">תוכן הכתבה המלא 📝</label><textarea class="fta tall" id="pt_body" placeholder="כתוב כאן את גוף הכתבה המלא. כל שורה ריקה תיצור פסקה חדשה. תוכן זה יוצג כשלוחצים על הכתבה." style="min-height:140px"></textarea></div>
+  <div style="display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end">
+    <div class="fg" style="margin-bottom:0"><label class="fl">קישור חיצוני (אופציונלי)</label><input class="fi" id="pt_link" placeholder="https://... — למקור מלא"/></div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer;padding-bottom:10px"><input type="checkbox" id="pt_feat"/> ⭐ כתבה ראשית</label>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button class="btn bnt bnsm" id="pt_save_btn" onclick="addPost()">➕ הוסף כתבה</button>
+    <button class="btn bno bnsm" onclick="resetPostForm()" style="display:none" id="pt_cancel_btn">ביטול עריכה</button>
+  </div>
 </div>
 <div class="card">
-  <div class="st mb">רשימת כתבות</div>
+  <div class="st mb">רשימת כתבות (${posts.length})</div>
   ${posts.map(p=>`
   <div class="row" style="align-items:flex-start;gap:12px">
     ${p.img?`<img src="${p.img}" style="width:56px;height:42px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>`:'<div style="width:56px;height:42px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📰</div>'}
-    <div style="flex:1">
-      <div style="font-size:11px;font-weight:700;color:var(--tx)">${p.title}</div>
-      <div style="font-size:8.5px;color:var(--tx3);margin-top:2px">${p.sub||''} · ${p.tag?'['+p.tag+']':''} ${p.featured?'⭐ ראשית':''}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:11px;font-weight:700;color:var(--tx)">${p.title} ${p.featured?'<span style="color:var(--gold)">⭐</span>':''}</div>
+      <div style="font-size:8.5px;color:var(--tx3);margin-top:2px">${p.sub||''} ${p.tag?'· ['+p.tag+']':''}</div>
     </div>
     <div style="display:flex;gap:5px;flex-shrink:0">
-      <button class="ab abv" onclick="featurePost(${p.id})">⭐ ראשית</button>
+      <button class="ab abv" onclick='editPost(${JSON.stringify(p).replace(/'/g,"&#39;")})'>✏️ ערוך</button>
+      ${!p.featured?`<button class="ab abg" onclick="featurePost(${p.id})">⭐</button>`:''}
       <button class="ab abr" onclick="delPost(${p.id})">🗑</button>
     </div>
   </div>`).join('')||'<div class="ldg">אין כתבות. הוסף את הראשונה!</div>'}
 </div>`;
 }
 
+function editPost(p) {
+  document.getElementById('pt_edit_id').value = p.id;
+  document.getElementById('pt_title').value = p.title||'';
+  document.getElementById('pt_sub').value = p.sub||'';
+  document.getElementById('pt_img').value = p.img||'';
+  document.getElementById('pt_tag').value = p.tag||'';
+  document.getElementById('pt_body').value = p.body||'';
+  document.getElementById('pt_link').value = p.link||'';
+  document.getElementById('pt_feat').checked = !!p.featured;
+  document.getElementById('pt_save_btn').innerHTML = '💾 שמור שינויים';
+  document.getElementById('pt_cancel_btn').style.display = 'inline-flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelector('.cnt')?.scrollTo({top:0,behavior:'smooth'});
+}
+function resetPostForm() {
+  ['pt_title','pt_sub','pt_img','pt_tag','pt_body','pt_link'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('pt_edit_id').value='';
+  document.getElementById('pt_feat').checked=false;
+  document.getElementById('pt_save_btn').innerHTML='➕ הוסף כתבה';
+  document.getElementById('pt_cancel_btn').style.display='none';
+}
+
 async function addPost() {
   const title=document.getElementById('pt_title')?.value.trim();
   if (!title) return toast('כותרת חובה',false);
-  await API.post('/posts',{title,sub:document.getElementById('pt_sub')?.value,img:document.getElementById('pt_img')?.value,tag:document.getElementById('pt_tag')?.value,link:document.getElementById('pt_link')?.value,featured:document.getElementById('pt_feat')?.checked});
-  toast('כתבה נוספה! 📰'); navigate('aposts');
+  const data = {
+    title,
+    sub:document.getElementById('pt_sub')?.value,
+    body:document.getElementById('pt_body')?.value,
+    img:document.getElementById('pt_img')?.value,
+    tag:document.getElementById('pt_tag')?.value,
+    link:document.getElementById('pt_link')?.value,
+    featured:document.getElementById('pt_feat')?.checked
+  };
+  const editId = document.getElementById('pt_edit_id')?.value;
+  if (editId) {
+    await API.put('/posts/'+editId, data);
+    toast('כתבה עודכנה! ✏️');
+  } else {
+    await API.post('/posts', data);
+    toast('כתבה נוספה! 📰');
+  }
+  navigate('aposts');
 }
 async function featurePost(id) { await API.put('/posts/'+id+'/feature'); toast('כתבה ראשית עודכנה ⭐'); navigate('aposts'); }
 async function delPost(id) { if (!confirm('למחוק כתבה זו?')) return; await API.delete('/posts/'+id); toast('נמחק'); navigate('aposts'); }
