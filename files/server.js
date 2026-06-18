@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { initDB, getDB } = require('./db');
@@ -11,11 +10,6 @@ const db = initDB();
 
 ['uploads','public'].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d,{recursive:true}); });
 
-const upload = multer({ dest: 'uploads/', limits: { fileSize: 10*1024*1024 } });
-const uploadLogo = multer({ storage: multer.diskStorage({
-  destination: 'public/',
-  filename: (req, file, cb) => cb(null, 'logo' + path.extname(file.originalname))
-})});
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -347,17 +341,6 @@ app.get('/api/stats', admin, (req,res) => {
 });
 
 // ── FILE UPLOAD ──
-app.post('/api/upload/logo', admin, uploadLogo.single('logo'), (req,res) => {
-  if(!req.file) return res.status(400).json({error:'No file'});
-  const ext=path.extname(req.file.originalname); const name='logo'+ext; const dest=path.join('public',name);
-  if(req.file.path!==dest) { try { fs.renameSync(req.file.path,dest); } catch(e) { fs.copyFileSync(req.file.path,dest); fs.unlinkSync(req.file.path); } }
-  db.prepare("INSERT OR REPLACE INTO settings(key,value) VALUES('logo_url',?)").run('/'+name);
-  res.json({url:'/'+name,ok:true});
-});
-app.post('/api/upload/file', auth, upload.single('file'), (req,res) => {
-  if(!req.file) return res.status(400).json({error:'No file'});
-  res.json({url:'/uploads/'+req.file.filename,name:req.file.originalname});
-});
 
 // ── SERVE SPA ──
 // NEWS PROXY — מביא RSS מהשרת
@@ -423,6 +406,68 @@ app.get('/api/news', auth, async (req, res) => {
 });
 
 app.get('*', (req,res) => res.sendFile(path.join(__dirname,'public','index.html')));
+
+
+// ── POSTS (כתבות שלוה) ──
+app.get('/api/posts', (req,res) => {
+  try { res.json(db.prepare('SELECT * FROM posts ORDER BY featured DESC, created_at DESC').all()); } catch(e){ res.json([]); }
+});
+app.post('/api/posts', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const {title,sub,img,tag,link,featured} = req.body;
+  if (!title) return res.status(400).json({error:'Title required'});
+  const r = db.prepare('INSERT INTO posts(title,sub,img,tag,link,featured) VALUES(?,?,?,?,?,?)').run(title,sub||'',img||'',tag||'',link||'',featured?1:0);
+  res.json({id:r.lastInsertRowid});
+});
+app.put('/api/posts/:id', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const {title,sub,img,tag,link,featured} = req.body;
+  db.prepare('UPDATE posts SET title=?,sub=?,img=?,tag=?,link=?,featured=?,updated_at=datetime("now") WHERE id=?').run(title,sub||'',img||'',tag||'',link||'',featured?1:0,req.params.id);
+  res.json({ok:true});
+});
+app.put('/api/posts/:id/feature', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  db.prepare('UPDATE posts SET featured=0').run();
+  db.prepare('UPDATE posts SET featured=1 WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+app.delete('/api/posts/:id', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  db.prepare('DELETE FROM posts WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+
+// ── ANNOUNCEMENTS (רולר) ──
+app.get('/api/announcements', auth, (req,res) => {
+  try {
+    const msgs = db.prepare('SELECT * FROM announcements ORDER BY created_at DESC').all();
+    // הוסף ימי הולדת אוטומטיים
+    const today = new Date();
+    const users = db.prepare('SELECT name,dept,birth_date FROM users WHERE active=1 AND birth_date!=\'\' ').all();
+    const bdayItems = users.filter(u => {
+      if (!u.birth_date) return false;
+      const bd = new Date(u.birth_date);
+      const diff = (new Date(today.getFullYear(), bd.getMonth(), bd.getDate()) - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000;
+      return diff >= 0 && diff <= 7;
+    }).map(u => {
+      const bd = new Date(u.birth_date);
+      const diff = Math.round((new Date(today.getFullYear(), bd.getMonth(), bd.getDate()) - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000);
+      return {type:'bday', name:u.name, dept:u.dept||'', date:diff===0?'היום 🎂':diff===1?'מחר 🎂':(bd.getDate()+'/'+(bd.getMonth()+1)+' 🎂'), color:'#E84393'};
+    });
+    res.json([...bdayItems, ...msgs.map(m=>({...m,type:'msg'}))]);
+  } catch(e){ res.json([]); }
+});
+app.post('/api/announcements', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const {title,body,color} = req.body;
+  const r = db.prepare('INSERT INTO announcements(title,body,color) VALUES(?,?,?)').run(title,body||'',color||'#7B2D8B');
+  res.json({id:r.lastInsertRowid});
+});
+app.delete('/api/announcements/:id', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  db.prepare('DELETE FROM announcements WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
 
 app.listen(PORT, () => {
   console.log(`\n🚀 פורטל שלוה פעיל!`);
