@@ -341,17 +341,6 @@ app.get('/api/stats', admin, (req,res) => {
 });
 
 // ── FILE UPLOAD ──
-app.post('/api/upload/logo', admin, uploadLogo.single('logo'), (req,res) => {
-  if(!req.file) return res.status(400).json({error:'No file'});
-  const ext=path.extname(req.file.originalname); const name='logo'+ext; const dest=path.join('public',name);
-  if(req.file.path!==dest) { try { fs.renameSync(req.file.path,dest); } catch(e) { fs.copyFileSync(req.file.path,dest); fs.unlinkSync(req.file.path); } }
-  db.prepare("INSERT OR REPLACE INTO settings(key,value) VALUES('logo_url',?)").run('/'+name);
-  res.json({url:'/'+name,ok:true});
-});
-app.post('/api/upload/file', auth, upload.single('file'), (req,res) => {
-  if(!req.file) return res.status(400).json({error:'No file'});
-  res.json({url:'/uploads/'+req.file.filename,name:req.file.originalname});
-});
 
 // ── SERVE SPA ──
 // NEWS PROXY — מביא RSS מהשרת
