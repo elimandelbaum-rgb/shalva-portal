@@ -92,20 +92,6 @@ function initDB() {
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now'))
     );
-    CREATE TABLE IF NOT EXISTS posts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL, sub TEXT DEFAULT '', img TEXT DEFAULT '',
-      tag TEXT DEFAULT '', link TEXT DEFAULT '',
-      featured INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT (datetime('now')),
-      updated_at TEXT DEFAULT (datetime('now'))
-    );
-    CREATE TABLE IF NOT EXISTS announcements (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL, body TEXT DEFAULT '',
-      color TEXT DEFAULT '#7B2D8B',
-      created_at TEXT DEFAULT (datetime('now'))
-    );
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, type TEXT NOT NULL,
       description TEXT DEFAULT '', bonus INTEGER DEFAULT 0, data TEXT DEFAULT '{}',

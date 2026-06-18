@@ -155,9 +155,69 @@ app.post('/api/requests', auth, (req,res) => {
   const me = req.session.user;
   const f = req.body;
   if (!f.subject) return res.status(400).json({error:'Missing subject'});
-  const info = db.prepare('INSERT INTO requests(user_id,type,dept,subject,details,status,priority,current_salary,requested_salary,steps,current_step) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
-    .run(me.id,f.type||'general',f.dept||'',f.subject,f.details||'','pending',f.priority||'normal',parseInt(f.current_salary)||0,parseInt(f.requested_salary)||0,JSON.stringify(f.steps||['emp','manager','hr']),0);
-  res.json({id:info.lastInsertRowid,ok:true});
+  const info = db.prepare('INSERT INTO requests(user_id,type,dept,subject,details,status,priority,current_salary,requested_salary,steps,current_step,copy_email) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)')
+    .run(me.id,f.type||'general',f.dept||'',f.subject,f.details||'','pending',f.priority||'normal',parseInt(f.current_salary)||0,parseInt(f.requested_salary)||0,JSON.stringify(f.steps||['emp','manager','hr']),0,f.copy_email||'');
+  const ticketId = info.lastInsertRowid;
+  const createdAt = new Date().toLocaleDateString('he-IL');
+
+  // שלח מייל ל-HR + עותק לפונה (nodemailer אם מוגדר, אחרת log בלבד)
+  try {
+    const settings = {};
+    db.prepare('SELECT key,value FROM settings').all().forEach(r => settings[r.key]=r.value);
+    if (settings.smtp_user && settings.smtp_pass) {
+      const nodemailer = (() => { try { return require('nodemailer'); } catch(e){ return null; } })();
+      if (nodemailer) {
+        const transporter = nodemailer.createTransporter({
+          host: settings.smtp_host||'smtp.gmail.com', port: parseInt(settings.smtp_port)||587,
+          secure: false, auth: { user: settings.smtp_user, pass: settings.smtp_pass }
+        });
+        const typeLabels = {hr:'HR כללי',salary_raise:'העלאת שכר',conditions:'שינוי תנאים',vacation:'חופשה',sick:'מחלה',accident:'תאונת עבודה',equipment:'ציוד',it_issue:'תקלת IT',maintenance:'תחזוקה',general:'כללי'};
+        const typeLabel = typeLabels[f.type||'general']||f.type||'כללי';
+        const priorityLabel = f.priority==='urgent'?'⚡ דחוף':f.priority==='high'?'🔴 גבוהה':'🟡 רגיל';
+        const emailBody = `
+<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:20px;border-radius:12px">
+  <div style="background:linear-gradient(135deg,#5C1F6A,#7B2D8B);padding:24px;border-radius:10px;text-align:center;margin-bottom:20px">
+    <h1 style="color:#fff;margin:0;font-size:20px">📨 פנייה חדשה — שלוה</h1>
+    <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:6px">פנייה #${ticketId} · ${createdAt}</div>
+  </div>
+  <div style="background:#fff;border-radius:10px;padding:20px;border:1px solid #e0d6f0">
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td style="padding:8px 0;color:#666;font-size:13px;width:120px">מספר פנייה:</td><td style="font-weight:700;font-size:15px;color:#5C1F6A">#${ticketId}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;font-size:13px">תאריך:</td><td style="font-size:13px">${createdAt}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;font-size:13px">שם הפונה:</td><td style="font-size:13px">${me.name}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;font-size:13px">מחלקה:</td><td style="font-size:13px">${me.dept||'—'}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;font-size:13px">סוג פנייה:</td><td style="font-size:13px">${typeLabel}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;font-size:13px">נושא:</td><td style="font-weight:700;font-size:13px">${f.subject}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;font-size:13px">עדיפות:</td><td style="font-size:13px">${priorityLabel}</td></tr>
+    </table>
+    ${f.details?`<div style="margin-top:14px;padding:14px;background:#f5f0fa;border-radius:8px;border-right:3px solid #7B2D8B"><div style="font-size:12px;color:#666;margin-bottom:6px">פרטי הפנייה:</div><div style="font-size:13px;color:#333;line-height:1.7">${f.details}</div></div>`:''}
+  </div>
+  <div style="text-align:center;margin-top:16px;font-size:11px;color:#999">מרכז לאומי שלוה · portal.shalva.org.il</div>
+</div>`;
+        // שלח ל-HR
+        transporter.sendMail({
+          from: `"פורטל שלוה" <${settings.smtp_user}>`,
+          to: 'lilach-hr@shalva.org',
+          subject: `[שלוה] פנייה חדשה #${ticketId} — ${f.subject}`,
+          html: emailBody
+        }).catch(e => console.error('HR email error:', e.message));
+        // שלח עותק לפונה אם יש מייל
+        const copyTo = f.copy_email || me.email;
+        if (copyTo) {
+          transporter.sendMail({
+            from: `"פורטל שלוה" <${settings.smtp_user}>`,
+            to: copyTo,
+            subject: `[שלוה] אישור קבלת פנייה #${ticketId} — ${f.subject}`,
+            html: emailBody.replace('<h1 style="color:#fff;margin:0;font-size:20px">📨 פנייה חדשה — שלוה</h1>', '<h1 style="color:#fff;margin:0;font-size:20px">✅ הפנייה שלך התקבלה!</h1>')
+          }).catch(e => console.error('Copy email error:', e.message));
+        }
+      }
+    } else {
+      console.log(`📧 [סימולציה] מייל HR: פנייה #${ticketId} — ${f.subject} מאת ${me.name}`);
+    }
+  } catch(emailErr) { console.error('Email send error:', emailErr.message); }
+
+  res.json({id:ticketId,ok:true,created_at:createdAt});
 });
 app.put('/api/requests/:id', auth, (req,res) => {
   const me = req.session.user;
