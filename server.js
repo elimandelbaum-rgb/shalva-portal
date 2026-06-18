@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { initDB, getDB } = require('./db');
@@ -11,11 +10,6 @@ const db = initDB();
 
 ['uploads','public'].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d,{recursive:true}); });
 
-const upload = multer({ dest: 'uploads/', limits: { fileSize: 10*1024*1024 } });
-const uploadLogo = multer({ storage: multer.diskStorage({
-  destination: 'public/',
-  filename: (req, file, cb) => cb(null, 'logo' + path.extname(file.originalname))
-})});
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
