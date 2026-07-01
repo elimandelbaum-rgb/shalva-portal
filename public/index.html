@@ -42,6 +42,153 @@
 .bgold{background:var(--gold3);color:#7A5700}
 body{background:var(--bg);color:var(--tx);overflow:hidden;height:100vh}
 
+/* ═══════════════════════════════════════
+   MOTION SYSTEM
+   ═══════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes navIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(16px,-20px) scale(1.09)}}
+@keyframes sheen{0%{background-position:-160% 0}55%,100%{background-position:160% 0}}
+@keyframes popIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes softGlow{0%,100%{box-shadow:0 4px 14px rgba(123,45,139,.25)}50%{box-shadow:0 7px 24px rgba(123,45,139,.42)}}
+
+/* content entrance — staggered reveal on every navigate() */
+#mainContent>*{animation:fadeUp .5s cubic-bezier(.16,1,.3,1) both}
+#mainContent>*:nth-child(1){animation-delay:.03s}
+#mainContent>*:nth-child(2){animation-delay:.08s}
+#mainContent>*:nth-child(3){animation-delay:.13s}
+#mainContent>*:nth-child(4){animation-delay:.18s}
+#mainContent>*:nth-child(5){animation-delay:.23s}
+#mainContent>*:nth-child(6){animation-delay:.28s}
+#mainContent>*:nth-child(7){animation-delay:.33s}
+#mainContent>*:nth-child(n+8){animation-delay:.38s}
+
+/* quick-icon cards on the home grid */
+.qhi{transition:transform .24s cubic-bezier(.34,1.56,.64,1),box-shadow .24s ease,border-color .24s ease}
+.qhi:hover{transform:translateY(-6px);border-color:var(--qc)!important;box-shadow:0 14px 30px color-mix(in srgb,var(--qc) 32%,transparent)}
+.qhi:active{transform:translateY(-2px) scale(.98)}
+.qhi-ic{animation:floaty 3.8s ease-in-out infinite;transition:background .2s ease}
+.qhi:nth-child(2) .qhi-ic{animation-delay:.5s}
+.qhi:nth-child(3) .qhi-ic{animation-delay:1s}
+.qhi:nth-child(4) .qhi-ic{animation-delay:1.5s}
+.qhi:nth-child(5) .qhi-ic{animation-delay:.3s}
+.qhi-gl{display:inline-block;line-height:1;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
+.qhi:hover .qhi-gl{transform:scale(1.3) rotate(-9deg)}
+
+/* sidebar nav — entrance cascade + lively hover + active accent */
+.ni{animation:navIn .42s cubic-bezier(.16,1,.3,1) both;position:relative;overflow:hidden}
+.ni:nth-child(1){animation-delay:.03s}.ni:nth-child(2){animation-delay:.06s}
+.ni:nth-child(3){animation-delay:.09s}.ni:nth-child(4){animation-delay:.12s}
+.ni:nth-child(5){animation-delay:.15s}.ni:nth-child(6){animation-delay:.18s}
+.ni:nth-child(7){animation-delay:.21s}.ni:nth-child(8){animation-delay:.24s}
+.ni:nth-child(n+9){animation-delay:.27s}
+.ni:hover{transform:translateX(-3px)}
+.ni .nic{transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.ni:hover .nic{transform:scale(1.22) rotate(-8deg)}
+.ni.on{animation:navIn .42s cubic-bezier(.16,1,.3,1) both,softGlow 3.6s ease-in-out .5s infinite}
+.ni.on .nic{transform:scale(1.1)}
+.ni.on::after{content:'';position:absolute;right:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:var(--gold2);box-shadow:0 0 8px rgba(245,200,66,.7)}
+
+/* login screen ambience */
+.lorb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(3px);z-index:0}
+.lorb1{width:230px;height:230px;background:rgba(255,255,255,.06);top:7%;right:11%;animation:orbFloat 9s ease-in-out infinite}
+.lorb2{width:170px;height:170px;background:rgba(212,160,23,.16);bottom:11%;left:13%;animation:orbFloat 11s ease-in-out infinite reverse}
+.lorb3{width:130px;height:130px;background:rgba(255,255,255,.05);top:58%;right:20%;animation:orbFloat 13s ease-in-out infinite}
+.lbox{position:relative;z-index:1;animation:popIn .55s cubic-bezier(.16,1,.3,1) both}
+.llogo img,.llogo-fb{animation:floaty 4.4s ease-in-out infinite}
+.lbtn{position:relative;overflow:hidden}
+.lbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 32%,rgba(255,255,255,.4) 50%,transparent 68%);background-size:220% 100%;animation:sheen 3.4s ease-in-out infinite;pointer-events:none}
+.lbtn:hover{transform:translateY(-1px)}
+
+/* banner decorative orbs */
+.bnr-orb{animation:orbFloat 12s ease-in-out infinite}
+.bnr-orb2{animation:orbFloat 15s ease-in-out infinite reverse}
+
+/* ═══ HERO (welcome banner) ═══ */
+@keyframes aur{0%{transform:translate(0,0) scale(1)}33%{transform:translate(34px,-22px) scale(1.18)}66%{transform:translate(-22px,16px) scale(.92)}100%{transform:translate(0,0) scale(1)}}
+@keyframes wave{0%,62%,100%{transform:rotate(0)}12%,32%{transform:rotate(16deg)}22%{transform:rotate(-8deg)}42%{transform:rotate(12deg)}52%{transform:rotate(-4deg)}}
+@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(245,200,66,.75)}70%{box-shadow:0 0 0 7px rgba(245,200,66,0)}100%{box-shadow:0 0 0 0 rgba(245,200,66,0)}}
+@keyframes countUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.hero2{position:relative;border-radius:22px;overflow:hidden;margin-bottom:16px;box-shadow:0 14px 38px rgba(123,45,139,.32)}
+.hero2-bg{position:absolute;inset:0;background:linear-gradient(135deg,#3A1152,#7B2D8B 55%,#9B3FA8)}
+.hero2-aur{position:absolute;border-radius:50%;filter:blur(46px);mix-blend-mode:screen;pointer-events:none}
+.hero2-aur1{width:300px;height:300px;background:#D060E6;top:-100px;right:-50px;opacity:.6;animation:aur 15s ease-in-out infinite}
+.hero2-aur2{width:250px;height:250px;background:#F5C842;bottom:-120px;left:6%;opacity:.42;animation:aur 19s ease-in-out infinite reverse}
+.hero2-aur3{width:210px;height:210px;background:#5C7CFA;top:14%;left:40%;opacity:.5;animation:aur 23s ease-in-out infinite}
+.hero2-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.16) 1px,transparent 1px);background-size:17px 17px;opacity:.45;-webkit-mask-image:linear-gradient(90deg,transparent,#000 42%,#000 58%,transparent);mask-image:linear-gradient(90deg,transparent,#000 42%,#000 58%,transparent);pointer-events:none}
+.hero2-in{position:relative;z-index:2;padding:22px 24px 20px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap}
+.hero2-kick{display:inline-flex;align-items:center;gap:7px;font-size:9px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.12em;margin-bottom:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);padding:4px 11px;border-radius:999px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#F5C842;animation:livePulse 2s infinite}
+.hero2-title{font-size:27px;font-weight:900;color:#fff;margin-bottom:5px;letter-spacing:-.6px;line-height:1.05;text-shadow:0 2px 14px rgba(0,0,0,.16)}
+.wave{display:inline-block;transform-origin:72% 72%;animation:wave 2.8s ease-in-out infinite}
+.hero2-sub{font-size:11.5px;color:rgba(255,255,255,.82);margin-bottom:11px;font-weight:500}
+.hero2-dt{display:inline-flex;align-items:center;gap:6px;font-size:10px;color:rgba(255,255,255,.68);font-weight:600;background:rgba(0,0,0,.12);padding:4px 11px;border-radius:999px}
+.hero2-dt b{color:#F5C842;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.hero2-stats{display:flex;gap:9px;flex-wrap:wrap}
+.hero2-pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);border-radius:15px;padding:11px 15px;text-align:center;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:transform .22s cubic-bezier(.34,1.56,.64,1),background .22s;min-width:82px;cursor:default}
+.hero2-pill.clk{cursor:pointer}
+.hero2-pill:hover{transform:translateY(-4px);background:rgba(255,255,255,.24)}
+.hero2-pl{font-size:8.5px;color:rgba(255,255,255,.72);font-weight:600;white-space:nowrap}
+.hero2-pv{font-size:21px;font-weight:900;color:#fff;line-height:1.1;margin-top:2px;animation:countUp .5s .2s both}
+.hero2-pv.gold{color:#F5C842}
+.hero2-cta{background:linear-gradient(135deg,#F5C842,#D4A017);border:none;border-radius:14px;padding:12px 20px;color:#4A1560;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px rgba(212,160,23,.4);transition:transform .2s}
+.hero2-cta:hover{transform:translateY(-3px) scale(1.02)}
+
+/* ═══ ROLLER (birthdays + announcements) ═══ */
+@keyframes rollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.roller2{position:relative;overflow:hidden;padding:6px 0 14px}
+.roller2::before,.roller2::after{content:'';position:absolute;top:0;bottom:0;width:40px;z-index:3;pointer-events:none}
+.roller2::before{right:0;background:linear-gradient(270deg,#fff,transparent)}
+.roller2::after{left:0;background:linear-gradient(90deg,#fff,transparent)}
+.roller2-track{display:flex;width:max-content;padding:6px 0;animation:rollLeft 42s linear infinite}
+.roller2:hover .roller2-track{animation-play-state:paused}
+.rc{flex-shrink:0;margin-inline-end:11px;border-radius:16px;padding:13px 14px;position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;cursor:pointer}
+.rc:hover{transform:translateY(-5px) scale(1.02)}
+.rc-bday{width:132px}
+.rc-msg{width:172px}
+.rc-shine{position:absolute;top:-40px;right:-30px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.5);filter:blur(14px)}
+.rc-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.rc-cake{position:absolute;top:10px;left:12px;font-size:17px;animation:floaty 3s ease-in-out infinite}
+.rc-name{font-size:11px;font-weight:800;color:var(--tx)}
+.rc-date{font-size:9px;font-weight:800;margin-top:3px}
+.rc-dept{font-size:8px;color:var(--tx3);margin-top:1px}
+.rc-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:7px}
+.rc-title{font-size:10.5px;font-weight:800;color:var(--tx);line-height:1.25}
+.rc-body{font-size:9px;color:var(--tx2);margin-top:4px;line-height:1.45}
+
+@media(max-width:768px){
+  .hero2-in{padding:18px 16px}
+  .hero2-title{font-size:21px}
+  .hero2-sub{font-size:10.5px}
+  .hero2-stats{width:100%}
+  .hero2-pill{flex:1;min-width:0}
+  .hero2-cta{width:100%}
+  .roller2-track{animation-duration:28s}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::after,*::before{animation:none!important;transition-duration:.01ms!important}
+}
+
+/* ═══ SITE-WIDE MICRO-INTERACTIONS ═══ */
+.btn{transition:transform .14s cubic-bezier(.34,1.56,.64,1),opacity .14s,background .14s,border-color .14s,color .14s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.96)}
+.mc{transition:transform .22s ease,box-shadow .22s ease}
+.mc:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(123,45,139,.16)}
+.tib{transition:background .13s,transform .15s}
+.tib:active{transform:scale(.9)}
+.cp:active{transform:scale(1.1)}
+.tab2{position:relative}
+.ab{transition:transform .13s cubic-bezier(.34,1.56,.64,1),filter .13s}
+.ab:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.ab:active{transform:scale(.94)}
+.mn-btn .mn-ic{transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.mn-btn:active .mn-ic{transform:scale(1.25)}
+.mn-btn.on .mn-ic{transform:scale(1.15)}
+
 /* ── LOGIN ── */
 #loginScr{display:none;position:fixed;inset:0;background:var(--grad);align-items:center;justify-content:center;z-index:999}
 #loginScr.on{display:flex}
@@ -265,6 +412,9 @@ body{background:var(--bg);color:var(--tx);overflow:hidden;height:100vh}
 
 <!-- LOGIN -->
 <div id="loginScr">
+  <div class="lorb lorb1"></div>
+  <div class="lorb lorb2"></div>
+  <div class="lorb lorb3"></div>
   <div class="lbox">
     <div class="llogo">
       <img src="/logo.png" onerror="this.style.display='none';document.getElementById('lfb').style.display='block'"/>
@@ -387,7 +537,7 @@ const API = {
   get: (p) => API.req('GET', p),
   post: (p, b) => API.req('POST', p, b),
   put: (p, b) => API.req('PUT', p, b),
-  delete: (p) => API.req('DELETE', p)
+  delete: (p, b) => API.req('DELETE', p, b)
 };
 
 // ══════════════════════════════════════
@@ -489,7 +639,6 @@ function getNavItems() {
     {ic:'📨', lb:'פניות לHR', id:'req'},
     {ic:'📋', lb:'פניה למחלקות', id:'forms'},
     {gr:'אישי'},
-    {ic:'💰', lb:'שכר ומילואים', id:'sal'},
     {ic:'⭐', lb:'הערכה ותנאים', id:'hr'},
     {ic:'🎓', lb:'הדרכות', id:'train'},
     {ic:'👤', lb:'האזור האישי', id:'personal'},
@@ -504,7 +653,6 @@ function getNavItems() {
     {ic:'📊', lb:'דשבורד', id:'adash'},
     {ic:'👥', lb:'עובדים', id:'aemp'},
     {ic:'📨', lb:'כל הפניות', id:'areq'},
-    {ic:'💰', lb:'שכר', id:'asal'},
     {ic:'🎓', lb:'הדרכות', id:'atrain'},
     {ic:'🏢', lb:'מחלקות', id:'adepts'},
     {ic:'📡', lb:'שידורים', id:'abcast'},
@@ -545,7 +693,6 @@ function buildNav() {
     {gr:'אישי'},
     {ic:'👤', lb:'האזור האישי', id:'personal'},
     {ic:'📨', lb:'הפניות שלי', id:'req'},
-    {ic:'💰', lb:'שכר', id:'sal'},
     {gr:'מערכת'},
     {ic:'🔧', lb:'ניהול', id:'mgmt'},
   ];
@@ -553,10 +700,18 @@ function buildNav() {
   // אם מחובר — הוסף פריטים נוספים
   const adminItems = ME && isAdmin() ? [
     {ic:'📊', lb:'דשבורד ניהול', id:'adash'},
+    {ic:'🏠', lb:'עורך דף הבית', id:'ahome'},
     {ic:'👥', lb:'עובדים', id:'aemp'},
     {ic:'📨', lb:'כל הפניות', id:'areq'},
     {ic:'📣', lb:'כתבות שלוה', id:'aposts'},
     {ic:'🎂', lb:'רולר הודעות', id:'aroller'},
+    {ic:'🎬', lb:'פרסומות וסרטונים', id:'aads'},
+    {ic:'📢', lb:'עדכוני צוות', id:'afeed'},
+    {ic:'🗂', lb:'ספריית מדיה', id:'amedia'},
+    {ic:'🤖', lb:'שלומית AI', id:'aai'},
+    {ic:'📋', lb:'בונה טפסים', id:'aforms'},
+    {ic:'🎓', lb:'הדרכות', id:'atrain'},
+    {ic:'📡', lb:'שידורים', id:'abcast'},
     {ic:'🏢', lb:'מחלקות', id:'adepts'},
     {ic:'⚙️', lb:'הגדרות', id:'aset'},
   ] : [];
@@ -587,27 +742,32 @@ function buildNav() {
 
 const TITLES = {
   home:'דף הבית', feed:'עדכוני צוות', chat:'שלומית AI',
-  req:'פניות לHR', forms:'פניה למחלקות', sal:'שכר ומילואים',
+  req:'פניות לHR', forms:'פניה למחלקות',
   hr:'הערכה ותנאים', train:'הדרכות', personal:'האזור האישי',
   approvals:'אישורים', myteam:'עובדי המחלקה',
   adash:'דשבורד', aemp:'ניהול עובדים', areq:'כל הפניות', aposts:'כתבות שלוה', aroller:'רולר הודעות',
-  asal:'ניהול שכר', atrain:'הדרכות', adepts:'ניהול מחלקות',
+  aads:'פרסומות וסרטונים',
+  afeed:'ניהול עדכוני צוות', amedia:'ספריית מדיה',
+  ahome:'עורך דף הבית', aai:'ניהול שלומית AI', aforms:'בונה טפסים',
+  atrain:'הדרכות', adepts:'ניהול מחלקות',
   abcast:'שידורים', ausers:'משתמשים', aset:'הגדרות'
 };
 
 const PAGES = {
   home:pgHome, feed:pgFeed, chat:pgChat,
-  req:pgReq, forms:pgForms, sal:pgSal,
+  req:pgReq, forms:pgForms,
   hr:pgHR, train:pgTrain, personal:pgPersonal,
   approvals:pgApprovals, myteam:pgMyTeam,
-  adash:pgAdash, aemp:pgAemp, areq:pgAreq, aposts:pgAposts, aroller:pgAroller,
-  asal:pgAsal, atrain:pgAtrain, adepts:pgAdepts,
+  adash:pgAdash, aemp:pgAemp, areq:pgAreq, aposts:pgAposts, aroller:pgAroller, aads:pgAads,
+  afeed:pgAfeed, amedia:pgAmedia,
+  ahome:pgAhome, aai:pgAai, aforms:pgAforms,
+  atrain:pgAtrain, adepts:pgAdepts,
   abcast:pgAbcast, ausers:pgAusers, aset:pgAset
 };
 
 // דפים שדורשים כניסה
-const PROTECTED = ['personal','req','sal','hr','approvals','myteam','adash','aemp','areq','asal','atrain','adepts','abcast','ausers','aset'];
-const ADMIN_ONLY = ['adash','aemp','areq','asal','atrain','adepts','abcast','ausers','aset'];
+const PROTECTED = ['personal','req','hr','approvals','myteam','adash','aemp','areq','aposts','aroller','aads','afeed','amedia','ahome','aai','aforms','atrain','adepts','abcast','ausers','aset'];
+const ADMIN_ONLY = ['adash','aemp','areq','aposts','aroller','aads','afeed','amedia','ahome','aai','aforms','atrain','adepts','abcast','ausers','aset'];
 const MGR_ONLY = ['approvals','myteam'];
 
 function navigate(id, el) {
@@ -745,8 +905,38 @@ async function pgHome(cnt) {
       ME = me; open = reqs.filter(r=>!['approved','rejected'].includes(r.status));
     } catch(e) {}
   }
-  const today = new Date();
-  const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  // טען קונפיג פומבי (ניתן לעריכה בעורך דף הבית)
+  let cfg = {};
+  try { cfg = await fetch('/api/public-config').then(r=>r.json()); } catch(e) {}
+  const kicker = cfg.home_banner_kicker || 'פורטל עובדים שלוה';
+  const welcomeGuest = cfg.home_banner_welcome_guest || 'ברוכים הבאים! 🌟';
+  const welcomeVerb = cfg.home_banner_welcome || 'שלום';
+  const weatherLabel = cfg.home_weather_label || 'ירושלים';
+  const _now = new Date();
+  const _hh = _now.getHours();
+  const greetWord = _hh<12?'בוקר טוב':_hh<17?'צהריים טובים':_hh<21?'ערב טוב':'לילה טוב';
+  const dateStr = _now.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'});
+  const firstName = me ? (me.name||'').split(' ')[0] : '';
+  const navRow1 = Array.isArray(cfg.home_nav_row1) ? cfg.home_nav_row1 : [
+    {ic:'📨',lb:'פניות HR',target:'req',color:'#7B2D8B'},
+    {ic:'📋',lb:'מחלקות',target:'forms',color:'#1565C0'},
+    {ic:'🎓',lb:'הדרכות',target:'train',color:'#27AE60'},
+    {ic:'⭐',lb:'הערכה',target:'hr',color:'#F4813A'}
+  ];
+  const navRow2 = Array.isArray(cfg.home_nav_row2) ? cfg.home_nav_row2 : [
+    {ic:'🤖',lb:'שלומית AI',target:'chat',color:'#E84393'},
+    {ic:'🎁',lb:'הטבות',target:'https://boomclub.org.il/',color:'#D4A017',caption:'boomclub'},
+    {ic:'📱',lb:'חילן',target:'https://www.hilannet.co.il/',color:'#4BAEE8',caption:'hilannet'},
+    {ic:'👤',lb:'הפרופיל',target:'personal',color:'#5C1F6A'}
+  ];
+  const isUrl = (t) => t && (t.startsWith('http://') || t.startsWith('https://'));
+  const clickHandler = (t) => isUrl(t) ? `window.open('${t.replace(/'/g,"\\'")}','_blank')` : `navigate('${t}')`;
+  const renderIcon = (item) => `
+  <div class="qhi" onclick="${clickHandler(item.target)}" title="${item.caption||''}" style="--qc:${item.color};background:#fff;border-radius:14px;padding:13px 8px;text-align:center;cursor:pointer;box-shadow:var(--sh);border:1.5px solid ${item.color}18">
+    <div class="qhi-ic" style="width:42px;height:42px;border-radius:13px;background:${item.color}15;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 7px"><span class="qhi-gl">${item.ic}</span></div>
+    <div style="font-size:10px;font-weight:700;color:var(--tx)">${item.lb}</div>
+    ${item.caption?`<div style="font-size:7px;color:${item.color};font-weight:600;margin-top:2px">${item.caption}</div>`:''}
+  </div>`;
 
   cnt.innerHTML = `
 
@@ -766,91 +956,105 @@ async function pgHome(cnt) {
 </div>
 
 <!-- BANNER -->
-<div style="border-radius:20px;background:var(--grad);padding:22px 22px 20px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(123,45,139,.28)">
-  <div style="position:absolute;top:-30px;left:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
-  <div style="position:absolute;bottom:-20px;right:10%;width:110px;height:110px;border-radius:50%;background:rgba(212,160,23,.15)"></div>
-  <div style="position:relative;z-index:1">
-    <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.12em;margin-bottom:4px">פורטל עובדים שלוה</div>
-    <div style="font-size:24px;font-weight:900;color:#fff;margin-bottom:4px">${me?'שלום, '+(me.name.split(' ')[0])+'! 👋':'ברוכים הבאים! 🌟'}</div>
-    <div style="font-size:10px;color:rgba(255,255,255,.7);margin-bottom:12px">${me?((me.title||'')+' · '+(me.dept||'')):'המרכז הלאומי שלוה'}</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:8px 13px;text-align:center">
-        <div style="font-size:8px;color:rgba(255,255,255,.7)" id="wDesc">☁️ ירושלים</div>
-        <div style="font-size:20px;font-weight:900;color:#fff" id="wTemp">--°</div>
+<div class="hero2">
+  <div class="hero2-bg"></div>
+  <div class="hero2-aur hero2-aur1"></div>
+  <div class="hero2-aur hero2-aur2"></div>
+  <div class="hero2-aur hero2-aur3"></div>
+  <div class="hero2-dots"></div>
+  <div class="hero2-in">
+    <div style="flex:1;min-width:230px">
+      <div class="hero2-kick"><span class="live-dot"></span>${kicker}</div>
+      <div class="hero2-title">${greetWord}${me?', '+firstName:''} <span class="wave">👋</span></div>
+      <div class="hero2-sub">${me?((me.title||'')+' · '+(me.dept||'')):welcomeGuest}</div>
+      <div class="hero2-dt">📅 ${dateStr} · <b id="heroClock">--:--</b></div>
+    </div>
+    <div class="hero2-stats">
+      <div class="hero2-pill">
+        <div class="hero2-pl" id="wDesc">☁️ ${weatherLabel}</div>
+        <div class="hero2-pv" id="wTemp">--°</div>
       </div>
-      ${me?'<div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:8px 13px;text-align:center;cursor:pointer" onclick="navigate(\'req\')"><div style="font-size:8px;color:rgba(255,255,255,.7)">📨 פניות</div><div style="font-size:20px;font-weight:900;color:#fff">'+open.length+'</div></div><div style="background:rgba(212,160,23,.25);border:1px solid rgba(212,160,23,.4);border-radius:10px;padding:8px 13px;text-align:center"><div style="font-size:8px;color:rgba(255,255,255,.7)">🏖 חופשה</div><div style="font-size:20px;font-weight:900;color:#F5C842">'+(me.vacation_days||0)+'</div></div>'
-      :'<button onclick="showLoginModal()" style="background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);border-radius:10px;padding:9px 16px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔐 כניסה לאזור האישי ←</button>'}
+      ${me?`<div class="hero2-pill clk" onclick="navigate('req')">
+        <div class="hero2-pl">📨 פניות פתוחות</div>
+        <div class="hero2-pv">${open.length}</div>
+      </div>
+      <div class="hero2-pill">
+        <div class="hero2-pl">🏖 ימי חופשה</div>
+        <div class="hero2-pv gold">${me.vacation_days||0}</div>
+      </div>`
+      :`<button class="hero2-cta" onclick="showLoginModal()">🔐 כניסה לאזור האישי ←</button>`}
     </div>
   </div>
 </div>
 
 <!-- אייקוני ניווט — שורה 1 -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
-  ${[
-    ['📨','פניות HR','req','#7B2D8B'],
-    ['📋','מחלקות','forms','#1565C0'],
-    ['🎓','הדרכות','train','#27AE60'],
-    ['💰','שכר','sal','#F4813A'],
-  ].map(([ic,lb,id,c])=>`
-  <div onclick="navigate('${id}')" style="background:#fff;border-radius:14px;padding:13px 8px;text-align:center;cursor:pointer;box-shadow:var(--sh);transition:transform .15s;border:1.5px solid ${c}18" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-    <div style="width:42px;height:42px;border-radius:13px;background:${c}15;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 7px">${ic}</div>
-    <div style="font-size:10px;font-weight:700;color:var(--tx)">${lb}</div>
-  </div>`).join('')}
+<div style="display:grid;grid-template-columns:repeat(${navRow1.length||4},1fr);gap:10px;margin-bottom:10px">
+  ${navRow1.map(renderIcon).join('')}
 </div>
 
 <!-- אייקוני ניווט — שורה 2 -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
-  ${[
-    ['🤖','שלומית AI','chat','#E84393'],
-    ['🎁','הטבות','_boom','#D4A017'],
-    ['📱','חילן','_hilan','#4BAEE8'],
-    ['👤','הפרופיל','personal','#5C1F6A'],
-  ].map(([ic,lb,id,c])=>`
-  <div onclick="${id==='_boom'?"window.open('https://boomclub.org.il/','_blank')":id==='_hilan'?"window.open('https://www.hilannet.co.il/','_blank')":`navigate('${id}')`}" title="${id==='_boom'?'boomclub.org.il':id==='_hilan'?'hilannet.co.il':''}" style="background:#fff;border-radius:14px;padding:13px 8px;text-align:center;cursor:pointer;box-shadow:var(--sh);transition:transform .15s;border:1.5px solid ${c}30" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='${c}'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='${c}30'">
-    <div style="width:42px;height:42px;border-radius:13px;background:${c}18;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 7px">${ic}</div>
-    <div style="font-size:10px;font-weight:700;color:var(--tx)">${lb}</div>
-    ${id==='_boom'?`<div style="font-size:7px;color:${c};font-weight:600;margin-top:2px">boomclub</div>`:id==='_hilan'?`<div style="font-size:7px;color:${c};font-weight:600;margin-top:2px">hilannet</div>`:''}
-  </div>`).join('')}
+<div style="display:grid;grid-template-columns:repeat(${navRow2.length||4},1fr);gap:10px;margin-bottom:16px">
+  ${navRow2.map(renderIcon).join('')}
 </div>
 
-<!-- רולר ימי הולדת + הודעות -->
-<div style="background:#fff;border-radius:16px;margin-bottom:16px;box-shadow:var(--sh);overflow:hidden">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px">
-    <div style="display:flex;align-items:center;gap:7px">
-      <div style="width:4px;height:16px;background:var(--grad-gold);border-radius:999px"></div>
-      <span style="font-size:12px;font-weight:800;color:var(--tx)">🎂 ימי הולדת והודעות</span>
+<!-- פרסומות + חדשות ישראל (רולר אנכי) — שורה מרכזית -->
+<div style="display:grid;grid-template-columns:1fr 260px;gap:12px;margin-bottom:16px" id="adsNewsRow">
+  <!-- קרוסלת פרסומות / סרטונים -->
+  <div id="adsCarousel" style="border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(123,45,139,.18);background:linear-gradient(135deg,#5C1F6A,#7B2D8B);position:relative;min-height:260px;height:100%">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-size:11px;font-weight:700;gap:8px">
+      <div style="font-size:32px">🎬</div>
+      <div>טוען פרסומות...</div>
     </div>
   </div>
-  <div id="roller" style="display:flex;gap:10px;padding:4px 14px 14px;overflow-x:auto;scroll-behavior:smooth">
-    <div class="ldg">⟳ טוען...</div>
+
+  <!-- חדשות ישראל — רולר אנכי -->
+  <div style="background:#fff;border-radius:18px;box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column;min-height:260px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 12px 9px;border-bottom:1px solid var(--bd2);flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:3px;height:14px;background:#1565C0;border-radius:999px"></div>
+        <span style="font-size:11px;font-weight:800;color:var(--tx)">📰 חדשות</span>
+      </div>
+      <div style="display:flex;gap:4px">
+        <span id="hn-a7" onclick="switchHomeNews('a7',this)" style="font-size:8px;font-weight:700;padding:3px 8px;border-radius:999px;background:#1565C0;color:#fff;cursor:pointer">ערוץ 7</span>
+        <span id="hn-ynet" onclick="switchHomeNews('ynet',this)" style="font-size:8px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--bg);color:var(--tx3);cursor:pointer;border:1px solid var(--bd)">ynet</span>
+      </div>
+    </div>
+    <div style="position:relative;flex:1;overflow:hidden;background:#F7F9FC">
+      <!-- Fade masks top+bottom -->
+      <div style="position:absolute;top:0;left:0;right:0;height:20px;background:linear-gradient(#F7F9FC,transparent);z-index:2;pointer-events:none"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(transparent,#F7F9FC);z-index:2;pointer-events:none"></div>
+      <div id="newsTicker" style="position:absolute;top:0;left:0;right:0;will-change:transform;padding:6px 0">
+        <div style="padding:14px;font-size:9.5px;color:var(--tx3);text-align:center">⟳ טוען חדשות...</div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- חדשות ישראל — שורת רולר רצה -->
-<div style="background:#fff;border-radius:16px;margin-bottom:16px;box-shadow:var(--sh);overflow:hidden">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px 9px">
-    <div style="display:flex;align-items:center;gap:7px">
-      <div style="width:4px;height:16px;background:#1565C0;border-radius:999px"></div>
-      <span style="font-size:12px;font-weight:800;color:var(--tx)">📰 חדשות ישראל</span>
-    </div>
-    <div style="display:flex;gap:5px">
-      <span id="hn-a7" onclick="switchHomeNews('a7',this)" style="font-size:8px;font-weight:700;padding:3px 10px;border-radius:999px;background:#1565C0;color:#fff;cursor:pointer">ערוץ 7</span>
-      <span id="hn-ynet" onclick="switchHomeNews('ynet',this)" style="font-size:8px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--tx3);cursor:pointer;border:1px solid var(--bd)">ynet</span>
-    </div>
-  </div>
-  <!-- פס רולר רץ -->
-  <div style="position:relative;background:#F7F9FC;border-top:1px solid var(--bd2);overflow:hidden;height:38px;display:flex;align-items:center">
-    <div id="newsTickerLabel" style="position:absolute;right:0;top:0;bottom:0;z-index:2;background:#1565C0;color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;padding:0 12px;box-shadow:-6px 0 10px rgba(0,0,0,.12)">חדשות ⚡</div>
-    <div id="newsTicker" style="display:flex;align-items:center;white-space:nowrap;will-change:transform;padding-right:90px">
-      <span style="font-size:10px;color:var(--tx3);padding:0 14px">⟳ טוען חדשות...</span>
-    </div>
-  </div>
-</div>
 <style>
 @keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(100%); } }
 @keyframes slideUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
-#newsTicker a:hover { color:#1565C0 !important; }
+#newsTicker a:hover { background:#EEF3FB !important; }
+@media (max-width: 768px) {
+  #adsNewsRow { grid-template-columns: 1fr !important; }
+  #adsNewsRow > div:last-child { min-height: 200px !important; max-height: 240px }
+}
 </style>
+
+<!-- רולר ימי הולדת + הודעות -->
+<div style="background:#fff;border-radius:16px;margin-bottom:16px;box-shadow:var(--sh);overflow:hidden">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 15px 9px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:4px;height:17px;background:var(--grad-gold);border-radius:999px"></div>
+      <span style="font-size:12.5px;font-weight:800;color:var(--tx)">🎉 חוגגים ומעדכנים</span>
+    </div>
+    <span style="font-size:8.5px;font-weight:700;color:var(--tx3);background:var(--bg);border-radius:999px;padding:3px 9px">ימי הולדת · הודעות צוות</span>
+  </div>
+  <div class="roller2">
+    <div class="roller2-track" id="roller">
+      <div class="ldg">⟳ טוען...</div>
+    </div>
+  </div>
+</div>
 
 <!-- כתבות שלוה -->
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 2px">
@@ -878,6 +1082,8 @@ async function pgHome(cnt) {
 
   loadWeatherHome();
   loadRoller();
+  startHeroClock();
+  loadAdsCarousel();
   switchHomeNews('a7', document.getElementById('hn-a7'));
   loadShalvaPosts();
 }
@@ -894,6 +1100,93 @@ async function loadWeatherHome() {
       if(de) de.textContent=(cur.weatherDesc?.[0]?.value||'')+'  ☁️ ירושלים';
     }
   } catch(e){}
+}
+
+// ── קרוסלת פרסומות / סרטונים ──
+let _ads = [];
+let _adsIdx = 0;
+let _adsTimer = null;
+async function loadAdsCarousel() {
+  const el = document.getElementById('adsCarousel');
+  if (!el) return;
+  try {
+    const raw = await API.get('/ads');
+    _ads = Array.isArray(raw) ? raw : [];
+  } catch(e) {
+    console.warn('ads API not available yet, using fallback demo', e);
+    _ads = [];
+  }
+  // אם ה-API עוד לא זמין / הטבלה ריקה — הצג פרסומות דמו כדי שהריבוע תמיד מופיע
+  if (!_ads.length) {
+    _ads = [
+      {id:0,title:'שלוה — נותנים תקווה, משנים חיים',sub:'ראו את הסיפור שלנו',type:'video',media_url:'/media/sha.mp4',poster_url:'/media/sha_poster.jpg',link_url:'https://www.shalva.org',link_text:'לצפייה באתר שלוה',overlay_color:'rgba(26,10,46,.35)'},
+      {id:0,title:'קמפיין ההתרמה השנתי',sub:'הצטרפו — כל תרומה עושה הבדל',type:'image',media_url:'https://images.unsplash.com/photo-1593113646773-028c64a8f1b8?w=1200',poster_url:'',link_url:'https://www.shalva.org/donate',link_text:'לתרומה',overlay_color:'rgba(26,10,46,.55)'},
+      {id:0,title:'מרכז שלוה החדש באשקלון',sub:'פתיחה חגיגית — ספטמבר 2026',type:'image',media_url:'https://images.unsplash.com/photo-1541535650810-10d26f5c2ab3?w=1200',poster_url:'',link_url:'',link_text:'',overlay_color:'rgba(26,10,46,.55)'},
+    ];
+  }
+  el.style.display = 'block';
+  _adsIdx = 0;
+  renderCurrentAd();
+}
+
+function renderCurrentAd() {
+  const el = document.getElementById('adsCarousel');
+  if (!el || !_ads.length) return;
+  const ad = _ads[_adsIdx];
+  if (!ad) return;
+
+  // Track view (fire and forget)
+  fetch('/api/ads/'+ad.id+'/view', {method:'POST'}).catch(()=>{});
+
+  const dots = _ads.length > 1 ? `
+    <div style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:5">
+      ${_ads.map((_,i)=>`<div onclick="showAd(${i})" style="width:${i===_adsIdx?'24px':'8px'};height:6px;border-radius:999px;background:${i===_adsIdx?'#fff':'rgba(255,255,255,.5)'};cursor:pointer;transition:all .3s"></div>`).join('')}
+    </div>
+    <button onclick="nextAd(-1)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.85);border:none;font-size:14px;font-weight:700;color:var(--tx);cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15)">›</button>
+    <button onclick="nextAd(1)" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.85);border:none;font-size:14px;font-weight:700;color:var(--tx);cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15)">‹</button>` : '';
+
+  const media = ad.type === 'video'
+    ? `<video src="${ad.media_url}" ${ad.poster_url?`poster="${ad.poster_url}"`:''} autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onended="nextAd(1)"></video>`
+    : `<div style="position:absolute;inset:0;background-image:url('${ad.media_url}');background-size:cover;background-position:center"></div>`;
+
+  const clickHandler = ad.link_url ? `onclick="adClick(${ad.id},'${ad.link_url.replace(/'/g,"\\'")}')"` : '';
+
+  el.innerHTML = `
+    <div style="position:absolute;inset:0;overflow:hidden;background:#1A0A2E">
+      ${media}
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,${ad.overlay_color||'rgba(26,10,46,.55)'});z-index:1"></div>
+      <div ${clickHandler} style="position:absolute;bottom:${_ads.length>1?'32px':'20px'};right:0;padding:0 22px;z-index:2;${ad.link_url?'cursor:pointer':''}">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.12em;margin-bottom:4px">🎬 מוצג עבורך</div>
+        <div style="font-size:20px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:4px;max-width:80%;text-shadow:0 2px 8px rgba(0,0,0,.3)">${ad.title}</div>
+        ${ad.sub?`<div style="font-size:11px;color:rgba(255,255,255,.9);max-width:75%;line-height:1.45;text-shadow:0 1px 4px rgba(0,0,0,.3)">${ad.sub}</div>`:''}
+        ${ad.link_url?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:10px;background:rgba(255,255,255,.95);color:var(--t);font-size:10px;font-weight:800;padding:7px 14px;border-radius:999px">${ad.link_text||'למידע נוסף'} ←</div>`:''}
+      </div>
+      ${dots}
+    </div>`;
+
+  // Auto-advance (unless it's a single-video that will trigger nextAd on end)
+  clearTimeout(_adsTimer);
+  if (_ads.length > 1 && ad.type !== 'video') {
+    _adsTimer = setTimeout(() => nextAd(1), 7000);
+  } else if (_ads.length > 1 && ad.type === 'video') {
+    // Fallback in case video onended doesn't fire (mobile)
+    _adsTimer = setTimeout(() => nextAd(1), 12000);
+  }
+}
+
+function nextAd(dir) {
+  if (!_ads.length) return;
+  _adsIdx = (_adsIdx + dir + _ads.length) % _ads.length;
+  renderCurrentAd();
+}
+function showAd(i) {
+  if (!_ads.length) return;
+  _adsIdx = i % _ads.length;
+  renderCurrentAd();
+}
+function adClick(id, url) {
+  fetch('/api/ads/'+id+'/click', {method:'POST'}).catch(()=>{});
+  if (url) window.open(url, '_blank');
 }
 
 // ── רולר ימי הולדת + הודעות ──
@@ -920,29 +1213,41 @@ async function loadRoller() {
   if (!items.length) items = demo;
   else if (items.length < 5) items = [...items, ...demo.slice(0, 6)];
 
-  const card = (item) => item.type==='bday'
-    ? '<div style="flex-shrink:0;width:120px;background:'+item.color+'10;border:1.5px solid '+item.color+'22;border-radius:14px;padding:11px 12px;cursor:pointer"><div style="width:32px;height:32px;border-radius:50%;background:'+item.color+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:6px">'+(item.name||'').substring(0,2)+'</div><div style="font-size:10px;font-weight:800;color:var(--tx)">'+item.name+'</div><div style="font-size:8.5px;color:'+item.color+';font-weight:700;margin-top:2px">'+item.date+'</div><div style="font-size:8px;color:var(--tx3)">'+(item.dept||'')+'</div></div>'
-    : '<div style="flex-shrink:0;width:150px;background:'+item.color+'10;border:1.5px solid '+item.color+'22;border-radius:14px;padding:11px 12px"><div style="font-size:16px;margin-bottom:5px">📢</div><div style="font-size:10px;font-weight:800;color:var(--tx)">'+item.title+'</div><div style="font-size:8.5px;color:var(--tx2);margin-top:3px;line-height:1.4">'+(item.body||'')+'</div></div>';
+  const card = (item) => {
+    const c = item.color || '#7B2D8B';
+    if (item.type==='bday') {
+      return '<div class="rc rc-bday" style="background:linear-gradient(140deg,'+c+'1f,'+c+'0a);border:1.5px solid '+c+'2e" onclick="toast(\'מזל טוב ל'+(item.name||'')+'! 🎉\')">'
+        + '<div class="rc-shine"></div><div class="rc-cake">🎂</div>'
+        + '<div class="rc-av" style="background:linear-gradient(135deg,'+c+',color-mix(in srgb,'+c+' 60%,#000))">'+(item.name||'').substring(0,2)+'</div>'
+        + '<div class="rc-name">'+item.name+'</div>'
+        + '<div class="rc-date" style="color:'+c+'">'+item.date+'</div>'
+        + '<div class="rc-dept">'+(item.dept||'')+'</div></div>';
+    }
+    return '<div class="rc rc-msg" style="background:linear-gradient(140deg,'+c+'18,'+c+'08);border:1.5px solid '+c+'2a">'
+      + '<div class="rc-shine"></div>'
+      + '<div class="rc-ic" style="background:'+c+';color:#fff">📢</div>'
+      + '<div class="rc-title">'+item.title+'</div>'
+      + '<div class="rc-body">'+(item.body||'')+'</div></div>';
+  };
 
-  // שכפל את התוכן כדי שהרולר יהיה רציף ואינסופי
+  // שכפל את התוכן כדי שהמרקי יהיה רציף ואינסופי (CSS translateX -50%)
   const html = items.map(card).join('');
   el.innerHTML = html + html;
-
-  // גלילה אוטומטית חלקה ורציפה
-  clearInterval(window._rollerT);
-  window._rollerPaused = false;
-  el.onmouseenter = ()=>{ window._rollerPaused = true; };
-  el.onmouseleave = ()=>{ window._rollerPaused = false; };
-  const half = el.scrollWidth / 2;
-  window._rollerT = setInterval(()=>{
-    if(!el.parentNode) return clearInterval(window._rollerT);
-    if(window._rollerPaused) return;
-    el.scrollLeft += 1;
-    if(el.scrollLeft >= half) el.scrollLeft = 0; // לולאה רציפה
-  }, 25);
 }
 
-// ── רולר חדשות רץ ──
+// ── שעון חי בבאנר ──
+function startHeroClock() {
+  clearInterval(window._clockT);
+  const upd = () => {
+    const c = document.getElementById('heroClock');
+    if (!c) return clearInterval(window._clockT);
+    c.textContent = new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  };
+  upd();
+  window._clockT = setInterval(upd, 1000);
+}
+
+// ── רולר חדשות אנכי (מלמטה למעלה) ──
 let _hnCache={};
 async function switchHomeNews(src, btn) {
   ['a7','ynet'].forEach(s=>{
@@ -952,12 +1257,9 @@ async function switchHomeNews(src, btn) {
     else{b.style.background='var(--bg)';b.style.color='var(--tx3)';b.style.border='1px solid var(--bd)';}
   });
   const ticker=document.getElementById('newsTicker');
-  const label=document.getElementById('newsTickerLabel');
   if(!ticker)return;
   const srcC=src==='ynet'?'#C0392B':'#1565C0';
-  const srcL=src==='ynet'?'ynet':'ערוץ 7';
-  if(label){label.style.background=srcC;label.textContent=srcL+' ⚡';}
-  ticker.innerHTML='<span style="font-size:10px;color:var(--tx3);padding:0 14px">⟳ טוען...</span>';
+  ticker.innerHTML='<div style="padding:14px;font-size:9.5px;color:var(--tx3);text-align:center">⟳ טוען...</div>';
   try {
     if(!_hnCache[src]){
       const urls={ynet:'https://www.ynet.co.il/Integration/StoryRss2.xml',a7:'https://www.inn.co.il/Rss.aspx'};
@@ -965,21 +1267,24 @@ async function switchHomeNews(src, btn) {
       const d=await r.json();
       _hnCache[src]=d.items||[];
     }
-    const items=_hnCache[src].slice(0,12);
+    const items=_hnCache[src].slice(0,15);
     if(!items.length) throw new Error('empty');
-    // בנה כל ידיעה כפריט בשורה
-    const itemHtml = items.map(item=>`
-      <a href="${item.link}" target="_blank" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;padding:0 18px;border-left:1px solid var(--bd2)">
-        <span style="width:5px;height:5px;border-radius:50%;background:${srcC};flex-shrink:0"></span>
-        <span style="font-size:10.5px;font-weight:600;color:var(--tx)">${item.title}</span>
-        <span style="font-size:8px;color:var(--tx3)">${new Date(item.pubDate||'').toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</span>
-      </a>`).join('');
-    // שכפול כדי שהרולר יהיה רציף ולא ייגמר
+    // כרטיס אנכי לכל ידיעה
+    const itemHtml = items.map(item=>{
+      const t = new Date(item.pubDate||'').toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+      return `<a href="${item.link}" target="_blank" style="display:block;text-decoration:none;padding:9px 12px;border-bottom:1px solid rgba(0,0,0,.04);transition:background .12s">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <span style="width:5px;height:5px;border-radius:50%;background:${srcC};flex-shrink:0"></span>
+          <span style="font-size:7.5px;font-weight:800;color:${srcC};letter-spacing:.05em">${t}</span>
+        </div>
+        <div style="font-size:9.5px;font-weight:600;color:var(--tx);line-height:1.4;padding-right:11px">${item.title}</div>
+      </a>`;
+    }).join('');
+    // שכפול לגלילה אינסופית חלקה
     ticker.innerHTML = itemHtml + itemHtml;
-    // הפעל אנימציית רולר רצה — מהירות לפי כמות התוכן
     startNewsTicker();
   } catch(e){
-    ticker.innerHTML='<span style="font-size:10px;color:var(--tx3);padding:0 14px">לא ניתן לטעון חדשות כעת</span>';
+    ticker.innerHTML='<div style="padding:14px;font-size:9.5px;color:var(--tx3);text-align:center;line-height:1.5">לא ניתן לטעון חדשות כעת</div>';
   }
 }
 
@@ -988,20 +1293,23 @@ function startNewsTicker() {
   if(!ticker)return;
   clearInterval(window._tickerInt);
   let pos = 0;
-  const halfWidth = ticker.scrollWidth/2;
-  ticker.style.transform='translateX(0)';
-  window._tickerPaused=false;
-  // עצור בריחוף
-  ticker.onmouseenter = ()=>{ window._tickerPaused=true; };
-  ticker.onmouseleave = ()=>{ window._tickerPaused=false; };
-  // גלילה רציפה (RTL — התוכן זז שמאלה ולולאה)
-  window._tickerInt = setInterval(()=>{
-    if(!ticker.parentNode){clearInterval(window._tickerInt);return;}
-    if(window._tickerPaused)return;
-    pos -= 0.6;
-    if(Math.abs(pos) >= halfWidth) pos = 0;
-    ticker.style.transform=`translateX(${pos}px)`;
-  }, 16);
+  // חכה קצת עד שה-DOM מסודר, אז חשב את הגובה
+  setTimeout(()=>{
+    const halfHeight = ticker.scrollHeight / 2;
+    if(halfHeight < 40) return; // אם אין מספיק תוכן — אל תזוז
+    ticker.style.transform='translateY(0)';
+    window._tickerPaused=false;
+    ticker.onmouseenter = ()=>{ window._tickerPaused=true; };
+    ticker.onmouseleave = ()=>{ window._tickerPaused=false; };
+    // גלילה מלמטה למעלה — התוכן זז למעלה (translateY שלילי)
+    window._tickerInt = setInterval(()=>{
+      if(!ticker.parentNode){clearInterval(window._tickerInt);return;}
+      if(window._tickerPaused)return;
+      pos -= 0.4;
+      if(Math.abs(pos) >= halfHeight) pos = 0;
+      ticker.style.transform=`translateY(${pos}px)`;
+    }, 30);
+  }, 100);
 }
 
 // ── כתבות שלוה — ריבוע גדול + 5 ריבועים בגריד 2 עמודות ──
@@ -1265,21 +1573,26 @@ async function switchNews(src, btn) {
 // ── עדכוני צוות ──
 async function pgFeed(cnt) {
   const posts = await API.get('/feed');
+  const isAdm = ME && isAdmin();
   cnt.innerHTML = `
 <div class="card mb">
   <div class="st mb">📢 שתף עם הצוות</div>
   <textarea class="fta" id="feedTxt" placeholder="מה חדש? שתף עם הצוות..."></textarea>
   <button class="btn bnt bnsm" style="margin-top:7px" onclick="postFeed()">פרסם ↗</button>
+  ${isAdm ? '<button class="btn bno bnsm" style="margin-top:7px;margin-right:6px" onclick="navigate(\'afeed\')">🛠 ניהול פוסטים</button>' : ''}
 </div>
 ${posts.map(p=>`
-<div class="card mb">
+<div class="card mb" style="${p.pinned?'border:2px solid var(--gold);position:relative':''}">
+  ${p.pinned?'<div style="position:absolute;top:-1px;right:14px;background:var(--gold);color:#fff;font-size:8px;font-weight:800;padding:3px 9px;border-radius:0 0 8px 8px">📌 מוצמד</div>':''}
   <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
     <div style="width:32px;height:32px;border-radius:50%;background:${p.author_color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff">${(p.author_name||'?').substring(0,2)}</div>
-    <div><div style="font-size:11px;font-weight:700;color:var(--tx)">${p.author_name}</div><div style="font-size:8.5px;color:var(--tx3)">${fmtD(p.created_at)}</div></div>
+    <div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--tx)">${p.author_name}</div><div style="font-size:8.5px;color:var(--tx3)">${fmtD(p.created_at)}</div></div>
+    ${isAdm?`<button class="ab abr" onclick="delFeedPost(${p.id})" title="מחק">🗑</button>`:''}
   </div>
-  <div style="font-size:11.5px;color:var(--tx);line-height:1.65">${p.text}</div>
+  <div style="font-size:11.5px;color:var(--tx);line-height:1.65;white-space:pre-wrap">${p.text}</div>
   <div style="margin-top:9px;display:flex;align-items:center;gap:8px">
     <button class="btn bno bnsm" onclick="likeFeed(${p.id},this)">❤️ ${(p.likes||[]).length}</button>
+    ${isAdm?`<button class="btn bno bnsm" onclick="pinPost(${p.id})">${p.pinned?'📌 בטל הצמדה':'📌 הצמד'}</button>`:''}
   </div>
 </div>`).join('') || '<div class="card ldg">אין פוסטים עדיין</div>'}`;
 }
@@ -1299,16 +1612,40 @@ async function likeFeed(id, btn) {
 
 // ── שלומית AI ──
 async function pgChat(cnt) {
+  // בדוק אם AI מופעל וטען הגדרות
+  let cfg = {};
+  try { cfg = await fetch('/api/public-config').then(r=>r.json()); } catch(e) {}
+  const aiName = cfg.ai_name || 'שלומית';
+  const enabled = cfg.ai_enabled !== 'false';
+  const welcomeTmpl = cfg.ai_welcome || 'שלום {name}! 👋 אני {ai_name}, העוזרת הדיגיטלית. איך אוכל לעזור?';
+  const welcome = welcomeTmpl.replace('{name}', ME?.name || 'אורח').replace('{ai_name}', aiName);
+
+  // טען שאלות נפוצות
+  let faq = [];
+  if (ME) { try { faq = await API.get('/ai/faq'); } catch(e){} }
+
   cnt.innerHTML = `
 <div class="card" style="height:calc(100vh - 160px);display:flex;flex-direction:column">
-  <div class="sh"><span class="st">🤖 שלומית — עוזרת AI</span></div>
+  <div class="sh"><span class="st">🤖 ${aiName} — עוזרת AI</span>${!enabled?'<span class="b br">כבוי</span>':''}</div>
   <div id="chatMsgs" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:6px 0"></div>
+  ${faq.length ? `
+  <div style="border-top:1px solid var(--bd2);padding-top:8px;margin-top:6px">
+    <div style="font-size:9px;font-weight:700;color:var(--tx3);margin-bottom:5px">🔥 שאלות נפוצות:</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">
+      ${faq.slice(0,6).map(f => `<button onclick="askFaq(${JSON.stringify(f.question).replace(/"/g,'&quot;')})" style="background:var(--bg);border:1px solid var(--bd);border-radius:999px;padding:4px 10px;font-size:9px;font-weight:600;color:var(--tx2);cursor:pointer">${f.question.substring(0,40)}${f.question.length>40?'...':''}</button>`).join('')}
+    </div>
+  </div>` : ''}
   <div style="display:flex;gap:8px;margin-top:10px;border-top:1px solid var(--bd);padding-top:10px">
-    <input class="fi" id="chatIn" placeholder="שאל אותי כל דבר..." style="flex:1" onkeydown="if(event.key==='Enter')sendChat()"/>
-    <button class="btn bnt" onclick="sendChat()">שלח →</button>
+    <input class="fi" id="chatIn" placeholder="${enabled?'שאל אותי כל דבר...':'AI כבוי כרגע'}" style="flex:1" ${enabled?'':'disabled'} onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="btn bnt" onclick="sendChat()" ${enabled?'':'disabled'}>שלח →</button>
   </div>
 </div>`;
-  addChatMsg('bot', `שלום ${ME.name}! 👋 אני שלומית, העוזרת הדיגיטלית של שלוה. איך אוכל לעזור לך היום?`);
+  addChatMsg('bot', welcome);
+}
+
+function askFaq(question) {
+  const inp = document.getElementById('chatIn');
+  if (inp) { inp.value = question; sendChat(); }
 }
 
 function addChatMsg(who, text) {
@@ -1319,7 +1656,7 @@ function addChatMsg(who, text) {
   div.style.cssText = `display:flex;gap:8px;align-items:flex-end;${isBot?'':'flex-direction:row-reverse'}`;
   div.innerHTML = `
   <div style="width:28px;height:28px;border-radius:50%;background:${isBot?'var(--t)':'#4BAEE8'};display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">${isBot?'🤖':'👤'}</div>
-  <div style="max-width:70%;padding:10px 13px;border-radius:12px;background:${isBot?'#F7F4FA':'linear-gradient(135deg,var(--t2),var(--t))'};color:${isBot?'var(--tx)':'#fff'};font-size:11px;line-height:1.6;border:${isBot?'1px solid var(--bd)':'none'}">${text}</div>`;
+  <div style="max-width:70%;padding:10px 13px;border-radius:12px;background:${isBot?'#F7F4FA':'linear-gradient(135deg,var(--t2),var(--t))'};color:${isBot?'var(--tx)':'#fff'};font-size:11px;line-height:1.6;border:${isBot?'1px solid var(--bd)':'none'};white-space:pre-wrap">${text}</div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -1334,17 +1671,19 @@ async function sendChat() {
   thinking.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><div style="width:28px;height:28px;border-radius:50%;background:var(--t);display:flex;align-items:center;justify-content:center;font-size:11px">🤖</div><div style="padding:10px 13px;background:#F7F4FA;border-radius:12px;font-size:11px;color:var(--tx3);border:1px solid var(--bd)">⟳ חושבת...</div></div>`;
   document.getElementById('chatMsgs')?.appendChild(thinking);
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:500,
-        system:`אתה שלומית, עוזרת AI של המרכז הלאומי שלוה בירושלים. עוזרת לעובדים בנושאי HR, נהלים, וכל שאלה. עונה בעברית, קצר וממוקד. המשתמש הוא ${ME.name}, ${ME.title||''}.`,
-        messages:[{role:'user',content:text}]
-      })
+    const r = await fetch('/api/ai/chat', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message: text})
     });
-    const d = await r.json();
     thinking.remove();
-    addChatMsg('bot', d.content?.[0]?.text || 'מצטערת, לא הצלחתי לעבד את הבקשה.');
+    if (!r.ok) {
+      const err = await r.json().catch(()=>({}));
+      addChatMsg('bot', '⚠️ ' + (err.error || 'שגיאה בקבלת תשובה. נסה שוב.'));
+      return;
+    }
+    const d = await r.json();
+    addChatMsg('bot', d.text || 'לא התקבלה תשובה');
   } catch(e) {
     thinking.remove();
     addChatMsg('bot', 'מצטערת, אני לא זמינה כרגע. נסה שוב מאוחר יותר.');
@@ -1354,14 +1693,13 @@ async function sendChat() {
 // ── פניות HR ──
 const REQ_CATS = {
   hr:{lb:'👥 פנייה כללית HR',dept:'HR',steps:['עובד','מנהל ישיר','HR'],color:'#7B2D8B'},
-  salary:{lb:'💰 שכר ותנאי העסקה',dept:'שכר',steps:['עובד','מנהל ישיר','שכר'],color:'#F4813A'},
   vacation:{lb:'✈️ חופשה / היעדרות',dept:'HR',steps:['עובד','מנהל ישיר','HR'],color:'#4BAEE8'},
   sick:{lb:'🤒 מחלה',dept:'HR',steps:['עובד','HR'],color:'#E84040'},
   conditions:{lb:'📋 שינוי תנאי העסקה',dept:'HR',steps:['עובד','מנהל ישיר','HR'],color:'#9B59B6'},
   eval:{lb:'⭐ הערכה עצמית',dept:'HR',steps:['עובד','HR'],color:'#E84393'},
   welfare:{lb:'❤️ רווחה',dept:'HR',steps:['עובד','HR'],color:'#E74C3C'},
   complaint:{lb:'⚠️ תלונה',dept:'HR',steps:['עובד','HR','הנהלה'],color:'#E84040'},
-  reserves:{lb:'🪖 מילואים',dept:'שכר',steps:['עובד','שכר'],color:'#27AE60'},
+  reserves:{lb:'🪖 מילואים',dept:'HR',steps:['עובד','HR'],color:'#27AE60'},
 };
 
 async function pgReq(cnt) {
@@ -1546,119 +1884,146 @@ function viewReq(id) {
 
 // ── פנייה למחלקות ──
 async function pgForms(cnt) {
+  let cats = [], forms = [];
+  try {
+    [cats, forms] = await Promise.all([
+      API.get('/form-categories'),
+      API.get('/forms')
+    ]);
+  } catch(e) {}
+  window._formCats = cats;
+  window._forms = forms;
+
   cnt.innerHTML = `
 <div id="frmWrap">
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px" id="frmDeptGrid">
-  ${[
-    ['fc0','👥','HR ומשאבי אנוש','#7B2D8B'],
-    ['fc1','💰','שכר ותנאים','#F4813A'],
-    ['fc2','📦','ציוד ומחשוב','#4BAEE8'],
-    ['fc3','🔧','תחזוקה','#E84040'],
-    ['fc4','📣','שיווק וצילום','#E84393'],
-    ['fc5','📋','מזכירות','#9B59B6'],
-    ['fc6','🏛️','לשכת מנכ"ל','#2C3E50'],
-    ['fc7','🔒','ביטחון','#27AE60'],
-    ['fc8','❤️','רווחה ופנאי','#E74C3C'],
-  ].map(([id,ic,lb,color])=>`
-  <div onclick="showFrmDept('${id}')" style="display:flex;align-items:center;gap:9px;padding:12px;background:#fff;border:1.5px solid ${color}22;border-radius:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='${color}';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${color}22';this.style.transform='translateY(0)'">
-    <div style="width:36px;height:36px;border-radius:9px;background:${color}18;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${ic}</div>
-    <div style="font-size:10.5px;font-weight:700;color:var(--tx)">${lb}</div>
-  </div>`).join('')}
-</div>
-<div id="frmDeptCnt" style="display:none">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:13px">
-    <button class="btn bno bnsm" onclick="document.getElementById('frmDeptGrid').style.display='grid';document.getElementById('frmDeptCnt').style.display='none'">← חזור</button>
-    <span id="frmDeptTitle" style="font-size:13px;font-weight:800;color:var(--tx)"></span>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px" id="frmDeptGrid">
+    ${cats.length ? cats.map(c => {
+      const count = forms.filter(f => f.category_id === c.id).length;
+      return `<div onclick="showFrmCat(${c.id})" style="display:flex;align-items:center;gap:9px;padding:12px;background:#fff;border:1.5px solid ${c.color}22;border-radius:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='${c.color}';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${c.color}22';this.style.transform='translateY(0)'">
+        <div style="width:36px;height:36px;border-radius:9px;background:${c.color}18;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${c.icon}</div>
+        <div style="flex:1"><div style="font-size:10.5px;font-weight:700;color:var(--tx)">${c.name}</div><div style="font-size:8px;color:var(--tx3)">${count} טפסים</div></div>
+      </div>`;
+    }).join('') : '<div class="ldg" style="grid-column:span 3">אין קטגוריות טפסים עדיין</div>'}
   </div>
-  <div class="tabs2" id="frmSubTabs" style="margin-bottom:13px"></div>
-  <div id="frmSubCnt"></div>
-</div>
+  <div id="frmDeptCnt" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:13px">
+      <button class="btn bno bnsm" onclick="document.getElementById('frmDeptGrid').style.display='grid';document.getElementById('frmDeptCnt').style.display='none'">← חזור</button>
+      <span id="frmDeptTitle" style="font-size:13px;font-weight:800;color:var(--tx)"></span>
+    </div>
+    <div class="tabs2" id="frmSubTabs" style="margin-bottom:13px"></div>
+    <div id="frmSubCnt"></div>
+  </div>
 </div>`;
-
-  window._frmDepts = buildFrmDepts();
 }
 
-function buildFrmDepts() {
-  const af = (steps) => approvalFlow(steps.map(s=>['👤',s]));
-  const cm = copyMailField;
-  return {
-    fc0:{title:'👥 HR ומשאבי אנוש',tabs:[
-      {lb:'✈️ חופשה',id:'fd0',html:`<div class="g2"><div class="card">${af(['עובד','מנהל ישיר','HR'])}<div class="fg"><label class="fl">סוג חופשה</label><select class="fsel" id="vtype"><option value="annual">שנתית</option><option value="personal">יום אישי</option><option value="emergency">חירום</option><option value="marriage">חתונה</option><option value="mourning">אבל</option></select></div><div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="vf"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="vt"/></div></div><div class="fg"><label class="fl">הערות</label><textarea class="fta" id="vn"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('vacation',{from:vf.value,to:vt.value,type:vtype.value,note:vn.value},'חופשה')">שלח ↗</button></div></div>`},
-      {lb:'🤒 מחלה',id:'fd1',html:`<div class="card">${af(['עובד','מנהל ישיר','HR'])}<div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="sk_f"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="sk_t"/></div></div><div class="fg"><label class="fl">סיבה</label><textarea class="fta" id="sk_r"></textarea></div><div class="info-box">עד 3 ימים ללא אישור. מ-3 ימים — אישור רופא חובה.</div>${cm()}<button class="btn bnt" onclick="subForm('sick',{from:sk_f.value,to:sk_t.value},'מחלה')">שלח ↗</button></div>`},
-      {lb:'🚑 תאונה',id:'fd2',html:`<div class="card"><div class="warn-box">🚨 חובה לדווח תוך 24 שעות!</div>${af(['עובד','מנהל ישיר','HR'])}<div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="ac_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="ac_t"/></div></div><div class="fg"><label class="fl">מיקום *</label><input class="fi" id="ac_l"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="ac_desc"></textarea></div><div class="fg"><label class="fl">פציעות</label><textarea class="fta" id="ac_inj"></textarea></div>${cm()}<button class="btn bnr" onclick="subForm('accident',{date:ac_d.value,loc:ac_l.value,desc:ac_desc.value,injuries:ac_inj.value},'תאונת עבודה')">🚨 דווח</button></div>`},
-      {lb:'⭐ הערכה',id:'fd3',html:`<div class="card">${af(['עובד','HR'])}<div class="fg"><label class="fl">שנת הערכה</label><input class="fi" id="ev_y" value="2026"/></div>${[['ביצועים','ev1'],['עבודת צוות','ev2'],['יוזמה','ev3']].map(([lb,id])=>`<div class="fg"><label class="fl" style="display:flex;justify-content:space-between">${lb}<span id="${id}v" style="color:var(--t);font-weight:700">3/5</span></label><input type="range" min="1" max="5" value="3" style="width:100%;accent-color:var(--t)" oninput="document.getElementById('${id}v').textContent=this.value+'/5'"></div>`).join('')}<div class="fg"><label class="fl">משוב *</label><textarea class="fta tall" id="ev_txt"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('eval',{year:ev_y.value,text:ev_txt.value},'הערכה עצמית')">שלח ↗</button></div>`},
-      {lb:'👥 חבר מביא חבר',id:'fd4',html:`<div class="card">${af(['עובד','HR'])}<div class="fr2"><div class="fg"><label class="fl">שם המועמד *</label><input class="fi" id="rf_n"/></div><div class="fg"><label class="fl">טלפון *</label><input class="fi" id="rf_p" type="tel"/></div></div><div class="fg"><label class="fl">תפקיד מתאים</label><input class="fi" id="rf_r"/></div><div class="fg"><label class="fl">למה מתאים/ה?</label><textarea class="fta" id="rf_w"></textarea></div>${cm()}<button class="btn bng" onclick="subForm('referral',{name:rf_n.value,phone:rf_p.value,role:rf_r.value,why:rf_w.value},'הפניית מועמד')">הפן ↗</button></div>`},
-    ]},
-    fc1:{title:'💰 שכר ותנאים',tabs:[
-      {lb:'💰 העלאת שכר',id:'fs0',html:`<div class="card">${af(['עובד','מנהל ישיר','שכר','ועדה'])}<div class="fr2"><div class="fg"><label class="fl">שכר נוכחי ₪</label><input class="fi" id="sal_c" type="number"/></div><div class="fg"><label class="fl">שכר מבוקש ₪ *</label><input class="fi" id="sal_r" type="number"/></div></div><div class="fg"><label class="fl">נימוק *</label><textarea class="fta tall" id="sal_n"></textarea></div>${cm()}<button class="btn bng" onclick="subForm('salary_raise',{current:sal_c.value,requested:sal_r.value,reason:sal_n.value},'בקשת העלאת שכר')">הגש ↗</button></div>`},
-      {lb:'🪖 מילואים',id:'fs1',html:`<div class="card">${af(['עובד','שכר'])}<div class="fr2"><div class="fg"><label class="fl">ימי שירות *</label><input class="fi" id="res_d" type="number" min="1"/></div><div class="fg"><label class="fl">יחידה *</label><input class="fi" id="res_u"/></div></div><div class="fr2"><div class="fg"><label class="fl">מתאריך</label><input class="fi" id="res_f" type="date"/></div><div class="fg"><label class="fl">עד תאריך</label><input class="fi" id="res_t" type="date"/></div></div><div class="fg"><label class="fl">מספר צו</label><input class="fi" id="res_ord"/></div>${cm()}<button class="btn bnt" onclick="subForm('reserves',{days:res_d.value,unit:res_u.value,from:res_f.value,to:res_t.value,order:res_ord.value},'מילואים')">שלח ↗</button></div>`},
-      {lb:'📋 שינוי תנאים',id:'fs2',html:`<div class="card">${af(['עובד','מנהל ישיר','HR'])}<div class="fg"><label class="fl">סוג השינוי</label><select class="fsel" id="cond_t"><option>שינוי היקף משרה</option><option>עדכון תפקיד</option><option>שינוי שעות</option><option>עבודה מהבית</option><option>אחר</option></select></div><div class="fg"><label class="fl">פירוט *</label><textarea class="fta tall" id="cond_det"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('conditions',{type:cond_t.value,details:cond_det.value},'שינוי תנאים')">הגש ↗</button></div>`},
-      {lb:'✈️ חל"ד',id:'fs3',html:`<div class="card"><div class="warn-box">⚠️ טעון אישור מיוחד.</div>${af(['עובד','מנהל','HR','שכר'])}<div class="fr2"><div class="fg"><label class="fl">מתאריך *</label><input class="fi" type="date" id="loa_f"/></div><div class="fg"><label class="fl">עד תאריך *</label><input class="fi" type="date" id="loa_t"/></div></div><div class="fg"><label class="fl">סיבה *</label><textarea class="fta tall" id="loa_r"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('vacation_leave',{from:loa_f.value,to:loa_t.value,reason:loa_r.value},'חל&quot;ד')">הגש ↗</button></div>`},
-    ]},
-    fc2:{title:'📦 ציוד ומחשוב',tabs:[
-      {lb:'📦 הזמנת ציוד',id:'fe0',html:`<div class="g2"><div class="card">${af(['עובד','מנהל ישיר','מחשוב'])}<div class="fg"><label class="fl">פריט *</label><input class="fi" id="eq_i" placeholder="שם הציוד"/></div><div class="fr3"><div class="fg"><label class="fl">כמות</label><input class="fi" type="number" id="eq_q" value="1" min="1"/></div><div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="eq_u"><option value="normal">רגיל</option><option value="high">גבוהה</option><option value="urgent">דחוף</option></select></div><div class="fg"><label class="fl">מחיר ₪</label><input class="fi" type="number" id="eq_p"/></div></div><div class="fg"><label class="fl">נימוק *</label><textarea class="fta" id="eq_r"></textarea></div><div class="fg"><label class="fl">קישור</label><input class="fi" id="eq_link" placeholder="https://..."/></div>${cm()}<button class="btn bnt" onclick="subEquip()">📦 הגש ↗</button></div><div class="card"><div class="sh"><span class="st">📋 הזמנות קודמות</span></div><div id="equipHist"><div class="ldg">⟳</div></div></div></div>`},
-      {lb:'💻 תקלת IT',id:'fe1',html:`<div class="card">${af(['עובד','מחשוב'])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="it_t"><option>מחשב</option><option>רשת</option><option>מדפסת</option><option>תוכנה</option><option>מייל</option><option>אחר</option></select></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="it_desc"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('it_issue',{type:it_t.value,desc:it_desc.value},'תקלת IT')">שלח ↗</button></div>`},
-    ]},
-    fc3:{title:'🔧 תחזוקה',tabs:[
-      {lb:'🔧 קריאת תחזוקה',id:'fm0',html:`<div class="card">${af(['עובד','תחזוקה'])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="mt_t"><option>חשמל</option><option>אינסטלציה</option><option>מיזוג</option><option>ניקיון</option><option>ריהוט</option><option>אחר</option></select></div><div class="fg"><label class="fl">מיקום *</label><input class="fi" id="mt_loc" placeholder="חדר / קומה..."/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="mt_desc"></textarea></div><div class="fg"><label class="fl">דחיפות</label><select class="fsel" id="mt_urg"><option value="normal">רגיל</option><option value="high">גבוהה</option><option value="urgent">סכנת בטיחות</option></select></div>${cm()}<button class="btn bnt" onclick="subForm('maintenance',{type:mt_t.value,loc:mt_loc.value,desc:mt_desc.value,urg:mt_urg.value},'תחזוקה')">שלח ↗</button></div>`},
-    ]},
-    fc4:{title:'📣 שיווק וצילום',tabs:[
-      {lb:'📸 צילום',id:'fp0',html:`<div class="card">${af(['עובד','מנהל','שיווק'])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="ph_t"><option>אירוע</option><option>תוכן לרשתות</option><option>צילום קבוצתי</option><option>פורטרט</option><option>אחר</option></select></div><div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="ph_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="ph_t2"/></div></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="ph_desc"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('photography',{type:ph_t.value,date:ph_d.value,desc:ph_desc.value},'בקשת צילום')">שלח ↗</button></div>`},
-      {lb:'🎬 וידאו',id:'fp1',html:`<div class="card">${af(['עובד','מנהל','שיווק'])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="vid_t"><option>תדמית</option><option>אירוע</option><option>Reel</option><option>הדרכה</option><option>אחר</option></select></div><div class="fg"><label class="fl">תאריך הפקה</label><input class="fi" type="date" id="vid_d"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="vid_desc"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('video',{type:vid_t.value,date:vid_d.value,desc:vid_desc.value},'בקשת וידאו')">שלח ↗</button></div>`},
-      {lb:'📢 קמפיין',id:'fp2',html:`<div class="card">${af(['עובד','מנהל','שיווק'])}<div class="fg"><label class="fl">נושא *</label><input class="fi" id="camp_n"/></div><div class="fr2"><div class="fg"><label class="fl">התחלה</label><input class="fi" type="date" id="camp_f"/></div><div class="fg"><label class="fl">סיום</label><input class="fi" type="date" id="camp_t"/></div></div><div class="fg"><label class="fl">מטרות *</label><textarea class="fta" id="camp_desc"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('campaign',{name:camp_n.value,from:camp_f.value,to:camp_t.value,desc:camp_desc.value},'קמפיין')">שלח ↗</button></div>`},
-    ]},
-    fc5:{title:'📋 מזכירות',tabs:[
-      {lb:'📋 בקשה כללית',id:'fsc0',html:`<div class="card">${af(['עובד','מזכירות'])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="sec_t"><option>תיאום פגישה</option><option>הזמנת חדר</option><option>הפקת מסמך</option><option>אישור חתימה</option><option>משלוח</option><option>כיבוד</option><option>אחר</option></select></div><div class="fg"><label class="fl">תאריך ושעה</label><input class="fi" type="datetime-local" id="sec_dt"/></div><div class="fg"><label class="fl">פרטים *</label><textarea class="fta tall" id="sec_desc"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('secretary',{type:sec_t.value,dt:sec_dt.value,desc:sec_desc.value},'בקשת מזכירות')">שלח ↗</button></div>`},
-      {lb:'🗓️ הזמנת חדר',id:'fsc1',html:`<div class="card">${af(['עובד','מזכירות'])}<div class="fg"><label class="fl">חדר</label><select class="fsel" id="room_n"><option>חדר A (8 מקומות)</option><option>חדר B (20 מקומות)</option><option>אולם (50+)</option><option>חדר הנהלה</option></select></div><div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="room_d"/></div><div class="fg"><label class="fl">שעות</label><input class="fi" id="room_h" placeholder="09:00-11:00"/></div></div><div class="fg"><label class="fl">משתתפים</label><input class="fi" type="number" id="room_cnt" value="5"/></div>${cm()}<button class="btn bnt" onclick="subForm('room_booking',{room:room_n.value,date:room_d.value,hours:room_h.value,count:room_cnt.value},'הזמנת חדר')">הזמן ↗</button></div>`},
-    ]},
-    fc6:{title:'🏛️ לשכת מנכ"ל',tabs:[
-      {lb:'🏛️ פנייה',id:'fceo0',html:`<div class="g2"><div class="card"><div class="warn-box">📌 עוברת תחילה לאישור מנהלך.</div>${af(['עובד','מנהל','מנכ"ל'])}<div class="fg"><label class="fl">נושא *</label><input class="fi" id="ceo_subj"/></div><div class="fg"><label class="fl">תוכן *</label><textarea class="fta tall" id="ceo_desc"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('ceo',{subj:ceo_subj.value,desc:ceo_desc.value},'פנייה למנכ&quot;ל')">שלח ↗</button></div><div class="card">${af(['עובד','ועדת חדשנות'])}<div class="st" style="margin-bottom:10px">💡 הצעת רעיון</div><div class="fg"><label class="fl">שם הרעיון *</label><input class="fi" id="idea_n"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="idea_desc"></textarea></div>${cm()}<button class="btn bnv" style="background:rgba(123,45,139,.1);color:var(--t);border:none" onclick="subForm('innovation',{name:idea_n.value,desc:idea_desc.value},'רעיון חדשנות')">שלח 💡</button></div></div>`},
-    ]},
-    fc7:{title:'🔒 ביטחון',tabs:[
-      {lb:'🔒 בקשות',id:'fsec0',html:`<div class="g2"><div class="card">${af(['עובד','ביטחון'])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="sec2_t"><option>כרטיס כניסה</option><option>תגית</option><option>גישה לאזור</option><option>רישום רכב</option><option>הכנסת אורח</option><option>מנעול</option></select></div><div class="fg"><label class="fl">פרטים *</label><textarea class="fta" id="sec2_desc"></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('security_req',{type:sec2_t.value,desc:sec2_desc.value},'בקשת ביטחון')">שלח ↗</button></div><div class="card"><div class="warn-box">🚨 חירום — התקשר לקצין הביטחון!</div>${af(['עובד','ביטחון'])}<div class="fg"><label class="fl">סוג</label><select class="fsel" id="sec_inc_t"><option>חשד לפריצה</option><option>גניבה</option><option>אדם חשוד</option><option>פגיעה בנכס</option><option>אחר</option></select></div><div class="fr2"><div class="fg"><label class="fl">תאריך *</label><input class="fi" type="date" id="sec_inc_d"/></div><div class="fg"><label class="fl">שעה</label><input class="fi" type="time" id="sec_inc_h"/></div></div><div class="fg"><label class="fl">מיקום *</label><input class="fi" id="sec_inc_l"/></div><div class="fg"><label class="fl">תיאור *</label><textarea class="fta" id="sec_inc_desc"></textarea></div>${cm()}<button class="btn bnr" onclick="subForm('security_incident',{type:sec_inc_t.value,date:sec_inc_d.value,loc:sec_inc_l.value,desc:sec_inc_desc.value},'אירוע ביטחוני')">🚨 דווח</button></div></div>`},
-    ]},
-    fc8:{title:'❤️ רווחה ופנאי',tabs:[
-      {lb:'❤️ סיוע',id:'fw0',html:`<div class="g2"><div class="card"><div class="info-box">💜 חסוי לחלוטין.</div>${af(['עובד','רווחה'])}<div class="fg"><label class="fl">נושא</label><select class="fsel" id="wlf_t"><option>קשיים אישיים</option><option>שחיקה</option><option>קשיים כלכליים</option><option>ייעוץ</option><option>גמישות מיוחדת</option><option>אחר</option></select></div><div class="fg"><label class="fl">פרטים</label><textarea class="fta tall" id="wlf_desc" placeholder="שתף ככל שתרצה. הכל חסוי."></textarea></div>${cm()}<button class="btn bnt" onclick="subForm('welfare',{type:wlf_t.value,desc:wlf_desc.value},'בקשת רווחה')">שלח ↗</button></div><div class="card">${af(['עובד','רווחה','מנהל'])}<div class="st" style="margin-bottom:10px">🎉 הצעת אירוע</div><div class="fg"><label class="fl">סוג</label><select class="fsel" id="evt_t"><option>גיבוש</option><option>ימי הולדת</option><option>ערב חברתי</option><option>סדנה</option><option>ספורט</option></select></div><div class="fg"><label class="fl">שם *</label><input class="fi" id="evt_n"/></div><div class="fr2"><div class="fg"><label class="fl">תאריך</label><input class="fi" type="date" id="evt_d"/></div><div class="fg"><label class="fl">משתתפים</label><input class="fi" type="number" id="evt_cnt" value="10"/></div></div>${cm()}<button class="btn bnt" onclick="subForm('event',{type:evt_t.value,name:evt_n.value,date:evt_d.value,count:evt_cnt.value},'אירוע')">שלח ↗</button></div></div>`},
-    ]},
-  };
+function showFrmCat(catId) {
+  const cat = (window._formCats||[]).find(c => c.id === catId);
+  if (!cat) return;
+  const catForms = (window._forms||[]).filter(f => f.category_id === catId);
+  document.getElementById('frmDeptGrid').style.display = 'none';
+  document.getElementById('frmDeptCnt').style.display = 'block';
+  document.getElementById('frmDeptTitle').textContent = `${cat.icon} ${cat.name}`;
+  const tabs = document.getElementById('frmSubTabs');
+  const cnt = document.getElementById('frmSubCnt');
+  if (!catForms.length) {
+    tabs.innerHTML = '';
+    cnt.innerHTML = '<div class="card ldg">אין טפסים בקטגוריה זו</div>';
+    return;
+  }
+  tabs.innerHTML = catForms.map((f,i)=>`<div class="tab2 ${i===0?'on':''}" onclick="swFrmTab(this,'frm${f.id}')">${f.icon||''} ${f.name}</div>`).join('');
+  cnt.innerHTML = catForms.map((f,i)=>`<div class="tbp ${i===0?'on':''}" id="frm${f.id}">${renderDynForm(f)}</div>`).join('');
 }
 
-function showFrmDept(id) {
-  document.getElementById('frmDeptGrid').style.display='none';
-  document.getElementById('frmDeptCnt').style.display='block';
-  const dept=window._frmDepts?.[id];
-  if (!dept) return;
-  document.getElementById('frmDeptTitle').textContent=dept.title;
-  const tabs=document.getElementById('frmSubTabs');
-  const cnt=document.getElementById('frmSubCnt');
-  tabs.innerHTML=dept.tabs.map((t,i)=>`<div class="tab2 ${i===0?'on':''}" onclick="swFrmTab(this,'${t.id}')">${t.lb}</div>`).join('');
-  cnt.innerHTML=dept.tabs.map((t,i)=>`<div class="tbp ${i===0?'on':''}" id="${t.id}">${t.html}</div>`).join('');
-  if (id==='fc2') setTimeout(loadEquipHist,100);
-}
-
-function swFrmTab(btn,tid) {
+function swFrmTab(btn, tid) {
   btn.closest('.tabs2').querySelectorAll('.tab2').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
   document.querySelectorAll('#frmSubCnt .tbp').forEach(t=>t.classList.remove('on'));
   document.getElementById(tid)?.classList.add('on');
 }
 
-async function subForm(type, data, label) {
-  if (!ME) { showLoginModal(); return; }
-  const copy=document.getElementById('frm_copy')?.value||'';
-  const deptMap={vacation:'HR',sick:'HR',accident:'HR',eval:'HR',referral:'HR',salary_raise:'שכר',reserves:'שכר',conditions:'HR',vacation_leave:'HR',it_issue:'מחשוב',maintenance:'תחזוקה',photography:'שיווק',video:'שיווק',campaign:'שיווק',secretary:'מזכירות',room_booking:'מזכירות',ceo:'לשכת מנכ"ל',innovation:'הנהלה',security_req:'ביטחון',security_incident:'ביטחון',welfare:'רווחה',event:'רווחה'};
-  try {
-    const res=await API.post('/requests',{
-      type,dept:deptMap[type]||'כללי',
-      subject:label+' — '+Object.values(data).filter(Boolean).join(', ').substring(0,60),
-      details:JSON.stringify(data),
-      priority:'normal',copy_email:copy,
-      steps:JSON.stringify(['עובד','מנהל','מחלקה'])
-    });
-    toast(`✅ ${label} #${res.id} נשלח!`);
-    document.getElementById('frm_copy').value='';
-  } catch(e){toast('שגיאה בשליחה',false);}
+// רנדור דינמי של טופס לפי המבנה מה-DB
+function renderDynForm(form) {
+  const flow = approvalFlow((form.approval_steps||['עובד','HR']).map(s=>['👤',s]));
+  const fieldsHtml = (form.fields||[]).map(f => {
+    const fid = `dyn_${form.id}_${f.id}`;
+    const req = f.required ? ' *' : '';
+    const placeholder = f.placeholder || '';
+    switch (f.type) {
+      case 'textarea':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><textarea class="fta" id="${fid}" placeholder="${placeholder}"></textarea></div>`;
+      case 'select':
+        const opts = (f.options||[]).map(o => `<option value="${o}">${o}</option>`).join('');
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><select class="fsel" id="${fid}">${opts}</select></div>`;
+      case 'number':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" type="number" placeholder="${placeholder}"/></div>`;
+      case 'date':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" type="date"/></div>`;
+      case 'time':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" type="time"/></div>`;
+      case 'datetime-local':
+      case 'datetime':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" type="datetime-local"/></div>`;
+      case 'tel':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" type="tel" placeholder="${placeholder}"/></div>`;
+      case 'email':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" type="email" placeholder="${placeholder}"/></div>`;
+      case 'url':
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" type="url" placeholder="${placeholder||'https://...'}"/></div>`;
+      case 'checkbox':
+        return `<div class="fg"><label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);cursor:pointer"><input type="checkbox" id="${fid}"/> ${f.lb}${req}</label></div>`;
+      default:
+        return `<div class="fg"><label class="fl">${f.lb}${req}</label><input class="fi" id="${fid}" placeholder="${placeholder}"/></div>`;
+    }
+  }).join('');
+
+  return `<div class="card">
+    ${flow}
+    ${form.description ? `<div class="info-box">${form.description}</div>` : ''}
+    ${fieldsHtml}
+    ${copyMailField()}
+    <button class="btn bnt" onclick="submitDynForm(${form.id})">שלח ↗</button>
+  </div>`;
 }
+
+async function submitDynForm(formId) {
+  if (!ME) { showLoginModal(); return; }
+  const form = (window._forms||[]).find(f => f.id === formId);
+  if (!form) return;
+  // אסוף ערכים מכל השדות
+  const data = {};
+  let missingRequired = null;
+  for (const f of (form.fields||[])) {
+    const el = document.getElementById(`dyn_${form.id}_${f.id}`);
+    if (!el) continue;
+    const v = el.type === 'checkbox' ? el.checked : el.value;
+    if (f.required && !v && v !== false) { missingRequired = f.lb; break; }
+    data[f.id] = v;
+  }
+  if (missingRequired) return toast(`שדה חובה: ${missingRequired}`, false);
+  const copy = document.getElementById('frm_copy')?.value || '';
+  try {
+    const summary = Object.values(data).filter(v => v && v !== false).join(', ').substring(0, 60);
+    const res = await API.post('/requests', {
+      type: 'form_' + form.id,
+      dept: form.dept || 'כללי',
+      subject: `${form.name} — ${summary}`,
+      details: JSON.stringify(data),
+      priority: 'normal',
+      copy_email: copy,
+      steps: JSON.stringify(form.approval_steps || ['עובד','HR'])
+    });
+    toast(`✅ ${form.name} #${res.id} נשלח!`);
+    // נקה שדות
+    (form.fields||[]).forEach(f => {
+      const el = document.getElementById(`dyn_${form.id}_${f.id}`);
+      if (el) { if (el.type === 'checkbox') el.checked = false; else el.value = ''; }
+    });
+    const cp = document.getElementById('frm_copy'); if (cp) cp.value = '';
+  } catch(e) {
+    toast('שגיאה בשליחה: ' + e.message, false);
+  }
+}
+
 
 async function subEquip() {
   const item=document.getElementById('eq_i')?.value.trim();
@@ -1683,11 +2048,6 @@ async function loadEquipHist() {
     el.innerHTML=my.slice(0,5).map(e=>`
     <div class="row"><div style="font-size:10.5px;font-weight:600;color:var(--tx);flex:1">${e.item} ×${e.quantity||1}</div><span class="b ${e.status==='approved'?'bt':e.status==='rejected'?'br':'bgr'}">${e.status==='approved'?'אושר':e.status==='rejected'?'נדחה':'ממתין'}</span></div>`).join('')||'<div class="ldg">אין הזמנות</div>';
   } catch(e){}
-}
-
-// ── שכר ──
-async function pgSal(cnt) {
-  cnt.innerHTML=`<div class="card"><div class="st mb">💰 שכר ומילואים</div><div class="info-box">מידע שכר מפורט זמין דרך מערכת חילנט. צור קשר עם מחלקת השכר לפרטים נוספים.</div><button class="btn bnt" onclick="navigate('forms');setTimeout(()=>showFrmDept('fc1'),100)">📋 טפסי שכר ↗</button></div>`;
 }
 
 // ── הערכה ──
@@ -1858,25 +2218,64 @@ async function pgMyTeam(cnt) {
 // ADMIN PAGES
 // ══════════════════════════════════════
 async function pgAdash(cnt) {
-  const [st,reqs,users]=await Promise.all([API.get('/stats').catch(()=>({})),API.get('/requests'),API.get('/users')]);
+  const [st,reqs,users,posts,ads,anns]=await Promise.all([
+    API.get('/stats').catch(()=>({})),
+    API.get('/requests').catch(()=>[]),
+    API.get('/users').catch(()=>[]),
+    API.get('/posts').catch(()=>[]),
+    API.get('/ads/all').catch(()=>[]),
+    API.get('/announcements').catch(()=>[])
+  ]);
   const open=reqs.filter(r=>!['approved','rejected'].includes(r.status));
   _reqs=reqs;
+  const activeAds = ads.filter(a=>a.active).length;
   cnt.innerHTML=`
 <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:var(--rd);background:linear-gradient(135deg,rgba(44,62,80,.08),rgba(44,62,80,.03));border:1px solid var(--bd);margin-bottom:16px">
   <div style="font-size:32px">👑</div>
   <div style="flex:1">
-    <div style="font-size:16px;font-weight:900;color:var(--tx)">דשבורד ניהול — ${ME.name}</div>
+    <div style="font-size:16px;font-weight:900;color:var(--tx)">מרכז שליטה — ${ME.name}</div>
     <div style="font-size:9.5px;color:var(--tx3)">עדכון: ${new Date().toLocaleString('he-IL')}</div>
   </div>
   <span class="b bt">🟢 מערכת תקינה</span>
   <button class="btn bnt bnsm" onclick="navigate('areq')">📨 פניות ממתינות (${open.length})</button>
 </div>
+
+<!-- מטריקות עיקריות -->
 <div class="mwrap m4 mb">
   <div class="mc"><div class="mi">👥</div><div class="mv">${users.length}</div><div class="ml">עובדים פעילים</div><div class="mst mT"></div></div>
   <div class="mc"><div class="mi">📨</div><div class="mv">${open.length}</div><div class="ml">פניות פתוחות</div><div class="mst mR"></div></div>
   <div class="mc"><div class="mi">✅</div><div class="mv">${reqs.filter(r=>r.status==='approved').length}</div><div class="ml">פניות שאושרו</div><div class="mst mG"></div></div>
   <div class="mc"><div class="mi">📊</div><div class="mv">${reqs.length}</div><div class="ml">סה"כ פניות</div><div class="mst mS"></div></div>
 </div>
+
+<!-- קיצורי דרך למודולי ניהול -->
+<div class="card mb">
+  <div class="st mb">🛠 מודולי ניהול</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+    ${[
+      ['🏠','עורך דף הבית','ahome','#5C1F6A','עיצוב'],
+      ['👥','ניהול עובדים','aemp','#1565C0',users.length+' עובדים'],
+      ['📨','כל הפניות','areq','#7B2D8B',open.length+' פתוחות'],
+      ['📣','כתבות שלוה','aposts','#F4813A',posts.length+' כתבות'],
+      ['🎬','פרסומות',    'aads','#E84040',activeAds+'/'+ads.length+' פעילות'],
+      ['📢','עדכוני צוות','afeed','#9B59B6','מודרציה'],
+      ['🗂','ספריית מדיה','amedia','#16A085','קבצים'],
+      ['🎂','רולר הודעות','aroller','#E84393',anns.length+' הודעות'],
+      ['🤖','שלומית AI','aai','#E84393','הגדרות'],
+      ['📋','בונה טפסים','aforms','#1565C0','דינמי'],
+      ['🎓','הדרכות','atrain','#27AE60','ניהול'],
+      ['📡','שידורים','abcast','#4BAEE8','הודעות דחופות'],
+      ['🏢','מחלקות','adepts','#F39C12','ניהול'],
+      ['⚙️','הגדרות','aset','#2C3E50','תצורה'],
+    ].map(([ic,lb,id,c,meta])=>`
+    <div onclick="navigate('${id}')" style="background:#fff;border:1.5px solid ${c}22;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--sh)" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='${c}';this.style.boxShadow='0 8px 20px ${c}33'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='${c}22';this.style.boxShadow='var(--sh)'">
+      <div style="width:42px;height:42px;border-radius:12px;background:${c}18;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 8px">${ic}</div>
+      <div style="font-size:10.5px;font-weight:800;color:var(--tx);margin-bottom:2px">${lb}</div>
+      <div style="font-size:8.5px;color:${c};font-weight:700">${meta}</div>
+    </div>`).join('')}
+  </div>
+</div>
+
 <div class="g2">
   <div class="card">
     <div class="sh"><span class="st">📨 פניות אחרונות</span><button class="btn bno bnsm" onclick="navigate('areq')">הכל ←</button></div>
@@ -2064,9 +2463,7 @@ async function adminApprove(id,status) {
   navigate('areq');
 }
 
-// שכר, הדרכות, מחלקות, שידור, משתמשים, הגדרות — Admin
-async function pgAsal(cnt) { cnt.innerHTML='<div class="card"><div class="st mb">💰 ניהול שכר</div><div class="info-box">ניהול שכר מפורט — בקרוב. לעדכון שכר ידני ערוך את פרטי העובד בניהול עובדים.</div><button class="btn bnt" onclick="navigate(\'aemp\')">👥 ניהול עובדים ↗</button></div>'; }
-
+// הדרכות, מחלקות, שידור, משתמשים, הגדרות — Admin
 async function pgAtrain(cnt) {
   const tr=await API.get('/trainings');
   cnt.innerHTML=`
@@ -2208,7 +2605,12 @@ async function pgAposts(cnt) {
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
     <div class="fg"><label class="fl">כותרת *</label><input class="fi" id="pt_title" placeholder="כותרת הכתבה"/></div>
     <div class="fg"><label class="fl">תת-כותרת</label><input class="fi" id="pt_sub" placeholder="תיאור קצר שמופיע מתחת לכותרת"/></div>
-    <div class="fg"><label class="fl">URL תמונה</label><input class="fi" id="pt_img" placeholder="https://..."/></div>
+    <div class="fg"><label class="fl">URL תמונה</label>
+      <div style="display:flex;gap:6px">
+        <input class="fi" id="pt_img" placeholder="/uploads/... או https://..." style="flex:1"/>
+        <button type="button" class="btn bno bnsm" style="white-space:nowrap" onclick="uploadFile('pt_img',{accept:'image/*',btn:this})">📤 העלה</button>
+      </div>
+    </div>
     <div class="fg"><label class="fl">תגית</label><input class="fi" id="pt_tag" placeholder="חינוך / קהילה / גיוס..."/></div>
   </div>
   <div class="fg"><label class="fl">תוכן הכתבה המלא 📝</label><textarea class="fta tall" id="pt_body" placeholder="כתוב כאן את גוף הכתבה המלא. כל שורה ריקה תיצור פסקה חדשה. תוכן זה יוצג כשלוחצים על הכתבה." style="min-height:140px"></textarea></div>
@@ -2318,6 +2720,850 @@ async function addAnn() {
 }
 async function delAnn(id) { await API.delete('/announcements/'+id); toast('נמחק'); navigate('aroller'); }
 
+// ── ניהול פרסומות וסרטונים ──
+async function pgAads(cnt) {
+  let ads = [];
+  try { ads = await API.get('/ads/all'); } catch(e) {}
+  const active = ads.filter(a=>a.active).length;
+  const totalViews = ads.reduce((s,a)=>s+(a.views||0),0);
+  const totalClicks = ads.reduce((s,a)=>s+(a.clicks||0),0);
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh">
+    <span class="st">🎬 ניהול פרסומות וסרטונים</span>
+    <span class="b bgr">${ads.length} פריטים · ${active} פעילים</span>
+  </div>
+  <div class="info-box">כל הפריטים כאן מוצגים כקרוסלה אוטומטית במיקום מרכזי בדף הבית. הזז בין תמונות וסרטונים לפי סדר תצוגה.</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">
+    <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:9px;color:var(--tx3);font-weight:700">👁 צפיות</div>
+      <div style="font-size:16px;font-weight:900;color:var(--t)">${totalViews.toLocaleString()}</div>
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:9px;color:var(--tx3);font-weight:700">🖱 קליקים</div>
+      <div style="font-size:16px;font-weight:900;color:#F4813A">${totalClicks.toLocaleString()}</div>
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:9px;color:var(--tx3);font-weight:700">📊 CTR</div>
+      <div style="font-size:16px;font-weight:900;color:#27AE60">${totalViews?((totalClicks/totalViews)*100).toFixed(1)+'%':'—'}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb">
+  <div class="st mb">${'➕ הוסף פריט חדש'}</div>
+  <input type="hidden" id="ad_edit_id" value=""/>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+    <div class="fg"><label class="fl">כותרת *</label><input class="fi" id="ad_title" placeholder="שלוה — הסיפור שלנו"/></div>
+    <div class="fg"><label class="fl">תת-כותרת</label><input class="fi" id="ad_sub" placeholder="תיאור קצר של הפרסומת"/></div>
+    <div class="fg"><label class="fl">סוג *</label><select class="fsel" id="ad_type" onchange="adTypeChanged()"><option value="image">🖼 תמונה</option><option value="video">🎬 סרטון</option></select></div>
+    <div class="fg"><label class="fl">סדר תצוגה</label><input class="fi" id="ad_order" type="number" value="0" min="0" placeholder="0 = ראשון"/></div>
+  </div>
+  <div class="fg">
+    <label class="fl">כתובת הקובץ (URL) *</label>
+    <div style="display:flex;gap:6px">
+      <input class="fi" id="ad_url" placeholder="/uploads/... או https://..." style="flex:1"/>
+      <button type="button" class="btn bno bnsm" style="white-space:nowrap" onclick="const t=document.getElementById('ad_type').value;uploadFile('ad_url',{accept:t==='video'?'video/*':'image/*',btn:this})">📤 העלה</button>
+    </div>
+  </div>
+  <div class="fg" id="ad_poster_row" style="display:none">
+    <label class="fl">תמונת פוסטר לסרטון (מוצגת לפני שהוא נטען)</label>
+    <div style="display:flex;gap:6px">
+      <input class="fi" id="ad_poster" placeholder="/uploads/... או https://..." style="flex:1"/>
+      <button type="button" class="btn bno bnsm" style="white-space:nowrap" onclick="uploadFile('ad_poster',{accept:'image/*',btn:this})">📤 העלה</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+    <div class="fg"><label class="fl">קישור בלחיצה (אופציונלי)</label><input class="fi" id="ad_link" placeholder="https://www.shalva.org"/></div>
+    <div class="fg"><label class="fl">טקסט הכפתור</label><input class="fi" id="ad_linktext" placeholder="למידע נוסף"/></div>
+    <div class="fg"><label class="fl">📅 תאריך התחלה (אופציונלי)</label><input class="fi" id="ad_start" type="date"/></div>
+    <div class="fg"><label class="fl">📅 תאריך סיום (אופציונלי)</label><input class="fi" id="ad_end" type="date"/></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin:8px 0 12px">
+    <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer"><input type="checkbox" id="ad_active" checked/> ✅ פעיל</label>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn bnt bnsm" id="ad_save_btn" onclick="saveAd()">➕ הוסף פריט</button>
+    <button class="btn bno bnsm" onclick="resetAdForm()" style="display:none" id="ad_cancel_btn">ביטול עריכה</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="st mb">רשימת פריטים (${ads.length})</div>
+  ${ads.length === 0 ? '<div class="ldg">אין פריטים. הוסף את הראשון!</div>' : ads.map(a=>`
+  <div class="row" style="align-items:flex-start;gap:12px;padding:10px 0">
+    <div style="width:60px;height:44px;background:${a.type==='video'?'#1A0A2E':'var(--bg)'};border-radius:8px;overflow:hidden;flex-shrink:0;position:relative">
+      ${a.type==='video' ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff">▶</div>` : (a.media_url?`<img src="${a.media_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`:'')}
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span style="font-size:8px;font-weight:800;padding:2px 7px;border-radius:999px;background:${a.type==='video'?'#E840401A':'#1565C01A'};color:${a.type==='video'?'#E84040':'#1565C0'}">${a.type==='video'?'🎬 סרטון':'🖼 תמונה'}</span>
+        <span style="font-size:8px;font-weight:800;padding:2px 7px;border-radius:999px;background:${a.active?'#27AE601A':'#95959520'};color:${a.active?'#27AE60':'#666'}">${a.active?'● פעיל':'○ לא פעיל'}</span>
+        <span style="font-size:8px;color:var(--tx3)">סדר: ${a.display_order}</span>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--tx);margin-top:3px">${a.title}</div>
+      <div style="font-size:9px;color:var(--tx3);margin-top:1px">${a.sub||''}</div>
+      <div style="font-size:8px;color:var(--tx3);margin-top:3px">👁 ${a.views||0} · 🖱 ${a.clicks||0} ${a.link_url?'· 🔗':''}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+      <button class="ab abv" onclick='editAd(${JSON.stringify(a).replace(/'/g,"&#39;")})'>✏️ ערוך</button>
+      <button class="ab abg" onclick="toggleAd(${a.id})">${a.active?'⏸ השבת':'▶ הפעל'}</button>
+      <button class="ab abr" onclick="delAd(${a.id})">🗑</button>
+    </div>
+  </div>`).join('')}
+</div>`;
+  // trigger poster row visibility for current selected type
+  setTimeout(adTypeChanged, 30);
+}
+
+function adTypeChanged() {
+  const t = document.getElementById('ad_type')?.value;
+  const row = document.getElementById('ad_poster_row');
+  if (row) row.style.display = t === 'video' ? 'block' : 'none';
+}
+
+function editAd(a) {
+  document.getElementById('ad_edit_id').value = a.id;
+  document.getElementById('ad_title').value = a.title||'';
+  document.getElementById('ad_sub').value = a.sub||'';
+  document.getElementById('ad_type').value = a.type||'image';
+  document.getElementById('ad_order').value = a.display_order||0;
+  document.getElementById('ad_url').value = a.media_url||'';
+  document.getElementById('ad_poster').value = a.poster_url||'';
+  document.getElementById('ad_link').value = a.link_url||'';
+  document.getElementById('ad_linktext').value = a.link_text||'למידע נוסף';
+  document.getElementById('ad_start').value = a.start_date||'';
+  document.getElementById('ad_end').value = a.end_date||'';
+  document.getElementById('ad_active').checked = !!a.active;
+  document.getElementById('ad_save_btn').innerHTML = '💾 שמור שינויים';
+  document.getElementById('ad_cancel_btn').style.display = 'inline-flex';
+  adTypeChanged();
+  document.querySelector('.cnt')?.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetAdForm() {
+  ['ad_title','ad_sub','ad_url','ad_poster','ad_link','ad_start','ad_end'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('ad_edit_id').value='';
+  document.getElementById('ad_type').value='image';
+  document.getElementById('ad_order').value='0';
+  document.getElementById('ad_linktext').value='למידע נוסף';
+  document.getElementById('ad_active').checked=true;
+  document.getElementById('ad_save_btn').innerHTML='➕ הוסף פריט';
+  document.getElementById('ad_cancel_btn').style.display='none';
+  adTypeChanged();
+}
+
+async function saveAd() {
+  const title = document.getElementById('ad_title')?.value.trim();
+  const media_url = document.getElementById('ad_url')?.value.trim();
+  if (!title) return toast('כותרת חובה', false);
+  if (!media_url) return toast('כתובת הקובץ חובה', false);
+  const data = {
+    title,
+    sub: document.getElementById('ad_sub')?.value,
+    type: document.getElementById('ad_type')?.value,
+    media_url,
+    poster_url: document.getElementById('ad_poster')?.value,
+    link_url: document.getElementById('ad_link')?.value,
+    link_text: document.getElementById('ad_linktext')?.value || 'למידע נוסף',
+    active: document.getElementById('ad_active')?.checked,
+    display_order: parseInt(document.getElementById('ad_order')?.value) || 0,
+    start_date: document.getElementById('ad_start')?.value,
+    end_date: document.getElementById('ad_end')?.value,
+  };
+  const editId = document.getElementById('ad_edit_id')?.value;
+  if (editId) {
+    await API.put('/ads/'+editId, data);
+    toast('הפריט עודכן ✏️');
+  } else {
+    await API.post('/ads', data);
+    toast('הפריט נוסף 🎬');
+  }
+  navigate('aads');
+}
+
+async function toggleAd(id) { await API.put('/ads/'+id+'/toggle'); toast('סטטוס עודכן'); navigate('aads'); }
+async function delAd(id) { if (!confirm('למחוק פריט זה?')) return; await API.delete('/ads/'+id); toast('נמחק'); navigate('aads'); }
+
+// ── פונקציית עזר: העלאת קובץ עם UI ──
+function uploadFile(targetInputId, options) {
+  options = options || {};
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = options.accept || 'image/*,video/*';
+  input.style.display = 'none';
+  document.body.appendChild(input);
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) { input.remove(); return; }
+    const maxMB = file.type.startsWith('video/') ? 60 : 8;
+    if (file.size > maxMB * 1024 * 1024) {
+      toast('קובץ גדול מדי (מקסימום '+maxMB+'MB)', false);
+      input.remove();
+      return;
+    }
+    const btn = options.btn;
+    const origLabel = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '⟳ מעלה... 0%'; }
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const url = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/upload');
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable && btn) {
+            const pct = Math.round((e.loaded/e.total)*100);
+            btn.innerHTML = '⟳ מעלה... '+pct+'%';
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            try { resolve(JSON.parse(xhr.responseText).url); }
+            catch(e) { reject(new Error('תשובה לא תקינה')); }
+          } else {
+            try { reject(new Error(JSON.parse(xhr.responseText).error || 'שגיאה')); }
+            catch(e) { reject(new Error('שגיאה בהעלאה')); }
+          }
+        };
+        xhr.onerror = () => reject(new Error('שגיאת רשת'));
+        xhr.send(fd);
+      });
+      if (targetInputId) {
+        const target = document.getElementById(targetInputId);
+        if (target) { target.value = url; target.dispatchEvent(new Event('input')); }
+      }
+      if (options.onSuccess) options.onSuccess(url);
+      toast('✅ הקובץ הועלה!');
+    } catch(e) {
+      toast('❌ ' + e.message, false);
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = origLabel; }
+      input.remove();
+    }
+  };
+  input.click();
+}
+
+// ── ספריית מדיה ──
+async function pgAmedia(cnt) {
+  let files = [];
+  try { files = await API.get('/media'); } catch(e) {}
+  const totalSize = files.reduce((s,f)=>s+(f.size||0), 0);
+  const fmt = (b) => b < 1024 ? b+'B' : b < 1048576 ? Math.round(b/1024)+'KB' : (b/1048576).toFixed(1)+'MB';
+  const groups = {video:[], image:[], pdf:[], file:[]};
+  files.forEach(f => (groups[f.type] || groups.file).push(f));
+  const icons = {video:'🎬 סרטונים', image:'🖼 תמונות', pdf:'📄 מסמכים', file:'📎 קבצים אחרים'};
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh">
+    <span class="st">🗂 ספריית מדיה</span>
+    <span class="b bgr">${files.length} קבצים · ${fmt(totalSize)}</span>
+  </div>
+  <div class="info-box">כל קובץ שהועלה מהניהול נשמר כאן. לחץ "העתק URL" והדבק בשדה של פרסומת או כתבה.</div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button class="btn bnt bnsm" onclick="uploadFile(null,{accept:'image/*',btn:this,onSuccess:()=>navigate('amedia')})">🖼 העלה תמונה</button>
+    <button class="btn bnt bnsm" onclick="uploadFile(null,{accept:'video/*',btn:this,onSuccess:()=>navigate('amedia')})">🎬 העלה סרטון</button>
+    <button class="btn bno bnsm" onclick="uploadFile(null,{accept:'*',btn:this,onSuccess:()=>navigate('amedia')})">📎 קובץ כלשהו</button>
+  </div>
+</div>
+${['video','image','pdf','file'].map(t => {
+  const arr = groups[t]; if(!arr.length) return '';
+  return `<div class="card mb">
+    <div class="st mb">${icons[t]} (${arr.length})</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
+      ${arr.map(f => `
+      <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+        <div style="height:110px;background:${t==='video'?'#1A0A2E':'var(--bg)'};display:flex;align-items:center;justify-content:center;overflow:hidden">
+          ${t==='image' ? '<img src="'+f.url+'" style="width:100%;height:100%;object-fit:cover"/>' :
+            t==='video' ? '<div style="font-size:32px;color:#fff">🎬</div>' :
+            t==='pdf' ? '<div style="font-size:32px">📄</div>' :
+            '<div style="font-size:32px">📎</div>'}
+        </div>
+        <div style="padding:8px 10px">
+          <div style="font-size:9px;font-weight:700;color:var(--tx);word-break:break-all;line-height:1.35;height:26px;overflow:hidden">${f.name}</div>
+          <div style="font-size:8px;color:var(--tx3);margin-top:3px">${fmt(f.size)}</div>
+          <div style="display:flex;gap:4px;margin-top:6px">
+            <button onclick="copyUrl('${f.url.replace(/'/g,"\\'")}')" style="flex:1;background:var(--t);color:#fff;border:none;font-size:8px;font-weight:700;padding:4px;border-radius:6px;cursor:pointer">📋 העתק URL</button>
+            <button onclick="delMedia('${f.url.replace(/'/g,"\\'")}')" style="background:#E840401A;color:#E84040;border:none;font-size:8px;font-weight:700;padding:4px 7px;border-radius:6px;cursor:pointer">🗑</button>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}).join('')}
+${!files.length ? '<div class="card ldg">אין קבצים עדיין. העלה את הראשון!</div>' : ''}`;
+}
+
+function copyUrl(url) {
+  navigator.clipboard.writeText(url).then(()=>toast('URL הועתק! 📋')).catch(()=>{
+    // Fallback
+    const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); toast('URL הועתק! 📋');
+  });
+}
+async function delMedia(url) {
+  if (!confirm('למחוק קובץ זה?\n\n⚠️ אם הוא בשימוש בפרסומת או כתבה — הקישור יישבר.')) return;
+  await API.delete('/media', {url});
+  toast('הקובץ נמחק');
+  navigate('amedia');
+}
+
+// ── מודרציית עדכוני צוות ──
+async function pgAfeed(cnt) {
+  let posts = [];
+  try { posts = await API.get('/feed?all=1'); } catch(e) {}
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh">
+    <span class="st">📢 ניהול עדכוני צוות</span>
+    <span class="b bgr">${posts.length} פוסטים</span>
+  </div>
+  <div class="info-box">פוסטים של עובדים. אפשר להצמיד לראש הפיד, להסתיר או למחוק תכנים לא ראויים.</div>
+</div>
+<div class="card">
+  ${posts.length===0 ? '<div class="ldg">אין פוסטים עדיין</div>' : posts.map(p=>`
+  <div class="row" style="align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd2)">
+    <div style="width:34px;height:34px;border-radius:50%;background:${p.author_color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">${(p.author_name||'').substring(0,2)}</div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:800;color:var(--tx)">${p.author_name||'—'}</span>
+        <span style="font-size:8.5px;color:var(--tx3)">· ${p.created_at?fmtD(p.created_at):''}</span>
+        ${p.pinned?'<span class="b bt" style="font-size:8px">📌 מוצמד</span>':''}
+        ${p.hidden?'<span class="b br" style="font-size:8px">🙈 מוסתר</span>':''}
+      </div>
+      <div style="font-size:10.5px;color:var(--tx2);margin-top:5px;line-height:1.5;white-space:pre-wrap;word-break:break-word">${p.text||''}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+      <button class="ab abv" onclick="pinPost(${p.id})">${p.pinned?'📌 בטל הצמדה':'📌 הצמד'}</button>
+      <button class="ab abg" onclick="hidePost(${p.id})">${p.hidden?'👁 הצג':'🙈 הסתר'}</button>
+      <button class="ab abr" onclick="delFeedPost(${p.id})">🗑</button>
+    </div>
+  </div>`).join('')}
+</div>`;
+}
+async function pinPost(id) { await API.put('/feed/'+id+'/pin'); toast('סטטוס עודכן'); navigate('afeed'); }
+async function hidePost(id) { await API.put('/feed/'+id+'/hide'); toast('סטטוס עודכן'); navigate('afeed'); }
+async function delFeedPost(id) { if (!confirm('למחוק פוסט זה לצמיתות?')) return; await API.delete('/feed/'+id); toast('נמחק'); navigate('afeed'); }
+
+
+// ══════════════════════════════════════
+// 🏠 עורך דף הבית
+// ══════════════════════════════════════
+async function pgAhome(cnt) {
+  const s = await API.get('/settings').catch(()=>({}));
+  const parseNav = (key) => {
+    try { return JSON.parse(s[key] || '[]'); } catch(e) { return []; }
+  };
+  const row1 = parseNav('home_nav_row1');
+  const row2 = parseNav('home_nav_row2');
+
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh"><span class="st">🏠 עורך דף הבית</span></div>
+  <div class="info-box">כאן אפשר לערוך את הטקסטים והאייקונים המופיעים בדף הבית. כל שינוי נשמר מיד כשלוחצים על "💾 שמור".</div>
+</div>
+
+<div class="card mb">
+  <div class="st mb">📢 טקסטים בבאנר</div>
+  <div class="fg"><label class="fl">כותרת עליונה (kicker)</label><input class="fi" id="ah_kicker" value="${s.home_banner_kicker||''}" placeholder="פורטל עובדים שלוה"/></div>
+  <div class="fg"><label class="fl">ברכה למחוברים (למשל: "שלום")</label><input class="fi" id="ah_welcome" value="${s.home_banner_welcome||''}"/></div>
+  <div class="fg"><label class="fl">ברכה לאורחים (כשלא מחוברים)</label><input class="fi" id="ah_welcome_guest" value="${s.home_banner_welcome_guest||''}"/></div>
+</div>
+
+<div class="card mb">
+  <div class="st mb">☁️ מזג אוויר</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+    <div class="fg"><label class="fl">עיר לAPI (באנגלית)</label><input class="fi" id="ah_weather_city" value="${s.home_weather_city||'Jerusalem'}" placeholder="Jerusalem"/></div>
+    <div class="fg"><label class="fl">תווית תצוגה</label><input class="fi" id="ah_weather_label" value="${s.home_weather_label||'ירושלים'}" placeholder="ירושלים"/></div>
+  </div>
+</div>
+
+<div class="card mb">
+  <div class="sh">
+    <span class="st">🎯 אייקוני ניווט — שורה 1</span>
+    <button class="btn bnt bnsm" onclick="addNavIcon(1)">+ הוסף אייקון</button>
+  </div>
+  <div id="navRow1List">${row1.map((it,i)=>renderNavRow(it,1,i)).join('')}</div>
+</div>
+
+<div class="card mb">
+  <div class="sh">
+    <span class="st">🎯 אייקוני ניווט — שורה 2</span>
+    <button class="btn bnt bnsm" onclick="addNavIcon(2)">+ הוסף אייקון</button>
+  </div>
+  <div id="navRow2List">${row2.map((it,i)=>renderNavRow(it,2,i)).join('')}</div>
+</div>
+
+<div style="display:flex;gap:8px;position:sticky;bottom:0;padding:10px 0;background:#F2EEF8">
+  <button class="btn bnt" onclick="saveHomepage()">💾 שמור שינויים</button>
+  <button class="btn bno" onclick="navigate('home')">👁 תצוגה חיה</button>
+</div>`;
+  window._navRow1 = row1;
+  window._navRow2 = row2;
+}
+
+function renderNavRow(item, rowNum, idx) {
+  const targetOptions = [
+    'home','feed','chat','req','forms','hr','train','personal',
+    'https://boomclub.org.il/','https://www.hilannet.co.il/','https://www.shalva.org/'
+  ];
+  return `
+<div style="display:grid;grid-template-columns:60px 1fr 1.5fr 100px 60px auto;gap:6px;align-items:end;padding:8px 0;border-bottom:1px solid var(--bd2)" data-row="${rowNum}" data-idx="${idx}">
+  <div><label style="font-size:8px;color:var(--tx3)">אייקון</label>
+    <input class="fi" value="${item.ic||''}" style="font-size:18px;text-align:center;padding:6px" oninput="updateNav(${rowNum},${idx},'ic',this.value)"/></div>
+  <div><label style="font-size:8px;color:var(--tx3)">תווית</label>
+    <input class="fi" value="${item.lb||''}" oninput="updateNav(${rowNum},${idx},'lb',this.value)"/></div>
+  <div><label style="font-size:8px;color:var(--tx3)">יעד (עמוד או URL)</label>
+    <input class="fi" value="${item.target||''}" placeholder="req / forms / https://..." oninput="updateNav(${rowNum},${idx},'target',this.value)" list="pageList"/></div>
+  <div><label style="font-size:8px;color:var(--tx3)">כיתוב משנה</label>
+    <input class="fi" value="${item.caption||''}" placeholder="opt." oninput="updateNav(${rowNum},${idx},'caption',this.value)"/></div>
+  <div><label style="font-size:8px;color:var(--tx3)">צבע</label>
+    <input class="fi" type="color" value="${item.color||'#7B2D8B'}" style="padding:2px;height:28px" oninput="updateNav(${rowNum},${idx},'color',this.value)"/></div>
+  <div><button class="ab abr" onclick="removeNavIcon(${rowNum},${idx})">🗑</button></div>
+</div>`;
+}
+
+function updateNav(rowNum, idx, field, value) {
+  const arr = rowNum === 1 ? window._navRow1 : window._navRow2;
+  if (arr && arr[idx]) arr[idx][field] = value;
+}
+
+function addNavIcon(rowNum) {
+  const arr = rowNum === 1 ? window._navRow1 : window._navRow2;
+  arr.push({ic:'📋', lb:'חדש', target:'home', color:'#7B2D8B'});
+  const listId = 'navRow'+rowNum+'List';
+  document.getElementById(listId).innerHTML = arr.map((it,i)=>renderNavRow(it,rowNum,i)).join('');
+}
+
+function removeNavIcon(rowNum, idx) {
+  if (!confirm('למחוק אייקון זה?')) return;
+  const arr = rowNum === 1 ? window._navRow1 : window._navRow2;
+  arr.splice(idx, 1);
+  const listId = 'navRow'+rowNum+'List';
+  document.getElementById(listId).innerHTML = arr.map((it,i)=>renderNavRow(it,rowNum,i)).join('');
+}
+
+async function saveHomepage() {
+  const settings = {
+    home_banner_kicker: document.getElementById('ah_kicker')?.value || '',
+    home_banner_welcome: document.getElementById('ah_welcome')?.value || '',
+    home_banner_welcome_guest: document.getElementById('ah_welcome_guest')?.value || '',
+    home_weather_city: document.getElementById('ah_weather_city')?.value || 'Jerusalem',
+    home_weather_label: document.getElementById('ah_weather_label')?.value || 'ירושלים',
+    home_nav_row1: JSON.stringify(window._navRow1 || []),
+    home_nav_row2: JSON.stringify(window._navRow2 || [])
+  };
+  try {
+    await API.put('/settings', settings);
+    toast('✅ דף הבית נשמר!');
+  } catch(e) {
+    toast('שגיאה: '+e.message, false);
+  }
+}
+
+
+// ══════════════════════════════════════
+// 🤖 ניהול שלומית AI
+// ══════════════════════════════════════
+async function pgAai(cnt) {
+  const [s, faq] = await Promise.all([
+    API.get('/settings').catch(()=>({})),
+    API.get('/ai/faq/all').catch(()=>[])
+  ]);
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh"><span class="st">🤖 ניהול שלומית — עוזרת AI</span>
+    <span class="b ${s.ai_enabled==='false'?'br':'bg'}">${s.ai_enabled==='false'?'○ כבוי':'● פעיל'}</span>
+  </div>
+  <div class="info-box">כאן אפשר לקנפג את הבוט: מפתח API, שם, ברכה, פרסונה, מודל, שאלות נפוצות.</div>
+</div>
+
+<div class="card mb">
+  <div class="st mb">⚙️ הגדרות בסיסיות</div>
+  <div style="display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:end">
+    <div class="fg"><label class="fl">מופעל?</label>
+      <select class="fsel" id="aai_enabled">
+        <option value="true" ${s.ai_enabled!=='false'?'selected':''}>✅ כן</option>
+        <option value="false" ${s.ai_enabled==='false'?'selected':''}>❌ לא</option>
+      </select></div>
+    <div class="fg"><label class="fl">שם הבוט</label><input class="fi" id="aai_name" value="${s.ai_name||'שלומית'}"/></div>
+  </div>
+  <div class="fg"><label class="fl">הודעת ברכה (השתמש ב-{name} לשם המשתמש, {ai_name} לשם הבוט)</label>
+    <textarea class="fta" id="aai_welcome">${s.ai_welcome||''}</textarea></div>
+</div>
+
+<div class="card mb">
+  <div class="st mb">🧠 פרסונה ו-System Prompt</div>
+  <div class="info-box">הטקסט הזה נשלח לבוט בכל שיחה. פה מגדירים את האופי, התחום והטון של התשובות.</div>
+  <div class="fg"><label class="fl">System Prompt (הנחיות לבוט)</label>
+    <textarea class="fta tall" id="aai_system" style="min-height:180px;font-family:monospace;font-size:11px">${s.ai_system_prompt||''}</textarea></div>
+</div>
+
+<div class="card mb">
+  <div class="st mb">🔧 הגדרות טכניות</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+    <div class="fg"><label class="fl">מודל Anthropic</label>
+      <select class="fsel" id="aai_model">
+        <option value="claude-sonnet-4-5-20250929" ${(s.ai_model||'').includes('sonnet-4-5')?'selected':''}>Sonnet 4.5 (מומלץ)</option>
+        <option value="claude-3-5-haiku-latest" ${(s.ai_model||'').includes('haiku')?'selected':''}>Haiku 3.5 (מהיר, זול)</option>
+        <option value="claude-opus-4-5" ${(s.ai_model||'').includes('opus')?'selected':''}>Opus 4.5 (חכם)</option>
+      </select></div>
+    <div class="fg"><label class="fl">מקסימום טוקנים לתשובה</label>
+      <input class="fi" id="aai_max_tokens" type="number" value="${s.ai_max_tokens||500}" min="50" max="4000"/></div>
+  </div>
+  <div class="warn-box">⚠️ מפתח ה-API מוגדר כמשתנה סביבה בשרת (<code>ANTHROPIC_API_KEY</code>). ב-Railway: Settings → Variables → הוסף משתנה חדש. אחרת הבוט לא יעבוד.</div>
+</div>
+
+<div style="display:flex;gap:8px;margin-bottom:20px">
+  <button class="btn bnt" onclick="saveAiConfig()">💾 שמור הגדרות</button>
+  <button class="btn bno" onclick="navigate('chat')">👁 בדוק בצ׳אט</button>
+</div>
+
+<div class="card">
+  <div class="sh">
+    <span class="st">🔥 שאלות נפוצות (FAQ)</span>
+    <span class="b bgr">${faq.length} שאלות</span>
+  </div>
+  <div class="info-box">שאלות אלה יופיעו ככפתורי-קיצור בצ׳אט, וישולבו ב-system prompt כדי שהבוט יידע לענות עליהן.</div>
+  <div id="faqEditList" style="margin-top:10px">
+    ${faq.map(f => renderFaqRow(f)).join('') || '<div class="ldg">אין שאלות נפוצות. הוסף את הראשונה!</div>'}
+  </div>
+  <button class="btn bnt bnsm" onclick="addFaq()" style="margin-top:10px">+ הוסף שאלה חדשה</button>
+</div>`;
+}
+
+function renderFaqRow(f) {
+  return `
+<div style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:9px" id="faq_${f.id}">
+  <div class="fg"><label class="fl">שאלה</label><input class="fi" id="faq_q_${f.id}" value="${(f.question||'').replace(/"/g,'&quot;')}"/></div>
+  <div class="fg"><label class="fl">תשובה</label><textarea class="fta" id="faq_a_${f.id}">${f.answer||''}</textarea></div>
+  <div style="display:flex;gap:6px;align-items:end">
+    <div class="fg" style="flex:0 0 100px;margin-bottom:0"><label class="fl">סדר</label><input class="fi" type="number" id="faq_o_${f.id}" value="${f.display_order||0}"/></div>
+    <button class="btn bnt bnsm" onclick="saveFaq(${f.id})">💾 שמור</button>
+    <button class="btn bno bnsm" onclick="delFaq(${f.id})">🗑 מחק</button>
+  </div>
+</div>`;
+}
+
+async function saveAiConfig() {
+  try {
+    await API.put('/settings', {
+      ai_enabled: document.getElementById('aai_enabled')?.value || 'true',
+      ai_name: document.getElementById('aai_name')?.value || 'שלומית',
+      ai_welcome: document.getElementById('aai_welcome')?.value || '',
+      ai_system_prompt: document.getElementById('aai_system')?.value || '',
+      ai_model: document.getElementById('aai_model')?.value || 'claude-sonnet-4-5-20250929',
+      ai_max_tokens: document.getElementById('aai_max_tokens')?.value || '500'
+    });
+    toast('✅ הגדרות נשמרו!');
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+async function addFaq() {
+  try {
+    const r = await API.post('/ai/faq', {question:'שאלה חדשה', answer:'תשובה', display_order:99});
+    toast('נוסף');
+    navigate('aai');
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+async function saveFaq(id) {
+  const q = document.getElementById('faq_q_'+id)?.value.trim();
+  const a = document.getElementById('faq_a_'+id)?.value.trim();
+  const o = parseInt(document.getElementById('faq_o_'+id)?.value) || 0;
+  if (!q || !a) return toast('שאלה ותשובה חובה', false);
+  try {
+    await API.put('/ai/faq/'+id, {question:q, answer:a, display_order:o, active:true});
+    toast('✅ נשמר');
+  } catch(e) { toast('שגיאה', false); }
+}
+
+async function delFaq(id) {
+  if (!confirm('למחוק שאלה זו?')) return;
+  await API.delete('/ai/faq/'+id);
+  toast('נמחק');
+  navigate('aai');
+}
+
+
+// ══════════════════════════════════════
+// 📋 בונה טפסים
+// ══════════════════════════════════════
+async function pgAforms(cnt) {
+  const [cats, forms] = await Promise.all([
+    API.get('/form-categories?all=1').catch(()=>[]),
+    API.get('/forms?all=1').catch(()=>[])
+  ]);
+  window._afCats = cats;
+  window._afForms = forms;
+  const selectedCat = window._afSelectedCat || (cats[0]?.id);
+  window._afSelectedCat = selectedCat;
+  const catForms = forms.filter(f => f.category_id === selectedCat);
+
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh">
+    <span class="st">📋 בונה טפסים</span>
+    <span class="b bgr">${cats.length} קטגוריות · ${forms.length} טפסים</span>
+  </div>
+  <div class="info-box">הכל דינמי. הוסף קטגוריות, בנה טפסים עם שדות שונים, קבע את זרימת האישור והמחלקה שתקבל את הפניה.</div>
+</div>
+
+<div class="g2" style="align-items:start">
+  <!-- קטגוריות -->
+  <div class="card">
+    <div class="sh"><span class="st">🗂 קטגוריות</span><button class="btn bnt bnsm" onclick="addFormCat()">+ קטגוריה</button></div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">
+      ${cats.map(c => `
+      <div onclick="selectAfCat(${c.id})" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:9px;cursor:pointer;background:${selectedCat===c.id?c.color+'18':'#fff'};border:1.5px solid ${selectedCat===c.id?c.color:'var(--bd)'}">
+        <span style="font-size:16px">${c.icon}</span>
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--tx)">${c.name}</div><div style="font-size:8px;color:var(--tx3)">${forms.filter(f=>f.category_id===c.id).length} טפסים ${c.active?'':'· ⏸ מושבת'}</div></div>
+        <button class="ab abv" onclick="event.stopPropagation();editFormCat(${c.id})">✏️</button>
+      </div>`).join('') || '<div class="ldg">אין קטגוריות</div>'}
+    </div>
+  </div>
+  <!-- טפסים בקטגוריה נבחרת -->
+  <div class="card">
+    <div class="sh"><span class="st">📄 טפסים בקטגוריה</span><button class="btn bnt bnsm" onclick="addForm(${selectedCat||'null'})" ${!selectedCat?'disabled':''}>+ טופס חדש</button></div>
+    ${!selectedCat ? '<div class="ldg">בחר קטגוריה קודם</div>' : catForms.length ? catForms.map(f => `
+    <div class="row" style="align-items:center">
+      <div style="width:30px;font-size:16px;text-align:center">${f.icon||'📄'}</div>
+      <div style="flex:1"><div style="font-size:11px;font-weight:700">${f.name} ${!f.active?'<span style="color:var(--tx3)">⏸</span>':''}</div><div style="font-size:8.5px;color:var(--tx3)">${f.fields.length} שדות · ${f.dept} · סדר ${f.display_order}</div></div>
+      <button class="ab abv" onclick="editForm(${f.id})">✏️ ערוך</button>
+      <button class="ab abr" onclick="delForm(${f.id})">🗑</button>
+    </div>`).join('') : '<div class="ldg">אין טפסים בקטגוריה זו</div>'}
+  </div>
+</div>`;
+}
+
+function selectAfCat(catId) {
+  window._afSelectedCat = catId;
+  pgAforms(document.querySelector('.cnt'));
+}
+
+async function addFormCat() {
+  const name = prompt('שם הקטגוריה החדשה?');
+  if (!name) return;
+  try {
+    await API.post('/form-categories', {name, icon:'📋', color:'#7B2D8B', display_order:99});
+    toast('קטגוריה נוספה');
+    navigate('aforms');
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+async function editFormCat(catId) {
+  const cat = (window._afCats||[]).find(c => c.id === catId);
+  if (!cat) return;
+  openFormCatModal(cat);
+}
+
+function openFormCatModal(cat) {
+  const modal = document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.onclick=(e)=>{if(e.target===modal)modal.remove();};
+  modal.innerHTML = `
+<div class="card" style="max-width:500px;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+  <div class="sh"><span class="st">✏️ עריכת קטגוריה</span><button class="btn bno bnsm" onclick="this.closest('div[style*=fixed]').remove()">✕</button></div>
+  <div class="fg"><label class="fl">שם</label><input class="fi" id="afc_name" value="${cat.name}"/></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+    <div class="fg"><label class="fl">אייקון</label><input class="fi" id="afc_icon" value="${cat.icon}" style="font-size:18px;text-align:center"/></div>
+    <div class="fg"><label class="fl">צבע</label><input class="fi" id="afc_color" type="color" value="${cat.color}" style="padding:2px;height:32px"/></div>
+    <div class="fg"><label class="fl">סדר</label><input class="fi" id="afc_order" type="number" value="${cat.display_order}"/></div>
+  </div>
+  <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);margin:8px 0"><input type="checkbox" id="afc_active" ${cat.active?'checked':''}/> ✅ פעיל</label>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="btn bnt" onclick="saveFormCat(${cat.id})">💾 שמור</button>
+    <button class="btn bnr" onclick="if(confirm('למחוק את הקטגוריה וכל הטפסים שבה?'))delFormCat(${cat.id})">🗑 מחק קטגוריה</button>
+  </div>
+</div>`;
+  document.body.appendChild(modal);
+}
+
+async function saveFormCat(id) {
+  try {
+    await API.put('/form-categories/'+id, {
+      name: document.getElementById('afc_name').value,
+      icon: document.getElementById('afc_icon').value,
+      color: document.getElementById('afc_color').value,
+      display_order: document.getElementById('afc_order').value,
+      active: document.getElementById('afc_active').checked
+    });
+    toast('נשמר');
+    document.querySelector('div[style*=fixed]')?.remove();
+    navigate('aforms');
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+async function delFormCat(id) {
+  await API.delete('/form-categories/'+id);
+  toast('נמחק');
+  document.querySelector('div[style*=fixed]')?.remove();
+  window._afSelectedCat = null;
+  navigate('aforms');
+}
+
+async function addForm(catId) {
+  if (!catId) return toast('בחר קטגוריה', false);
+  try {
+    const r = await API.post('/forms', {
+      category_id: catId,
+      name: 'טופס חדש',
+      icon: '📄',
+      dept: 'HR',
+      approval_steps: ['עובד','HR'],
+      fields: [{id:'f1', lb:'שדה ראשון', type:'text', required:false}],
+      display_order: 99
+    });
+    editForm(r.id);
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+function editForm(formId) {
+  const form = (window._afForms||[]).find(f => f.id === formId);
+  if (!form) { navigate('aforms'); return; }
+  window._afEditingForm = JSON.parse(JSON.stringify(form)); // clone
+  openFormEditor();
+}
+
+function openFormEditor() {
+  const f = window._afEditingForm;
+  if (!f) return;
+  const modal = document.createElement('div');
+  modal.id = 'formEditorModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto';
+  modal.onclick=(e)=>{if(e.target===modal)closeFormEditor();};
+  modal.innerHTML = `
+<div class="card" style="max-width:800px;width:100%;max-height:95vh;overflow-y:auto" onclick="event.stopPropagation()">
+  <div class="sh"><span class="st">✏️ ${f.id ? 'עריכת' : 'יצירת'} טופס</span>
+    <button class="btn bno bnsm" onclick="closeFormEditor()">✕ סגור</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:60px 1fr 1fr 100px;gap:9px">
+    <div class="fg"><label class="fl">אייקון</label><input class="fi" id="af_icon" value="${f.icon||'📄'}" style="font-size:18px;text-align:center"/></div>
+    <div class="fg"><label class="fl">שם הטופס *</label><input class="fi" id="af_name" value="${f.name||''}"/></div>
+    <div class="fg"><label class="fl">מחלקה יעד</label><input class="fi" id="af_dept" value="${f.dept||'HR'}" placeholder="HR / מחשוב / ..."/></div>
+    <div class="fg"><label class="fl">סדר</label><input class="fi" id="af_order" type="number" value="${f.display_order||0}"/></div>
+  </div>
+  <div class="fg"><label class="fl">תיאור (אופציונלי — מוצג מעל הטופס)</label><textarea class="fta" id="af_desc">${f.description||''}</textarea></div>
+  <div class="fg"><label class="fl">זרימת אישור (מופרד בפסיקים, למשל: עובד, מנהל ישיר, HR)</label><input class="fi" id="af_steps" value="${(f.approval_steps||[]).join(', ')}"/></div>
+
+  <div class="sep"></div>
+  <div class="st mb">🧩 שדות הטופס</div>
+  <div id="af_fields_list"></div>
+  <button class="btn bnt bnsm" onclick="addFormField()">+ הוסף שדה</button>
+
+  <div style="display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)">
+    <button class="btn bnt" onclick="saveEditingForm()">💾 שמור טופס</button>
+    <button class="btn bno" onclick="closeFormEditor()">ביטול</button>
+  </div>
+</div>`;
+  document.body.appendChild(modal);
+  renderFormFields();
+}
+
+function renderFormFields() {
+  const list = document.getElementById('af_fields_list');
+  if (!list) return;
+  const f = window._afEditingForm;
+  list.innerHTML = (f.fields||[]).map((fld, idx) => `
+<div style="border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:9px;background:var(--bg)">
+  <div style="display:grid;grid-template-columns:80px 1fr 1fr auto;gap:6px;align-items:end;margin-bottom:6px">
+    <div><label style="font-size:8px;color:var(--tx3)">ID (פנימי)</label>
+      <input class="fi" value="${fld.id||''}" style="padding:5px;font-family:monospace;font-size:10px" oninput="updateField(${idx},'id',this.value)"/></div>
+    <div><label style="font-size:8px;color:var(--tx3)">תווית *</label>
+      <input class="fi" value="${fld.lb||''}" oninput="updateField(${idx},'lb',this.value)"/></div>
+    <div><label style="font-size:8px;color:var(--tx3)">סוג</label>
+      <select class="fsel" oninput="updateField(${idx},'type',this.value);renderFormFields()">
+        ${['text','textarea','number','select','date','time','datetime-local','tel','email','url','checkbox'].map(t=>`<option value="${t}" ${fld.type===t?'selected':''}>${t}</option>`).join('')}
+      </select></div>
+    <div style="display:flex;gap:4px">
+      <button class="ab abv" onclick="moveField(${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+      <button class="ab abv" onclick="moveField(${idx},1)" ${idx===f.fields.length-1?'disabled':''}>↓</button>
+      <button class="ab abr" onclick="removeField(${idx})">🗑</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr auto;gap:6px;align-items:end">
+    <div><label style="font-size:8px;color:var(--tx3)">placeholder (רמז בשדה)</label>
+      <input class="fi" value="${fld.placeholder||''}" oninput="updateField(${idx},'placeholder',this.value)" style="padding:5px"/></div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tx2);padding-bottom:4px"><input type="checkbox" ${fld.required?'checked':''} onchange="updateField(${idx},'required',this.checked)"/> חובה</label>
+  </div>
+  ${fld.type === 'select' ? `
+  <div class="fg" style="margin-top:6px"><label style="font-size:8px;color:var(--tx3)">אפשרויות בחירה (מופרד בפסיקים)</label>
+    <input class="fi" value="${(fld.options||[]).join(', ')}" placeholder="אפשרות 1, אפשרות 2, ..." oninput="updateFieldOptions(${idx},this.value)"/></div>
+  ` : ''}
+</div>`).join('') || '<div class="ldg" style="padding:20px">אין שדות. הוסף שדה ראשון!</div>';
+}
+
+function updateField(idx, key, val) {
+  const f = window._afEditingForm;
+  if (!f || !f.fields[idx]) return;
+  f.fields[idx][key] = val;
+}
+function updateFieldOptions(idx, str) {
+  const f = window._afEditingForm;
+  if (!f || !f.fields[idx]) return;
+  f.fields[idx].options = str.split(',').map(s=>s.trim()).filter(Boolean);
+}
+function addFormField() {
+  const f = window._afEditingForm;
+  f.fields = f.fields || [];
+  const newId = 'f' + (f.fields.length+1);
+  f.fields.push({id:newId, lb:'שדה חדש', type:'text', required:false});
+  renderFormFields();
+}
+function removeField(idx) {
+  const f = window._afEditingForm;
+  f.fields.splice(idx, 1);
+  renderFormFields();
+}
+function moveField(idx, dir) {
+  const f = window._afEditingForm;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= f.fields.length) return;
+  [f.fields[idx], f.fields[newIdx]] = [f.fields[newIdx], f.fields[idx]];
+  renderFormFields();
+}
+
+async function saveEditingForm() {
+  const f = window._afEditingForm;
+  if (!f) return;
+  const name = document.getElementById('af_name')?.value.trim();
+  if (!name) return toast('שם חובה', false);
+  const steps = (document.getElementById('af_steps')?.value || '').split(',').map(s=>s.trim()).filter(Boolean);
+  const payload = {
+    category_id: f.category_id,
+    name,
+    icon: document.getElementById('af_icon')?.value || '📄',
+    description: document.getElementById('af_desc')?.value || '',
+    dept: document.getElementById('af_dept')?.value || 'HR',
+    approval_steps: steps.length ? steps : ['עובד','HR'],
+    fields: f.fields || [],
+    display_order: parseInt(document.getElementById('af_order')?.value) || 0,
+    active: true
+  };
+  try {
+    await API.put('/forms/'+f.id, payload);
+    toast('✅ הטופס נשמר!');
+    closeFormEditor();
+    navigate('aforms');
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+function closeFormEditor() {
+  document.getElementById('formEditorModal')?.remove();
+  window._afEditingForm = null;
+}
+
+async function delForm(id) {
+  if (!confirm('למחוק טופס זה לצמיתות?')) return;
+  await API.delete('/forms/'+id);
+  toast('נמחק');
+  navigate('aforms');
+}
+
+
 async function pgAset(cnt) {
   const s=await API.get('/settings').catch(()=>({}));
   cnt.innerHTML=`
@@ -2331,7 +3577,7 @@ async function pgAset(cnt) {
   <div class="sep"></div>
   <div class="st mb">📧 מיילים לקטגוריות</div>
   <div class="info-box">הגדר מייל לכל מחלקה — לשם יגיעו הפניות.</div>
-  ${['HR','שכר','מחשוב','תחזוקה','שיווק','מזכירות','לשכת מנכ"ל','ביטחון','רווחה'].map(d=>`
+  ${['HR','מחשוב','תחזוקה','שיווק','מזכירות','לשכת מנכ"ל','ביטחון','רווחה'].map(d=>`
   <div class="fg"><label class="fl">${d}</label><input class="fi" id="s_mail_${d.replace(/[^a-zA-Zא-ת]/g,'_')}" value="${s['mail_'+d]||''}" placeholder="${d.toLowerCase().replace(/\s/g,'')}@shalva.org.il"/></div>`).join('')}
   <button class="btn bnt" onclick="saveSettings()">💾 שמור הגדרות</button>
 </div>`;

@@ -1,14 +1,47 @@
+// טוען משתני סביבה מקובץ .env אם קיים (לא חובה)
+try { require('dotenv').config(); } catch (e) {}
+
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 const { initDB, getDB } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const db = initDB();
 
-['uploads','public'].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d,{recursive:true}); });
+// יצירת תיקיות uploads מסודרות
+const uploadRoot = path.join(__dirname, 'public', 'uploads');
+['uploads','public',uploadRoot].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d,{recursive:true}); });
+
+// הגדרת multer — קבצים נשמרים ב-public/uploads/YYYY-MM/
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const now = new Date();
+    const subDir = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const dir = path.join(uploadRoot, subDir);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, {recursive:true});
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    // אבטח שם קובץ + הוסף חותמת זמן
+    const ext = path.extname(file.originalname).toLowerCase();
+    const safe = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9א-ת\-_]/g,'_').substring(0, 40);
+    const ts = Date.now();
+    cb(null, `${ts}-${safe}${ext}`);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 60 * 1024 * 1024 }, // 60MB
+  fileFilter: (req, file, cb) => {
+    const allowed = /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|mov|pdf)$/i;
+    if (!allowed.test(file.originalname)) return cb(new Error('סוג קובץ לא נתמך'));
+    cb(null, true);
+  }
+});
 
 
 app.use(express.json({ limit: '10mb' }));
@@ -233,7 +266,10 @@ app.put('/api/requests/:id', auth, (req,res) => {
 
 // ── FEED ──
 app.get('/api/feed', auth, (req,res) => {
-  const rows = db.prepare('SELECT * FROM feed_posts ORDER BY created_at DESC LIMIT 50').all();
+  const isAdm = isManager(req.session.user);
+  const showAll = isAdm && req.query.all === '1';
+  const where = showAll ? '' : 'WHERE (hidden IS NULL OR hidden=0)';
+  const rows = db.prepare(`SELECT * FROM feed_posts ${where} ORDER BY pinned DESC, created_at DESC LIMIT 50`).all();
   res.json(rows.map(p=>({...p, likes:JSON.parse(p.likes||'[]')})));
 });
 app.post('/api/feed', auth, (req,res) => {
@@ -249,6 +285,17 @@ app.post('/api/feed/:id/like', auth, (req,res) => {
   if(idx>=0)likes.splice(idx,1); else likes.push(me.id);
   db.prepare('UPDATE feed_posts SET likes=? WHERE id=?').run(JSON.stringify(likes),p.id);
   res.json({likes});
+});
+// אדמין — הצמדה, הסתרה, מחיקה
+app.put('/api/feed/:id/pin', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  db.prepare('UPDATE feed_posts SET pinned = CASE COALESCE(pinned,0) WHEN 1 THEN 0 ELSE 1 END WHERE id=?').run(parseInt(req.params.id));
+  res.json({ok:true});
+});
+app.put('/api/feed/:id/hide', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  db.prepare('UPDATE feed_posts SET hidden = CASE COALESCE(hidden,0) WHEN 1 THEN 0 ELSE 1 END WHERE id=?').run(parseInt(req.params.id));
+  res.json({ok:true});
 });
 app.delete('/api/feed/:id', admin, (req,res) => { db.prepare('DELETE FROM feed_posts WHERE id=?').run(parseInt(req.params.id)); res.json({ok:true}); });
 
@@ -367,6 +414,198 @@ app.get('/api/settings', auth, (req,res) => {
 app.put('/api/settings', admin, (req,res) => {
   const stmt=db.prepare("INSERT OR REPLACE INTO settings(key,value,updated_at) VALUES(?,?,datetime('now'))");
   for (const [k,v] of Object.entries(req.body)) stmt.run(k,String(v));
+  res.json({ok:true});
+});
+
+// ── PUBLIC CONFIG — הגדרות פומביות לדף הבית (בלי דרישת כניסה) ──
+const PUBLIC_KEYS = [
+  'org_name','org_name_en','logo_url',
+  'home_banner_kicker','home_banner_welcome','home_banner_welcome_guest',
+  'home_weather_city','home_weather_label',
+  'home_nav_row1','home_nav_row2',
+  'ai_enabled','ai_name','ai_welcome'
+];
+app.get('/api/public-config', (req,res) => {
+  try {
+    const rows = db.prepare(`SELECT key,value FROM settings WHERE key IN (${PUBLIC_KEYS.map(()=>'?').join(',')})`).all(...PUBLIC_KEYS);
+    const s = {};
+    rows.forEach(r => {
+      // Parse JSON values if possible
+      if (r.value && (r.value.startsWith('[') || r.value.startsWith('{'))) {
+        try { s[r.key] = JSON.parse(r.value); } catch(e) { s[r.key] = r.value; }
+      } else {
+        s[r.key] = r.value;
+      }
+    });
+    res.json(s);
+  } catch(e) { res.json({}); }
+});
+
+// ── AI (שלומית) ──
+// FAQ — כל המשתמשים מחוברים רואים
+app.get('/api/ai/faq', auth, (req,res) => {
+  try {
+    const rows = db.prepare('SELECT * FROM ai_faq WHERE active=1 ORDER BY display_order ASC, id ASC').all();
+    res.json(rows);
+  } catch(e) { res.json([]); }
+});
+// FAQ CRUD (אדמין)
+app.get('/api/ai/faq/all', admin, (req,res) => {
+  try { res.json(db.prepare('SELECT * FROM ai_faq ORDER BY display_order ASC, id ASC').all()); }
+  catch(e) { res.json([]); }
+});
+app.post('/api/ai/faq', admin, (req,res) => {
+  const {question, answer, display_order} = req.body;
+  if (!question || !answer) return res.status(400).json({error:'question and answer required'});
+  const r = db.prepare('INSERT INTO ai_faq(question,answer,display_order) VALUES(?,?,?)').run(question, answer, parseInt(display_order)||0);
+  res.json({id:r.lastInsertRowid});
+});
+app.put('/api/ai/faq/:id', admin, (req,res) => {
+  const {question, answer, display_order, active} = req.body;
+  db.prepare('UPDATE ai_faq SET question=?,answer=?,display_order=?,active=? WHERE id=?').run(question, answer, parseInt(display_order)||0, active===false?0:1, req.params.id);
+  res.json({ok:true});
+});
+app.delete('/api/ai/faq/:id', admin, (req,res) => {
+  db.prepare('DELETE FROM ai_faq WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+
+// Chat proxy — מעביר את הבקשה ל-Anthropic API עם ה-API key מהשרת
+app.post('/api/ai/chat', auth, async (req,res) => {
+  const {message} = req.body;
+  if (!message) return res.status(400).json({error:'message required'});
+
+  // בדוק אם AI מופעל
+  const enabled = db.prepare("SELECT value FROM settings WHERE key='ai_enabled'").get()?.value;
+  if (enabled === 'false') return res.status(503).json({error:'AI מבוטל כרגע'});
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return res.status(503).json({error:'API key לא מוגדר. הוסף ANTHROPIC_API_KEY למשתני הסביבה של Railway.'});
+  }
+
+  const sysPrompt = db.prepare("SELECT value FROM settings WHERE key='ai_system_prompt'").get()?.value || '';
+  const model = db.prepare("SELECT value FROM settings WHERE key='ai_model'").get()?.value || 'claude-sonnet-4-5-20250929';
+  const maxTokens = parseInt(db.prepare("SELECT value FROM settings WHERE key='ai_max_tokens'").get()?.value) || 500;
+
+  // בנה הקשר עם שאלות נפוצות
+  let context = sysPrompt;
+  try {
+    const faq = db.prepare('SELECT question,answer FROM ai_faq WHERE active=1 ORDER BY display_order').all();
+    if (faq.length) {
+      context += '\n\nשאלות נפוצות ותשובות (אם השאלה תואמת — השתמש בתשובה):\n' +
+        faq.map(f => `שאלה: ${f.question}\nתשובה: ${f.answer}`).join('\n\n');
+    }
+  } catch(e){}
+
+  // מידע על המשתמש
+  const me = req.session.user;
+  const userInfo = `\n\nהמשתמש הפונה אליך: ${me.name} (${me.title||'עובד'}, מחלקת ${me.dept||'—'}).`;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTokens,
+        system: context + userInfo,
+        messages: [{role:'user', content:message}]
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      console.error('Anthropic API error:', data);
+      return res.status(500).json({error: data.error?.message || 'שגיאה מ-Anthropic API'});
+    }
+    const text = data.content?.[0]?.text || 'לא התקבלה תשובה';
+    res.json({text});
+  } catch(e) {
+    console.error('Chat error:', e);
+    res.status(500).json({error: e.message});
+  }
+});
+
+// ── FORM CATEGORIES ──
+app.get('/api/form-categories', auth, (req,res) => {
+  try {
+    const showAll = isManager(req.session.user) && req.query.all === '1';
+    const where = showAll ? '' : 'WHERE active=1';
+    res.json(db.prepare(`SELECT * FROM form_categories ${where} ORDER BY display_order ASC, id ASC`).all());
+  } catch(e) { res.json([]); }
+});
+app.post('/api/form-categories', admin, (req,res) => {
+  const {name, icon, color, display_order} = req.body;
+  if (!name) return res.status(400).json({error:'name required'});
+  const r = db.prepare('INSERT INTO form_categories(name,icon,color,display_order) VALUES(?,?,?,?)').run(name, icon||'📋', color||'#7B2D8B', parseInt(display_order)||0);
+  res.json({id:r.lastInsertRowid});
+});
+app.put('/api/form-categories/:id', admin, (req,res) => {
+  const {name, icon, color, display_order, active} = req.body;
+  db.prepare('UPDATE form_categories SET name=?,icon=?,color=?,display_order=?,active=? WHERE id=?').run(name, icon||'📋', color||'#7B2D8B', parseInt(display_order)||0, active===false?0:1, req.params.id);
+  res.json({ok:true});
+});
+app.delete('/api/form-categories/:id', admin, (req,res) => {
+  // מחק גם את הטפסים
+  db.prepare('DELETE FROM forms WHERE category_id=?').run(req.params.id);
+  db.prepare('DELETE FROM form_categories WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+
+// ── FORMS ──
+app.get('/api/forms', auth, (req,res) => {
+  try {
+    const showAll = isManager(req.session.user) && req.query.all === '1';
+    const catFilter = req.query.category_id ? ' AND category_id=?' : '';
+    const activeFilter = showAll ? '' : ' AND active=1';
+    const where = 'WHERE 1=1' + activeFilter + catFilter;
+    const params = req.query.category_id ? [parseInt(req.query.category_id)] : [];
+    const rows = db.prepare(`SELECT * FROM forms ${where} ORDER BY display_order ASC, id ASC`).all(...params);
+    res.json(rows.map(f => ({
+      ...f,
+      approval_steps: JSON.parse(f.approval_steps || '[]'),
+      fields: JSON.parse(f.fields || '[]')
+    })));
+  } catch(e) { res.json([]); }
+});
+app.get('/api/forms/:id', auth, (req,res) => {
+  try {
+    const f = db.prepare('SELECT * FROM forms WHERE id=?').get(req.params.id);
+    if (!f) return res.status(404).json({error:'not found'});
+    f.approval_steps = JSON.parse(f.approval_steps || '[]');
+    f.fields = JSON.parse(f.fields || '[]');
+    res.json(f);
+  } catch(e) { res.status(500).json({error:e.message}); }
+});
+app.post('/api/forms', admin, (req,res) => {
+  const {category_id, name, icon, description, dept, approval_steps, fields, display_order} = req.body;
+  if (!category_id || !name) return res.status(400).json({error:'category_id and name required'});
+  const r = db.prepare('INSERT INTO forms(category_id,name,icon,description,dept,approval_steps,fields,display_order) VALUES(?,?,?,?,?,?,?,?)').run(
+    parseInt(category_id), name, icon||'📄', description||'', dept||'HR',
+    JSON.stringify(approval_steps||['עובד','HR']),
+    JSON.stringify(fields||[]),
+    parseInt(display_order)||0
+  );
+  res.json({id:r.lastInsertRowid});
+});
+app.put('/api/forms/:id', admin, (req,res) => {
+  const {category_id, name, icon, description, dept, approval_steps, fields, display_order, active} = req.body;
+  db.prepare('UPDATE forms SET category_id=?,name=?,icon=?,description=?,dept=?,approval_steps=?,fields=?,display_order=?,active=? WHERE id=?').run(
+    parseInt(category_id), name, icon||'📄', description||'', dept||'HR',
+    JSON.stringify(approval_steps||['עובד','HR']),
+    JSON.stringify(fields||[]),
+    parseInt(display_order)||0,
+    active===false?0:1,
+    req.params.id
+  );
+  res.json({ok:true});
+});
+app.delete('/api/forms/:id', admin, (req,res) => {
+  db.prepare('DELETE FROM forms WHERE id=?').run(req.params.id);
   res.json({ok:true});
 });
 
@@ -532,6 +771,139 @@ app.delete('/api/announcements/:id', auth, (req,res) => {
   if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
   db.prepare('DELETE FROM announcements WHERE id=?').run(req.params.id);
   res.json({ok:true});
+});
+
+// ── ADS (פרסומות / סרטונים לדף הבית) ──
+// public: only active ads, sorted by display_order
+app.get('/api/ads', (req,res) => {
+  try {
+    const now = new Date().toISOString().slice(0,10);
+    const ads = db.prepare(`SELECT * FROM ads WHERE active=1
+      AND (start_date='' OR start_date <= ?)
+      AND (end_date='' OR end_date >= ?)
+      ORDER BY display_order ASC, id ASC`).all(now, now);
+    res.json(ads);
+  } catch(e){ res.json([]); }
+});
+// admin: all ads including inactive
+app.get('/api/ads/all', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  try {
+    res.json(db.prepare('SELECT * FROM ads ORDER BY display_order ASC, id ASC').all());
+  } catch(e){ res.json([]); }
+});
+app.get('/api/ads/:id', (req,res) => {
+  try {
+    const a = db.prepare('SELECT * FROM ads WHERE id=?').get(req.params.id);
+    if (!a) return res.status(404).json({error:'Not found'});
+    res.json(a);
+  } catch(e){ res.status(500).json({error:e.message}); }
+});
+app.post('/api/ads', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const {title,sub,type,media_url,poster_url,link_url,link_text,overlay_color,active,display_order,start_date,end_date} = req.body;
+  if (!title || !media_url) return res.status(400).json({error:'Title and media URL required'});
+  const r = db.prepare(`INSERT INTO ads(title,sub,type,media_url,poster_url,link_url,link_text,overlay_color,active,display_order,start_date,end_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`).run(
+    title, sub||'', type||'image', media_url, poster_url||'', link_url||'',
+    link_text||'למידע נוסף', overlay_color||'rgba(26,10,46,.55)',
+    active===false?0:1, parseInt(display_order)||0, start_date||'', end_date||''
+  );
+  res.json({id:r.lastInsertRowid});
+});
+app.put('/api/ads/:id', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const {title,sub,type,media_url,poster_url,link_url,link_text,overlay_color,active,display_order,start_date,end_date} = req.body;
+  db.prepare(`UPDATE ads SET title=?,sub=?,type=?,media_url=?,poster_url=?,link_url=?,link_text=?,overlay_color=?,active=?,display_order=?,start_date=?,end_date=?,updated_at=datetime('now') WHERE id=?`).run(
+    title, sub||'', type||'image', media_url, poster_url||'', link_url||'',
+    link_text||'למידע נוסף', overlay_color||'rgba(26,10,46,.55)',
+    active===false?0:1, parseInt(display_order)||0, start_date||'', end_date||'',
+    req.params.id
+  );
+  res.json({ok:true});
+});
+app.put('/api/ads/:id/toggle', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  db.prepare('UPDATE ads SET active = CASE active WHEN 1 THEN 0 ELSE 1 END WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+app.delete('/api/ads/:id', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  db.prepare('DELETE FROM ads WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+// Anonymous view/click tracking
+app.post('/api/ads/:id/view', (req,res) => {
+  try { db.prepare('UPDATE ads SET views = views + 1 WHERE id=?').run(req.params.id); } catch(e){}
+  res.json({ok:true});
+});
+app.post('/api/ads/:id/click', (req,res) => {
+  try { db.prepare('UPDATE ads SET clicks = clicks + 1 WHERE id=?').run(req.params.id); } catch(e){}
+  res.json({ok:true});
+});
+
+// ── MEDIA / UPLOADS (ספריית מדיה) ──
+app.post('/api/upload', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  upload.single('file')(req, res, (err) => {
+    if (err) return res.status(400).json({error: err.message || 'Upload failed'});
+    if (!req.file) return res.status(400).json({error:'לא נבחר קובץ'});
+    // בנה URL פומבי (public/uploads/YYYY-MM/xxx.mp4 → /uploads/YYYY-MM/xxx.mp4)
+    const rel = req.file.path.replace(path.join(__dirname,'public'),'').replace(/\\/g,'/');
+    const url = rel.startsWith('/') ? rel : '/'+rel;
+    res.json({
+      url,
+      name: req.file.originalname,
+      size: req.file.size,
+      mime: req.file.mimetype
+    });
+  });
+});
+// רשימת כל הקבצים בספריית המדיה
+app.get('/api/media', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  try {
+    const files = [];
+    const scan = (dir, rel) => {
+      if (!fs.existsSync(dir)) return;
+      fs.readdirSync(dir).forEach(name => {
+        const full = path.join(dir, name);
+        const stat = fs.statSync(full);
+        if (stat.isDirectory()) {
+          scan(full, rel + '/' + name);
+        } else {
+          const ext = path.extname(name).toLowerCase();
+          const type = /\.(mp4|webm|mov)$/i.test(name) ? 'video'
+                     : /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(name) ? 'image'
+                     : /\.(pdf)$/i.test(name) ? 'pdf' : 'file';
+          files.push({
+            url: '/uploads' + rel + '/' + name,
+            name, size: stat.size, type,
+            modified: stat.mtime.toISOString()
+          });
+        }
+      });
+    };
+    scan(uploadRoot, '');
+    files.sort((a,b) => b.modified.localeCompare(a.modified));
+    res.json(files);
+  } catch(e) {
+    res.status(500).json({error:e.message});
+  }
+});
+// מחיקת קובץ מדיה
+app.delete('/api/media', auth, (req,res) => {
+  if (!isManager(req.session.user)) return res.status(403).json({error:'Forbidden'});
+  const url = req.body.url;
+  if (!url || !url.startsWith('/uploads/')) return res.status(400).json({error:'URL לא תקין'});
+  try {
+    const full = path.join(__dirname, 'public', url);
+    // אבטחה — הקובץ חייב להיות בתוך uploadRoot
+    if (!full.startsWith(uploadRoot)) return res.status(400).json({error:'נתיב לא חוקי'});
+    if (fs.existsSync(full)) fs.unlinkSync(full);
+    res.json({ok:true});
+  } catch(e) {
+    res.status(500).json({error:e.message});
+  }
 });
 
 // ── SPA fallback — חייב להיות אחרון, אחרי כל ה-API routes ──

@@ -112,6 +112,55 @@ function initDB() {
       description TEXT DEFAULT '', bonus INTEGER DEFAULT 0, data TEXT DEFAULT '{}',
       active INTEGER DEFAULT 1, created_at TEXT DEFAULT (datetime('now'))
     );
+    CREATE TABLE IF NOT EXISTS ads (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      sub TEXT DEFAULT '',
+      type TEXT NOT NULL DEFAULT 'image',
+      media_url TEXT NOT NULL,
+      poster_url TEXT DEFAULT '',
+      link_url TEXT DEFAULT '',
+      link_text TEXT DEFAULT 'למידע נוסף',
+      overlay_color TEXT DEFAULT 'rgba(26,10,46,.55)',
+      active INTEGER DEFAULT 1,
+      display_order INTEGER DEFAULT 0,
+      views INTEGER DEFAULT 0,
+      clicks INTEGER DEFAULT 0,
+      start_date TEXT DEFAULT '',
+      end_date TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS ai_faq (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      question TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      display_order INTEGER DEFAULT 0,
+      active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS form_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      icon TEXT DEFAULT '📋',
+      color TEXT DEFAULT '#7B2D8B',
+      display_order INTEGER DEFAULT 0,
+      active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS forms (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      category_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      icon TEXT DEFAULT '📄',
+      description TEXT DEFAULT '',
+      dept TEXT DEFAULT 'HR',
+      approval_steps TEXT DEFAULT '["עובד","HR"]',
+      fields TEXT DEFAULT '[]',
+      display_order INTEGER DEFAULT 0,
+      active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 
   // הוסף עמודות חדשות אם לא קיימות (migration)
@@ -120,6 +169,8 @@ function initDB() {
     `ALTER TABLE equipment_requests ADD COLUMN current_step INTEGER DEFAULT 0`,
     `ALTER TABLE posts ADD COLUMN body TEXT DEFAULT ''`,
     `ALTER TABLE posts ADD COLUMN author TEXT DEFAULT 'מערכת שלוה'`,
+    `ALTER TABLE feed_posts ADD COLUMN pinned INTEGER DEFAULT 0`,
+    `ALTER TABLE feed_posts ADD COLUMN hidden INTEGER DEFAULT 0`,
   ];
   migrations.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
@@ -128,7 +179,32 @@ function initDB() {
    ['org_email','info@shalva.org.il'],['smtp_host','smtp.gmail.com'],['smtp_port','587'],
    ['smtp_user',''],['smtp_pass',''],['whatsapp_num','+972501234567'],
    ['sms_provider','twilio'],['sms_active','true'],['chatbot_active','true'],
-   ['auto_approve','false'],['recruit_bonus','500'],['logo_url','/logo.png'],['maintenance','false']
+   ['auto_approve','false'],['recruit_bonus','500'],['logo_url','/logo.png'],['maintenance','false'],
+   // הגדרות דף הבית
+   ['home_banner_kicker','פורטל עובדים שלוה'],
+   ['home_banner_welcome','שלום'],
+   ['home_banner_welcome_guest','ברוכים הבאים! 🌟'],
+   ['home_weather_city','Jerusalem'],
+   ['home_weather_label','ירושלים'],
+   ['home_nav_row1', JSON.stringify([
+     {ic:'📨',lb:'פניות HR',target:'req',color:'#7B2D8B'},
+     {ic:'📋',lb:'מחלקות',target:'forms',color:'#1565C0'},
+     {ic:'🎓',lb:'הדרכות',target:'train',color:'#27AE60'},
+     {ic:'⭐',lb:'הערכה',target:'hr',color:'#F4813A'}
+   ])],
+   ['home_nav_row2', JSON.stringify([
+     {ic:'🤖',lb:'שלומית AI',target:'chat',color:'#E84393'},
+     {ic:'🎁',lb:'הטבות',target:'https://boomclub.org.il/',color:'#D4A017',caption:'boomclub'},
+     {ic:'📱',lb:'חילן',target:'https://www.hilannet.co.il/',color:'#4BAEE8',caption:'hilannet'},
+     {ic:'👤',lb:'הפרופיל',target:'personal',color:'#5C1F6A'}
+   ])],
+   // הגדרות שלומית AI
+   ['ai_enabled','true'],
+   ['ai_name','שלומית'],
+   ['ai_welcome','שלום {name}! 👋 אני שלומית, העוזרת הדיגיטלית של שלוה. איך אוכל לעזור לך היום?'],
+   ['ai_system_prompt','אתה שלומית, עוזרת AI של המרכז הלאומי שלוה בירושלים. המרכז נותן שירותים לילדים ומבוגרים עם צרכים מיוחדים. אתה עוזרת לעובדים בנושאי HR, נהלים, טפסים, ושאלות כלליות על הארגון. תעני בעברית, קצר וממוקד, בטון חם ומכבד. אם שאלה חורגת מתחום עבודתך — הפני לגורם המתאים.'],
+   ['ai_model','claude-sonnet-4-5-20250929'],
+   ['ai_max_tokens','500']
   ].forEach(([k,v]) => ins.run(k,v));
 
   // כתבות שלוה לדוגמה (רק אם הטבלה ריקה)
@@ -178,6 +254,156 @@ function initDB() {
       iann.run('יום כיף שנתי 🌳','15.07 — פרטים בקרוב','#16A085');
     }
   } catch(e) { console.error('announcements seed error:', e.message); }
+
+  // שאלות נפוצות לשלומית AI (רק אם הטבלה ריקה)
+  try {
+    if (db.prepare('SELECT COUNT(*) as c FROM ai_faq').get().c === 0) {
+      const ifaq = db.prepare('INSERT INTO ai_faq(question,answer,display_order) VALUES(?,?,?)');
+      ifaq.run('איך אני מבקש חופשה?','להיכנס ל"פניה למחלקות" ← HR ומשאבי אנוש ← חופשה, למלא את הטופס ולהגיש. הבקשה עוברת לאישור המנהל הישיר ואז ל-HR.', 1);
+      ifaq.run('מתי מגיע לי יום מנוחה?','לכל עובד מגיעים ימי חופשה שנתיים לפי הוותק. אפשר לראות את הצבירה שלך באזור האישי.', 2);
+      ifaq.run('איפה רואים תלוש שכר?','תלושי שכר זמינים במערכת חילנט. יש קישור אליה מאייקון "חילן" בדף הבית.', 3);
+      ifaq.run('איך שולחים בקשה לתחזוקה?','להיכנס ל"פניה למחלקות" ← תחזוקה ← קריאת תחזוקה, למלא מיקום ותיאור.', 4);
+    }
+  } catch(e) { console.error('ai_faq seed error:', e.message); }
+
+  // קטגוריות טפסים וטפסים דיפולטיים (רק אם הטבלה ריקה)
+  try {
+    if (db.prepare('SELECT COUNT(*) as c FROM form_categories').get().c === 0) {
+      const icat = db.prepare('INSERT INTO form_categories(name,icon,color,display_order) VALUES(?,?,?,?)');
+      const iform = db.prepare('INSERT INTO forms(category_id,name,icon,dept,approval_steps,fields,display_order) VALUES(?,?,?,?,?,?,?)');
+
+      // fc0 — HR ומשאבי אנוש
+      const hrId = icat.run('HR ומשאבי אנוש','👥','#7B2D8B',1).lastInsertRowid;
+      iform.run(hrId,'חופשה','✈️','HR',JSON.stringify(['עובד','מנהל ישיר','HR']),JSON.stringify([
+        {id:'vtype',lb:'סוג חופשה',type:'select',options:['שנתית','יום אישי','חירום','חתונה','אבל']},
+        {id:'from',lb:'מתאריך',type:'date',required:true},
+        {id:'to',lb:'עד תאריך',type:'date',required:true},
+        {id:'note',lb:'הערות',type:'textarea'}
+      ]),1);
+      iform.run(hrId,'מחלה','🤒','HR',JSON.stringify(['עובד','HR']),JSON.stringify([
+        {id:'from',lb:'מתאריך',type:'date',required:true},
+        {id:'to',lb:'עד תאריך',type:'date',required:true},
+        {id:'reason',lb:'סיבה',type:'textarea'}
+      ]),2);
+      iform.run(hrId,'תאונת עבודה','🚑','HR',JSON.stringify(['עובד','מנהל ישיר','HR']),JSON.stringify([
+        {id:'date',lb:'תאריך',type:'date',required:true},
+        {id:'time',lb:'שעה',type:'time'},
+        {id:'loc',lb:'מיקום',type:'text',required:true},
+        {id:'desc',lb:'תיאור',type:'textarea',required:true},
+        {id:'injuries',lb:'פציעות',type:'textarea'}
+      ]),3);
+      iform.run(hrId,'הערכה עצמית','⭐','HR',JSON.stringify(['עובד','HR']),JSON.stringify([
+        {id:'year',lb:'שנת הערכה',type:'text'},
+        {id:'text',lb:'משוב',type:'textarea',required:true}
+      ]),4);
+      iform.run(hrId,'חבר מביא חבר','👥','HR',JSON.stringify(['עובד','HR']),JSON.stringify([
+        {id:'name',lb:'שם המועמד',type:'text',required:true},
+        {id:'phone',lb:'טלפון',type:'tel',required:true},
+        {id:'role',lb:'תפקיד מתאים',type:'text'},
+        {id:'why',lb:'למה מתאים?',type:'textarea'}
+      ]),5);
+      iform.run(hrId,'מילואים','🪖','HR',JSON.stringify(['עובד','HR']),JSON.stringify([
+        {id:'days',lb:'ימי שירות',type:'number',required:true},
+        {id:'unit',lb:'יחידה',type:'text',required:true},
+        {id:'from',lb:'מתאריך',type:'date'},
+        {id:'to',lb:'עד תאריך',type:'date'},
+        {id:'order',lb:'מספר צו',type:'text'}
+      ]),6);
+      iform.run(hrId,'שינוי תנאים','📋','HR',JSON.stringify(['עובד','מנהל ישיר','HR']),JSON.stringify([
+        {id:'type',lb:'סוג השינוי',type:'select',options:['שינוי היקף משרה','עדכון תפקיד','שינוי שעות','עבודה מהבית','אחר']},
+        {id:'details',lb:'פירוט',type:'textarea',required:true}
+      ]),7);
+      iform.run(hrId,'חל"ד','✈️','HR',JSON.stringify(['עובד','מנהל ישיר','HR']),JSON.stringify([
+        {id:'from',lb:'מתאריך',type:'date',required:true},
+        {id:'to',lb:'עד תאריך',type:'date',required:true},
+        {id:'reason',lb:'סיבה',type:'textarea',required:true}
+      ]),8);
+
+      // fc2 — ציוד ומחשוב
+      const itId = icat.run('ציוד ומחשוב','📦','#4BAEE8',2).lastInsertRowid;
+      iform.run(itId,'הזמנת ציוד','📦','מחשוב',JSON.stringify(['עובד','מנהל ישיר','מחשוב']),JSON.stringify([
+        {id:'item',lb:'פריט',type:'text',required:true},
+        {id:'qty',lb:'כמות',type:'number'},
+        {id:'urg',lb:'דחיפות',type:'select',options:['רגיל','גבוהה','דחוף']},
+        {id:'price',lb:'מחיר ₪',type:'number'},
+        {id:'reason',lb:'נימוק',type:'textarea',required:true},
+        {id:'link',lb:'קישור',type:'url'}
+      ]),1);
+      iform.run(itId,'תקלת IT','💻','מחשוב',JSON.stringify(['עובד','מחשוב']),JSON.stringify([
+        {id:'type',lb:'סוג',type:'select',options:['מחשב','רשת','מדפסת','תוכנה','מייל','אחר']},
+        {id:'desc',lb:'תיאור',type:'textarea',required:true}
+      ]),2);
+
+      // fc3 — תחזוקה
+      const mntId = icat.run('תחזוקה','🔧','#E84040',3).lastInsertRowid;
+      iform.run(mntId,'קריאת תחזוקה','🔧','תחזוקה',JSON.stringify(['עובד','תחזוקה']),JSON.stringify([
+        {id:'type',lb:'סוג',type:'select',options:['חשמל','אינסטלציה','מיזוג','ניקיון','ריהוט','אחר']},
+        {id:'loc',lb:'מיקום',type:'text',required:true,placeholder:'חדר / קומה...'},
+        {id:'desc',lb:'תיאור',type:'textarea',required:true},
+        {id:'urg',lb:'דחיפות',type:'select',options:['רגיל','גבוהה','סכנת בטיחות']}
+      ]),1);
+
+      // fc4 — שיווק וצילום
+      const mktId = icat.run('שיווק וצילום','📣','#E84393',4).lastInsertRowid;
+      iform.run(mktId,'צילום','📸','שיווק',JSON.stringify(['עובד','מנהל','שיווק']),JSON.stringify([
+        {id:'type',lb:'סוג',type:'select',options:['אירוע','תוכן לרשתות','צילום קבוצתי','פורטרט','אחר']},
+        {id:'date',lb:'תאריך',type:'date',required:true},
+        {id:'time',lb:'שעה',type:'time'},
+        {id:'desc',lb:'תיאור',type:'textarea',required:true}
+      ]),1);
+      iform.run(mktId,'וידאו','🎬','שיווק',JSON.stringify(['עובד','מנהל','שיווק']),JSON.stringify([
+        {id:'type',lb:'סוג',type:'select',options:['תדמית','אירוע','Reel','הדרכה','אחר']},
+        {id:'date',lb:'תאריך הפקה',type:'date'},
+        {id:'desc',lb:'תיאור',type:'textarea',required:true}
+      ]),2);
+
+      // fc5 — מזכירות
+      const secId = icat.run('מזכירות','📋','#9B59B6',5).lastInsertRowid;
+      iform.run(secId,'בקשה כללית','📋','מזכירות',JSON.stringify(['עובד','מזכירות']),JSON.stringify([
+        {id:'type',lb:'סוג',type:'select',options:['תיאום פגישה','הזמנת חדר','הפקת מסמך','אישור חתימה','משלוח','כיבוד','אחר']},
+        {id:'dt',lb:'תאריך ושעה',type:'datetime-local'},
+        {id:'desc',lb:'פרטים',type:'textarea',required:true}
+      ]),1);
+      iform.run(secId,'הזמנת חדר','🗓️','מזכירות',JSON.stringify(['עובד','מזכירות']),JSON.stringify([
+        {id:'room',lb:'חדר',type:'select',options:['חדר A (8 מקומות)','חדר B (20 מקומות)','אולם (50+)','חדר הנהלה']},
+        {id:'date',lb:'תאריך',type:'date',required:true},
+        {id:'hours',lb:'שעות',type:'text',placeholder:'09:00-11:00'},
+        {id:'count',lb:'משתתפים',type:'number'}
+      ]),2);
+
+      // fc7 — ביטחון
+      const secDeptId = icat.run('ביטחון','🔒','#27AE60',6).lastInsertRowid;
+      iform.run(secDeptId,'דיווח אירוע ביטחוני','🚨','ביטחון',JSON.stringify(['עובד','ביטחון']),JSON.stringify([
+        {id:'date',lb:'תאריך',type:'date',required:true},
+        {id:'time',lb:'שעה',type:'time'},
+        {id:'loc',lb:'מיקום',type:'text',required:true},
+        {id:'desc',lb:'תיאור האירוע',type:'textarea',required:true}
+      ]),1);
+
+      // fc8 — רווחה ופנאי
+      const welId = icat.run('רווחה ופנאי','❤️','#E74C3C',7).lastInsertRowid;
+      iform.run(welId,'הצעת אירוע','🎉','רווחה',JSON.stringify(['עובד','רווחה']),JSON.stringify([
+        {id:'title',lb:'שם האירוע',type:'text',required:true},
+        {id:'date',lb:'תאריך רצוי',type:'date'},
+        {id:'desc',lb:'תיאור',type:'textarea',required:true}
+      ]),1);
+    }
+  } catch(e) { console.error('forms seed error:', e.message); }
+
+
+  // פרסומות / סרטונים לדף הבית (רק אם הטבלה ריקה)
+  try {
+    if (db.prepare('SELECT COUNT(*) as c FROM ads').get().c === 0) {
+      const iad = db.prepare(`INSERT INTO ads(title,sub,type,media_url,poster_url,link_url,link_text,overlay_color,active,display_order) VALUES(?,?,?,?,?,?,?,?,?,?)`);
+      // הוידאו הראשי של שלוה
+      iad.run('שלוה — נותנים תקווה, משנים חיים','ראו את הסיפור שלנו','video','/media/sha.mp4','/media/sha_poster.jpg','https://www.shalva.org','לצפייה באתר שלוה','rgba(26,10,46,.35)',1,1);
+      // תמונות פרסום לדוגמה
+      iad.run('קמפיין ההתרמה השנתי','הצטרפו לפעילות ההתרמה — כל תרומה עושה הבדל','image','https://images.unsplash.com/photo-1593113646773-028c64a8f1b8?w=1200','','https://www.shalva.org/donate','לתרומה','rgba(26,10,46,.55)',1,2);
+      iad.run('מרכז שלוה החדש באשקלון','פתיחה חגיגית — ספטמבר 2026','image','https://images.unsplash.com/photo-1541535650810-10d26f5c2ab3?w=1200','','','','rgba(26,10,46,.55)',1,3);
+      iad.run('הצטרפו לצוות שלוה','דרושים אנשי חינוך, טיפול, ואדמיניסטרציה','image','https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200','','','','rgba(26,10,46,.55)',1,4);
+    }
+  } catch(e) { console.error('ads seed error:', e.message); }
+
 
 
   if (db.prepare('SELECT COUNT(*) as c FROM users').get().c === 0) {
