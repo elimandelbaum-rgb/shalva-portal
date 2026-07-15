@@ -27,6 +27,7 @@ function initDB() {
       bank TEXT DEFAULT '', bank_branch TEXT DEFAULT '', bank_account TEXT DEFAULT '',
       emergency_name TEXT DEFAULT '', emergency_phone TEXT DEFAULT '',
       employment_type TEXT DEFAULT 'full', scope_pct INTEGER DEFAULT 100,
+      extension TEXT DEFAULT '',
       avatar TEXT DEFAULT '', color TEXT DEFAULT '#7C5CFC', menu TEXT DEFAULT '[]',
       notes TEXT DEFAULT '', active INTEGER DEFAULT 1,
       created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
@@ -161,6 +162,29 @@ function initDB() {
       active INTEGER DEFAULT 1,
       created_at TEXT DEFAULT (datetime('now'))
     );
+    CREATE TABLE IF NOT EXISTS mailing_lists (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      icon TEXT DEFAULT '📧',
+      color TEXT DEFAULT '#7B2D8B',
+      criteria_type TEXT DEFAULT 'manual',
+      criteria_value TEXT DEFAULT '',
+      member_ids TEXT DEFAULT '[]',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS social_posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      source TEXT DEFAULT 'instagram',
+      image_url TEXT NOT NULL,
+      post_url TEXT NOT NULL,
+      caption TEXT DEFAULT '',
+      posted_at TEXT DEFAULT (datetime('now')),
+      display_order INTEGER DEFAULT 0,
+      active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 
   // הוסף עמודות חדשות אם לא קיימות (migration)
@@ -171,6 +195,7 @@ function initDB() {
     `ALTER TABLE posts ADD COLUMN author TEXT DEFAULT 'מערכת שלוה'`,
     `ALTER TABLE feed_posts ADD COLUMN pinned INTEGER DEFAULT 0`,
     `ALTER TABLE feed_posts ADD COLUMN hidden INTEGER DEFAULT 0`,
+    `ALTER TABLE users ADD COLUMN extension TEXT DEFAULT ''`,
   ];
   migrations.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
@@ -195,7 +220,7 @@ function initDB() {
    ['home_nav_row2', JSON.stringify([
      {ic:'🤖',lb:'שלומית AI',target:'chat',color:'#E84393'},
      {ic:'🎁',lb:'הטבות',target:'https://boomclub.org.il/',color:'#D4A017',caption:'boomclub'},
-     {ic:'📱',lb:'חילן',target:'https://www.hilannet.co.il/',color:'#4BAEE8',caption:'hilannet'},
+     {ic:'📱',lb:'חילן',target:'https://shalva.net.hilan.co.il/login',color:'#4BAEE8',caption:'חילן שלוה'},
      {ic:'👤',lb:'הפרופיל',target:'personal',color:'#5C1F6A'}
    ])],
    // הגדרות שלומית AI

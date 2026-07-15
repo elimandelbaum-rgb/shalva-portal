@@ -6,6 +6,7 @@ const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const XLSX = require('xlsx');
 const { initDB, getDB } = require('./db');
 
 const app = express();
@@ -144,17 +145,17 @@ app.post('/api/users', admin, (req,res) => {
   if (!f.username||!f.name) return res.status(400).json({error:'Missing required'});
   if (db.prepare('SELECT id FROM users WHERE username=?').get(f.username)) return res.status(409).json({error:'Username exists'});
   const av = f.name.split(' ').map(w=>w[0]).join('').substring(0,2);
-  const info = db.prepare(`INSERT INTO users(username,password,role,name,name_en,email,phone,dept,title,title_en,salary,vacation_days,sick_days,reserve_days,hire_date,birth_date,id_number,address,city,bank,bank_branch,bank_account,emergency_name,emergency_phone,employment_type,scope_pct,color,avatar,menu,notes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-    .run(f.username,f.password||'1234','emp',f.name,f.name_en||'',f.email||'',f.phone||'',f.dept||'',f.title||'',f.title_en||'',parseInt(f.salary)||0,parseInt(f.vacation_days)||16,parseInt(f.sick_days)||10,parseInt(f.reserve_days)||0,f.hire_date||'',f.birth_date||'',f.id_number||'',f.address||'',f.city||'',f.bank||'',f.bank_branch||'',f.bank_account||'',f.emergency_name||'',f.emergency_phone||'',f.employment_type||'full',parseInt(f.scope_pct)||100,f.color||'#7C5CFC',av,JSON.stringify(f.menu||['home','feed','chat','req','sal','train','forms']),f.notes||'');
+  const info = db.prepare(`INSERT INTO users(username,password,role,name,name_en,email,phone,extension,dept,title,title_en,salary,vacation_days,sick_days,reserve_days,hire_date,birth_date,id_number,address,city,bank,bank_branch,bank_account,emergency_name,emergency_phone,employment_type,scope_pct,color,avatar,menu,notes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+    .run(f.username,f.password||'1234',f.role||'emp',f.name,f.name_en||'',f.email||'',f.phone||'',f.extension||'',f.dept||'',f.title||'',f.title_en||'',parseInt(f.salary)||0,parseInt(f.vacation_days)||16,parseInt(f.sick_days)||10,parseInt(f.reserve_days)||0,f.hire_date||'',f.birth_date||'',f.id_number||'',f.address||'',f.city||'',f.bank||'',f.bank_branch||'',f.bank_account||'',f.emergency_name||'',f.emergency_phone||'',f.employment_type||'full',parseInt(f.scope_pct)||100,f.color||'#7C5CFC',av,JSON.stringify(f.menu||['home','feed','chat','req','train','forms','directory']),f.notes||'');
   res.json({id:info.lastInsertRowid,ok:true});
 });
 app.put('/api/users/:id', auth, (req,res) => {
   const id = parseInt(req.params.id);
   const me = req.session.user;
-  if (me.role!=='adm' && me.id!==id) return res.status(403).json({error:'Forbidden'});
+  if (me.role!=='adm' && me.role!=='super' && me.id!==id) return res.status(403).json({error:'Forbidden'});
   const f = req.body;
-  const FIELDS = ['name','name_en','email','phone','dept','title','title_en','salary','vacation_days','sick_days','reserve_days','hire_date','birth_date','id_number','address','city','bank','bank_branch','bank_account','emergency_name','emergency_phone','employment_type','scope_pct','color','notes'];
-  if (me.role==='adm') FIELDS.push('username','active');
+  const FIELDS = ['name','name_en','email','phone','extension','dept','title','title_en','salary','vacation_days','sick_days','reserve_days','hire_date','birth_date','id_number','address','city','bank','bank_branch','bank_account','emergency_name','emergency_phone','employment_type','scope_pct','color','notes'];
+  if (me.role==='adm' || me.role==='super') FIELDS.push('username','active','role');
   let sets=[], vals=[];
   for (const field of FIELDS) {
     if (f[field] !== undefined) { sets.push(`${field}=?`); vals.push(f[field]); }
@@ -905,6 +906,432 @@ app.delete('/api/media', auth, (req,res) => {
     res.status(500).json({error:e.message});
   }
 });
+
+// ══════════════════════════════════════════════════
+// 📞 ALPHONE - אלפון עובדים (public directory)
+// ══════════════════════════════════════════════════
+app.get('/api/directory', auth, (req,res) => {
+  try {
+    const rows = db.prepare(`SELECT id, name, name_en, email, phone, extension, dept, title, title_en, color, avatar, active
+                             FROM users WHERE active=1 ORDER BY name ASC`).all();
+    res.json(rows);
+  } catch(e) { res.json([]); }
+});
+
+// ══════════════════════════════════════════════════
+// 📊 EXCEL IMPORT / DEACTIVATE
+// ══════════════════════════════════════════════════
+// יבוא עובדים מקובץ אקסל — עמודות תואמות לטבלת users
+// עמודות מזוהות: username, name, email, phone, extension, dept, title, birth_date, hire_date, role, salary, vacation_days, id_number
+app.post('/api/users/import', admin, (req,res) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) return res.status(400).json({error: err.message || 'Upload failed'});
+    if (!req.file) return res.status(400).json({error:'לא נבחר קובץ'});
+    try {
+      const wb = XLSX.readFile(req.file.path);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+      // מפוי עמודות: תמיכה בעברית ובאנגלית
+      const colMap = {
+        'שם משתמש':'username','username':'username','user':'username',
+        'שם':'name','name':'name','שם מלא':'name','שם עובד':'name',
+        'שם באנגלית':'name_en','name_en':'name_en','english name':'name_en',
+        'מייל':'email','email':'email','דוא"ל':'email',
+        'טלפון':'phone','phone':'phone','נייד':'phone',
+        'שלוחה':'extension','extension':'extension','ext':'extension',
+        'מחלקה':'dept','dept':'dept','department':'dept',
+        'תפקיד':'title','title':'title','job':'title',
+        'תפקיד באנגלית':'title_en','title_en':'title_en',
+        'תאריך לידה':'birth_date','birth_date':'birth_date','birthday':'birth_date','תאריך יומולדת':'birth_date',
+        'תאריך תחילת עבודה':'hire_date','hire_date':'hire_date','תאריך תחילת העסקה':'hire_date','תחילת עבודה':'hire_date',
+        'תפקיד מערכתי':'role','role':'role',
+        'שכר':'salary','salary':'salary',
+        'ימי חופשה':'vacation_days','vacation_days':'vacation_days',
+        'ימי מחלה':'sick_days','sick_days':'sick_days',
+        'תעודת זהות':'id_number','id_number':'id_number','ת.ז':'id_number','ת"ז':'id_number','id':'id_number',
+        'כתובת':'address','address':'address',
+        'עיר':'city','city':'city',
+        'סיסמה':'password','password':'password'
+      };
+      const normalize = (obj) => {
+        const out = {};
+        for (const [k,v] of Object.entries(obj)) {
+          const key = colMap[String(k).trim().toLowerCase()] || colMap[String(k).trim()];
+          if (key) out[key] = String(v).trim();
+        }
+        return out;
+      };
+      let created = 0, updated = 0, skipped = 0;
+      const errors = [];
+      const insUser = db.prepare(`INSERT INTO users(username,password,role,name,name_en,email,phone,extension,dept,title,title_en,salary,vacation_days,sick_days,hire_date,birth_date,id_number,address,city,color,active,menu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`);
+      const updUser = db.prepare(`UPDATE users SET name=?,name_en=?,email=?,phone=?,extension=?,dept=?,title=?,title_en=?,salary=?,vacation_days=?,sick_days=?,hire_date=?,birth_date=?,id_number=?,address=?,city=?,active=1,updated_at=datetime('now') WHERE id=?`);
+      const findByUsername = db.prepare('SELECT id FROM users WHERE username=?');
+      const findByEmail = db.prepare('SELECT id FROM users WHERE email=?');
+      const findByIdNum = db.prepare("SELECT id FROM users WHERE id_number=? AND id_number!=''");
+
+      const colors = ['#7B2D8B','#4BAEE8','#27AE60','#F4813A','#E84040','#9B59B6','#E84393','#16A085','#F39C12','#2C3E50'];
+      let ci = 0;
+
+      for (const raw of rows) {
+        const r = normalize(raw);
+        if (!r.name) { skipped++; errors.push({row: raw, error: 'חסר שם'}); continue; }
+
+        // אתר משתמש קיים לפי username, email, או id_number
+        let existing = null;
+        if (r.username) existing = findByUsername.get(r.username);
+        if (!existing && r.email) existing = findByEmail.get(r.email);
+        if (!existing && r.id_number) existing = findByIdNum.get(r.id_number);
+
+        try {
+          if (existing) {
+            updUser.run(
+              r.name, r.name_en||'', r.email||'', r.phone||'', r.extension||'',
+              r.dept||'', r.title||'', r.title_en||'',
+              parseInt(r.salary)||0, parseInt(r.vacation_days)||16, parseInt(r.sick_days)||10,
+              r.hire_date||'', r.birth_date||'', r.id_number||'',
+              r.address||'', r.city||'', existing.id
+            );
+            updated++;
+          } else {
+            // נדרש username — אם אין, בנה מהמייל או השם
+            const uname = r.username || r.email?.split('@')[0] || r.name.replace(/\s+/g,'_');
+            const pwd = r.password || '1234';
+            const role = r.role || 'emp';
+            const color = colors[ci++ % colors.length];
+            const defMenu = JSON.stringify(['home','feed','chat','req','forms','train','personal']);
+            insUser.run(
+              uname, pwd, role, r.name, r.name_en||'', r.email||'', r.phone||'', r.extension||'',
+              r.dept||'', r.title||'', r.title_en||'',
+              parseInt(r.salary)||0, parseInt(r.vacation_days)||16, parseInt(r.sick_days)||10,
+              r.hire_date||'', r.birth_date||'', r.id_number||'',
+              r.address||'', r.city||'',
+              color, 1, defMenu
+            );
+            created++;
+          }
+        } catch(err) {
+          skipped++;
+          errors.push({row: r.name || 'unknown', error: err.message});
+        }
+      }
+      // מחק את הקובץ
+      try { fs.unlinkSync(req.file.path); } catch(e){}
+      res.json({ok:true, created, updated, skipped, total: rows.length, errors: errors.slice(0,20)});
+    } catch(e) {
+      res.status(500).json({error: 'שגיאה בעיבוד הקובץ: ' + e.message});
+    }
+  });
+});
+
+// השבתה גורפת של עובדים מקובץ אקסל (עובדים שסיימו)
+app.post('/api/users/deactivate-batch', admin, (req,res) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) return res.status(400).json({error: err.message});
+    if (!req.file) return res.status(400).json({error:'לא נבחר קובץ'});
+    try {
+      const wb = XLSX.readFile(req.file.path);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+      let deactivated = 0, notFound = 0;
+      const notFoundList = [];
+      const deact = db.prepare("UPDATE users SET active=0, updated_at=datetime('now') WHERE id=?");
+      const findByUsername = db.prepare("SELECT id, name FROM users WHERE username=? AND role != 'super'");
+      const findByEmail = db.prepare("SELECT id, name FROM users WHERE email=? AND role != 'super'");
+      const findByIdNum = db.prepare("SELECT id, name FROM users WHERE id_number=? AND id_number!='' AND role != 'super'");
+      const findByName = db.prepare("SELECT id, name FROM users WHERE name=? AND role != 'super'");
+
+      for (const raw of rows) {
+        const norm = {};
+        for (const [k,v] of Object.entries(raw)) {
+          const key = String(k).trim().toLowerCase();
+          if (key.includes('user') || key.includes('שם משתמש')) norm.username = String(v).trim();
+          else if (key.includes('mail') || key.includes('מייל') || key.includes('דוא')) norm.email = String(v).trim();
+          else if (key.includes('id') || key.includes('ת.ז') || key.includes('תעודת')) norm.id_number = String(v).trim();
+          else if (key === 'שם' || key === 'name' || key.includes('שם עובד') || key.includes('שם מלא')) norm.name = String(v).trim();
+        }
+        let user = null;
+        if (norm.username) user = findByUsername.get(norm.username);
+        if (!user && norm.email) user = findByEmail.get(norm.email);
+        if (!user && norm.id_number) user = findByIdNum.get(norm.id_number);
+        if (!user && norm.name) user = findByName.get(norm.name);
+
+        if (user) { deact.run(user.id); deactivated++; }
+        else { notFound++; notFoundList.push(norm.name || norm.username || norm.email || 'unknown'); }
+      }
+      try { fs.unlinkSync(req.file.path); } catch(e){}
+      res.json({ok:true, deactivated, notFound, notFoundList: notFoundList.slice(0,20), total: rows.length});
+    } catch(e) {
+      res.status(500).json({error: 'שגיאה בעיבוד הקובץ: ' + e.message});
+    }
+  });
+});
+
+// תבנית אקסל להורדה
+app.get('/api/users/import-template', admin, (req,res) => {
+  const template = [{
+    'שם משתמש':'yossi', 'סיסמה':'1234', 'שם':'יוסי כהן', 'שם באנגלית':'Yossi Cohen',
+    'מייל':'yossi@shalva.org', 'טלפון':'050-1234567', 'שלוחה':'201',
+    'מחלקה':'HR', 'תפקיד':'מנהל HR', 'תפקיד באנגלית':'HR Manager',
+    'תפקיד מערכתי':'mgr', 'שכר':15000, 'ימי חופשה':22, 'ימי מחלה':10,
+    'תאריך תחילת עבודה':'2020-01-15', 'תאריך לידה':'1985-06-20',
+    'תעודת זהות':'123456789', 'כתובת':'רחוב הרצל 10', 'עיר':'ירושלים'
+  }];
+  const ws = XLSX.utils.json_to_sheet(template);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'עובדים');
+  const buf = XLSX.write(wb, {type:'buffer', bookType:'xlsx'});
+  res.setHeader('Content-Disposition','attachment; filename="employees_template.xlsx"');
+  res.setHeader('Content-Type','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.send(buf);
+});
+
+// ייצוא רשימת עובדים לאקסל
+app.get('/api/users/export', admin, (req,res) => {
+  const users = db.prepare(`SELECT username, name, name_en, email, phone, extension, dept, title, birth_date, hire_date, role, active FROM users ORDER BY name`).all();
+  const rows = users.map(u => ({
+    'שם משתמש':u.username, 'שם':u.name, 'שם באנגלית':u.name_en, 'מייל':u.email, 'טלפון':u.phone,
+    'שלוחה':u.extension, 'מחלקה':u.dept, 'תפקיד':u.title,
+    'תאריך לידה':u.birth_date, 'תאריך תחילת עבודה':u.hire_date,
+    'תפקיד מערכתי':u.role, 'פעיל':u.active?'כן':'לא'
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'עובדים');
+  const buf = XLSX.write(wb, {type:'buffer', bookType:'xlsx'});
+  res.setHeader('Content-Disposition','attachment; filename="shalva_employees.xlsx"');
+  res.setHeader('Content-Type','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.send(buf);
+});
+
+// ══════════════════════════════════════════════════
+// 📧 MAILING LISTS - רשימות תפוצה
+// ══════════════════════════════════════════════════
+app.get('/api/mailing-lists', auth, (req,res) => {
+  try {
+    const lists = db.prepare('SELECT * FROM mailing_lists ORDER BY name ASC').all();
+    // הרחב כל רשימה עם המספר של החברים בפועל
+    for (const list of lists) {
+      list.member_ids = JSON.parse(list.member_ids || '[]');
+      list.member_count = resolveMailingListMembers(list).length;
+    }
+    res.json(lists);
+  } catch(e) { res.json([]); }
+});
+
+app.get('/api/mailing-lists/:id/members', admin, (req,res) => {
+  try {
+    const list = db.prepare('SELECT * FROM mailing_lists WHERE id=?').get(req.params.id);
+    if (!list) return res.status(404).json({error:'not found'});
+    list.member_ids = JSON.parse(list.member_ids || '[]');
+    const memberIds = resolveMailingListMembers(list);
+    if (!memberIds.length) return res.json([]);
+    const placeholders = memberIds.map(()=>'?').join(',');
+    const users = db.prepare(`SELECT id,name,email,dept,title,active FROM users WHERE id IN (${placeholders}) AND active=1`).all(...memberIds);
+    res.json(users);
+  } catch(e) { res.status(500).json({error:e.message}); }
+});
+
+app.post('/api/mailing-lists', admin, (req,res) => {
+  const {name, description, icon, color, criteria_type, criteria_value, member_ids} = req.body;
+  if (!name) return res.status(400).json({error:'name required'});
+  const r = db.prepare('INSERT INTO mailing_lists(name,description,icon,color,criteria_type,criteria_value,member_ids) VALUES(?,?,?,?,?,?,?)').run(
+    name, description||'', icon||'📧', color||'#7B2D8B',
+    criteria_type||'manual', criteria_value||'',
+    JSON.stringify(member_ids||[])
+  );
+  res.json({id:r.lastInsertRowid});
+});
+
+app.put('/api/mailing-lists/:id', admin, (req,res) => {
+  const {name, description, icon, color, criteria_type, criteria_value, member_ids} = req.body;
+  db.prepare(`UPDATE mailing_lists SET name=?, description=?, icon=?, color=?, criteria_type=?, criteria_value=?, member_ids=?, updated_at=datetime('now') WHERE id=?`).run(
+    name, description||'', icon||'📧', color||'#7B2D8B',
+    criteria_type||'manual', criteria_value||'',
+    JSON.stringify(member_ids||[]),
+    req.params.id
+  );
+  res.json({ok:true});
+});
+
+app.delete('/api/mailing-lists/:id', admin, (req,res) => {
+  db.prepare('DELETE FROM mailing_lists WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+
+// עזר: פענוח חברי רשימה לפי criteria (manual / dept / role / all)
+function resolveMailingListMembers(list) {
+  try {
+    if (list.criteria_type === 'all') {
+      return db.prepare("SELECT id FROM users WHERE active=1").all().map(r=>r.id);
+    }
+    if (list.criteria_type === 'dept') {
+      const depts = (list.criteria_value||'').split(',').map(s=>s.trim()).filter(Boolean);
+      if (!depts.length) return [];
+      const placeholders = depts.map(()=>'?').join(',');
+      return db.prepare(`SELECT id FROM users WHERE active=1 AND dept IN (${placeholders})`).all(...depts).map(r=>r.id);
+    }
+    if (list.criteria_type === 'role') {
+      const roles = (list.criteria_value||'').split(',').map(s=>s.trim()).filter(Boolean);
+      if (!roles.length) return [];
+      const placeholders = roles.map(()=>'?').join(',');
+      return db.prepare(`SELECT id FROM users WHERE active=1 AND role IN (${placeholders})`).all(...roles).map(r=>r.id);
+    }
+    // manual — return the stored member_ids
+    return Array.isArray(list.member_ids) ? list.member_ids : [];
+  } catch(e) { return []; }
+}
+
+// ══════════════════════════════════════════════════
+// 📸 SOCIAL POSTS (אינסטגרם / רשתות)
+// ══════════════════════════════════════════════════
+app.get('/api/social-posts', (req,res) => {
+  try {
+    const rows = db.prepare('SELECT * FROM social_posts WHERE active=1 ORDER BY display_order ASC, posted_at DESC LIMIT 12').all();
+    res.json(rows);
+  } catch(e) { res.json([]); }
+});
+
+app.get('/api/social-posts/all', admin, (req,res) => {
+  try {
+    res.json(db.prepare('SELECT * FROM social_posts ORDER BY display_order ASC, posted_at DESC').all());
+  } catch(e) { res.json([]); }
+});
+
+app.post('/api/social-posts', admin, (req,res) => {
+  const {source, image_url, post_url, caption, posted_at, display_order, active} = req.body;
+  if (!image_url || !post_url) return res.status(400).json({error:'image_url and post_url required'});
+  const r = db.prepare('INSERT INTO social_posts(source,image_url,post_url,caption,posted_at,display_order,active) VALUES(?,?,?,?,?,?,?)').run(
+    source||'instagram', image_url, post_url, caption||'',
+    posted_at || new Date().toISOString(),
+    parseInt(display_order)||0,
+    active===false?0:1
+  );
+  res.json({id:r.lastInsertRowid});
+});
+
+app.put('/api/social-posts/:id', admin, (req,res) => {
+  const {source, image_url, post_url, caption, posted_at, display_order, active} = req.body;
+  db.prepare('UPDATE social_posts SET source=?,image_url=?,post_url=?,caption=?,posted_at=?,display_order=?,active=? WHERE id=?').run(
+    source||'instagram', image_url, post_url, caption||'',
+    posted_at || new Date().toISOString(),
+    parseInt(display_order)||0,
+    active===false?0:1,
+    req.params.id
+  );
+  res.json({ok:true});
+});
+
+app.delete('/api/social-posts/:id', admin, (req,res) => {
+  db.prepare('DELETE FROM social_posts WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+
+// ══════════════════════════════════════════════════
+// 🎂 AUTO-BIRTHDAYS & ANNIVERSARIES — נבנה דינמית ב-roller
+// ══════════════════════════════════════════════════
+// endpoint משופר לרולר — הודעות + ימי הולדת אוטומטיים + ותק
+app.get('/api/roller-items', (req,res) => {
+  try {
+    const items = [];
+    // 1. הודעות מהניהול
+    const anns = db.prepare('SELECT * FROM announcements ORDER BY id DESC LIMIT 20').all();
+    anns.forEach(a => items.push({
+      type:'msg', title:a.title, body:a.body, color:a.color, source:'manual'
+    }));
+
+    // 2. ימי הולדת ב-14 הימים הקרובים
+    const today = new Date();
+    const users = db.prepare("SELECT id, name, dept, color, birth_date, hire_date FROM users WHERE active=1 AND (birth_date != '' OR hire_date != '')").all();
+
+    users.forEach(u => {
+      // יום הולדת
+      if (u.birth_date) {
+        const bd = new Date(u.birth_date);
+        if (!isNaN(bd)) {
+          const thisYear = new Date(today.getFullYear(), bd.getMonth(), bd.getDate());
+          const daysDiff = Math.floor((thisYear - today) / (1000*60*60*24));
+          if (daysDiff >= 0 && daysDiff <= 14) {
+            const dateStr = daysDiff === 0 ? 'היום 🎂' : daysDiff === 1 ? 'מחר 🎂' : bd.getDate()+'/'+(bd.getMonth()+1)+' 🎂';
+            items.push({type:'bday', name:u.name, date:dateStr, dept:u.dept||'', color:u.color||'#E84393', daysUntil:daysDiff});
+          }
+        }
+      }
+      // ותק — יום השנה של תחילת עבודה
+      if (u.hire_date) {
+        const hd = new Date(u.hire_date);
+        if (!isNaN(hd)) {
+          const thisYear = new Date(today.getFullYear(), hd.getMonth(), hd.getDate());
+          const daysDiff = Math.floor((thisYear - today) / (1000*60*60*24));
+          if (daysDiff >= 0 && daysDiff <= 14) {
+            const years = today.getFullYear() - hd.getFullYear();
+            if (years > 0) {
+              const emoji = years >= 10 ? '🏆' : years >= 5 ? '⭐' : '🎉';
+              const dateStr = daysDiff === 0 ? 'היום '+emoji : daysDiff === 1 ? 'מחר '+emoji : hd.getDate()+'/'+(hd.getMonth()+1)+' '+emoji;
+              items.push({
+                type:'anniversary', name:u.name,
+                title: years+' שנים בשלוה '+emoji,
+                body: u.name + (u.dept?' · '+u.dept:''),
+                date: dateStr, dept:u.dept||'',
+                color: years>=10?'#D4A017':years>=5?'#9B59B6':'#F4813A',
+                years, daysUntil:daysDiff
+              });
+            }
+          }
+        }
+      }
+    });
+
+    // מיון: ימי הולדת/ותק להיום קודם, אז ההודעות, אז השאר
+    items.sort((a,b) => {
+      const aDays = a.daysUntil ?? 999;
+      const bDays = b.daysUntil ?? 999;
+      return aDays - bDays;
+    });
+
+    res.json(items);
+  } catch(e) {
+    console.error('roller-items error:', e);
+    res.json([]);
+  }
+});
+
+// ══════════════════════════════════════════════════
+// 📡 BROADCASTS — עדכון: תמיכה ברשימת תפוצה
+// ══════════════════════════════════════════════════
+// Extended broadcast: takes mailing_list_id and sends only to those members
+app.post('/api/broadcasts/send', admin, async (req,res) => {
+  const {subject, body, mailing_list_id, channels} = req.body;
+  if (!subject || !body) return res.status(400).json({error:'subject and body required'});
+  try {
+    let recipients = [];
+    if (mailing_list_id) {
+      const list = db.prepare('SELECT * FROM mailing_lists WHERE id=?').get(mailing_list_id);
+      if (list) {
+        list.member_ids = JSON.parse(list.member_ids || '[]');
+        const memberIds = resolveMailingListMembers(list);
+        if (memberIds.length) {
+          const placeholders = memberIds.map(()=>'?').join(',');
+          recipients = db.prepare(`SELECT id,name,email FROM users WHERE id IN (${placeholders}) AND active=1 AND email != ''`).all(...memberIds);
+        }
+      }
+    } else {
+      recipients = db.prepare("SELECT id,name,email FROM users WHERE active=1 AND email != ''").all();
+    }
+    const me = req.session.user;
+    const listInfo = mailing_list_id ? `list:${mailing_list_id}` : 'all';
+    db.prepare('INSERT INTO broadcasts(sender_id,recipients,subject,body,channels) VALUES(?,?,?,?,?)').run(
+      me.id, listInfo, subject, body, JSON.stringify(channels||['portal'])
+    );
+    // הוספת התראה לכל נמען
+    const insN = db.prepare('INSERT INTO notifications(user_id,text,type) VALUES(?,?,?)');
+    recipients.forEach(u => insN.run(String(u.id), `📢 ${subject}`, 'broadcast'));
+    res.json({ok:true, sent_to: recipients.length, recipients_preview: recipients.slice(0,5).map(r=>r.name)});
+  } catch(e) {
+    console.error('broadcast error:', e);
+    res.status(500).json({error:e.message});
+  }
+});
+
 
 // ── SPA fallback — חייב להיות אחרון, אחרי כל ה-API routes ──
 app.get('*', (req,res) => res.sendFile(path.join(__dirname,'public','index.html')));

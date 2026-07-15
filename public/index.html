@@ -690,6 +690,7 @@ function buildNav() {
     {ic:'📰', lb:'חדשות', id:'news'},
     {ic:'📋', lb:'פניה למחלקות', id:'forms'},
     {ic:'🎓', lb:'הדרכות', id:'train'},
+    {ic:'📞', lb:'אלפון עובדים', id:'directory'},
     {gr:'אישי'},
     {ic:'👤', lb:'האזור האישי', id:'personal'},
     {ic:'📨', lb:'הפניות שלי', id:'req'},
@@ -702,10 +703,12 @@ function buildNav() {
     {ic:'📊', lb:'דשבורד ניהול', id:'adash'},
     {ic:'🏠', lb:'עורך דף הבית', id:'ahome'},
     {ic:'👥', lb:'עובדים', id:'aemp'},
+    {ic:'📧', lb:'רשימות תפוצה', id:'amail'},
     {ic:'📨', lb:'כל הפניות', id:'areq'},
     {ic:'📣', lb:'כתבות שלוה', id:'aposts'},
     {ic:'🎂', lb:'רולר הודעות', id:'aroller'},
     {ic:'🎬', lb:'פרסומות וסרטונים', id:'aads'},
+    {ic:'📸', lb:'רשתות חברתיות', id:'asocial'},
     {ic:'📢', lb:'עדכוני צוות', id:'afeed'},
     {ic:'🗂', lb:'ספריית מדיה', id:'amedia'},
     {ic:'🤖', lb:'שלומית AI', id:'aai'},
@@ -744,11 +747,13 @@ const TITLES = {
   home:'דף הבית', feed:'עדכוני צוות', chat:'שלומית AI',
   req:'פניות לHR', forms:'פניה למחלקות',
   hr:'הערכה ותנאים', train:'הדרכות', personal:'האזור האישי',
+  directory:'📞 אלפון עובדים',
   approvals:'אישורים', myteam:'עובדי המחלקה',
   adash:'דשבורד', aemp:'ניהול עובדים', areq:'כל הפניות', aposts:'כתבות שלוה', aroller:'רולר הודעות',
   aads:'פרסומות וסרטונים',
   afeed:'ניהול עדכוני צוות', amedia:'ספריית מדיה',
   ahome:'עורך דף הבית', aai:'ניהול שלומית AI', aforms:'בונה טפסים',
+  amail:'רשימות תפוצה', asocial:'רשתות חברתיות',
   atrain:'הדרכות', adepts:'ניהול מחלקות',
   abcast:'שידורים', ausers:'משתמשים', aset:'הגדרות'
 };
@@ -757,17 +762,19 @@ const PAGES = {
   home:pgHome, feed:pgFeed, chat:pgChat,
   req:pgReq, forms:pgForms,
   hr:pgHR, train:pgTrain, personal:pgPersonal,
+  directory:pgDirectory,
   approvals:pgApprovals, myteam:pgMyTeam,
   adash:pgAdash, aemp:pgAemp, areq:pgAreq, aposts:pgAposts, aroller:pgAroller, aads:pgAads,
   afeed:pgAfeed, amedia:pgAmedia,
   ahome:pgAhome, aai:pgAai, aforms:pgAforms,
+  amail:pgAmail, asocial:pgAsocial,
   atrain:pgAtrain, adepts:pgAdepts,
   abcast:pgAbcast, ausers:pgAusers, aset:pgAset
 };
 
 // דפים שדורשים כניסה
-const PROTECTED = ['personal','req','hr','approvals','myteam','adash','aemp','areq','aposts','aroller','aads','afeed','amedia','ahome','aai','aforms','atrain','adepts','abcast','ausers','aset'];
-const ADMIN_ONLY = ['adash','aemp','areq','aposts','aroller','aads','afeed','amedia','ahome','aai','aforms','atrain','adepts','abcast','ausers','aset'];
+const PROTECTED = ['personal','req','hr','approvals','myteam','directory','adash','aemp','areq','aposts','aroller','aads','afeed','amedia','ahome','aai','aforms','amail','asocial','atrain','adepts','abcast','ausers','aset'];
+const ADMIN_ONLY = ['adash','aemp','areq','aposts','aroller','aads','afeed','amedia','ahome','aai','aforms','amail','asocial','atrain','adepts','abcast','ausers','aset'];
 const MGR_ONLY = ['approvals','myteam'];
 
 function navigate(id, el) {
@@ -926,7 +933,7 @@ async function pgHome(cnt) {
   const navRow2 = Array.isArray(cfg.home_nav_row2) ? cfg.home_nav_row2 : [
     {ic:'🤖',lb:'שלומית AI',target:'chat',color:'#E84393'},
     {ic:'🎁',lb:'הטבות',target:'https://boomclub.org.il/',color:'#D4A017',caption:'boomclub'},
-    {ic:'📱',lb:'חילן',target:'https://www.hilannet.co.il/',color:'#4BAEE8',caption:'hilannet'},
+    {ic:'📱',lb:'חילן',target:'https://shalva.net.hilan.co.il/login',color:'#4BAEE8',caption:'חילן שלוה'},
     {ic:'👤',lb:'הפרופיל',target:'personal',color:'#5C1F6A'}
   ];
   const isUrl = (t) => t && (t.startsWith('http://') || t.startsWith('https://'));
@@ -1068,6 +1075,18 @@ async function pgHome(cnt) {
   <div class="ldg" style="grid-column:span 2">⟳ טוען...</div>
 </div>
 
+<!-- פוסטים מרשתות חברתיות -->
+<div id="socialSection" style="display:none;margin-bottom:14px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:4px;height:16px;background:linear-gradient(180deg,#F58529,#DD2A7B,#8134AF);border-radius:999px"></div>
+      <span style="font-size:13px;font-weight:900;color:var(--tx)">📸 שלוה ברשתות</span>
+    </div>
+    <a href="https://www.instagram.com/shalvaisrael/" target="_blank" style="font-size:9.5px;font-weight:700;color:#DD2A7B;cursor:pointer;text-decoration:none">עקבו אחרינו ←</a>
+  </div>
+  <div id="socialPosts" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px"></div>
+</div>
+
 <!-- כפתור תחתון -->
 <div style="background:var(--grad);border-radius:18px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 24px rgba(123,45,139,.28);margin-bottom:4px;flex-wrap:wrap;gap:10px">
   <div>
@@ -1086,6 +1105,32 @@ async function pgHome(cnt) {
   loadAdsCarousel();
   switchHomeNews('a7', document.getElementById('hn-a7'));
   loadShalvaPosts();
+  loadSocialFeed();
+}
+
+// ── טעינת פוסטים מרשתות חברתיות ──
+async function loadSocialFeed() {
+  const section = document.getElementById('socialSection');
+  const el = document.getElementById('socialPosts');
+  if (!section || !el) return;
+  let posts = [];
+  try {
+    const r = await fetch('/api/social-posts');
+    if (r.ok) posts = await r.json();
+  } catch(e) {}
+  if (!posts.length) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  const sourceIcons = {instagram:'📸', facebook:'👥', youtube:'▶️', twitter:'🐦', linkedin:'💼', tiktok:'🎵'};
+  const sourceColors = {instagram:'linear-gradient(45deg,#F58529,#DD2A7B,#8134AF)', facebook:'#1877F2', youtube:'#FF0000', twitter:'#000', linkedin:'#0A66C2', tiktok:'#000'};
+  el.innerHTML = posts.map(p => `
+  <a href="${p.post_url}" target="_blank" style="display:block;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:1;background:#F7F4FA;text-decoration:none;box-shadow:var(--sh);transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+    <img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'"/>
+    <div style="position:absolute;top:6px;left:6px;background:${sourceColors[p.source]||'#000'};color:#fff;font-size:11px;padding:3px 6px;border-radius:6px;font-weight:800">${sourceIcons[p.source]||'📸'}</div>
+    ${p.caption ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.75));padding:16px 8px 6px;color:#fff;font-size:9px;font-weight:600;line-height:1.3;overflow:hidden;max-height:50%">${p.caption.substring(0,80)}${p.caption.length>80?'...':''}</div>` : ''}
+  </a>`).join('');
 }
 
 // ── מזג אוויר ──
@@ -1193,25 +1238,27 @@ function adClick(id, url) {
 async function loadRoller() {
   const el = document.getElementById('roller');
   if (!el) return;
-  // טען מה-API (ימי הולדת אוטומטיים + הודעות מהניהול)
+  // טען מה-API — כולל ימי הולדת + ותק אוטומטיים
   let items = [];
-  try { items = await API.get('/announcements'); } catch(e) {}
+  try {
+    // Try new endpoint first (includes birthdays + anniversaries)
+    const r = await fetch('/api/roller-items');
+    if (r.ok) items = await r.json();
+  } catch(e) {}
+  // Fallback to plain announcements if new endpoint isn't ready
+  if (!items.length) {
+    try { items = await API.get('/announcements'); } catch(e) {}
+  }
   // הודעות ברירת מחדל להדגמה אם אין מספיק תוכן
   const demo = [
-    {type:'bday',name:'רחל כהן',date:'היום 🎂',dept:'HR',color:'#E84393'},
-    {type:'bday',name:'משה לוי',date:'מחר 🎂',dept:'תפעול',color:'#7B2D8B'},
-    {type:'msg',title:'ארוחת צוות קיץ 🎉',body:'20.06 בגן החברה 18:00',color:'#27AE60'},
-    {type:'bday',name:'שרה אברהם',date:'23/06 🎂',dept:'שיווק',color:'#F4813A'},
-    {type:'msg',title:'עדכון נהלי חופשה',body:'אנא קראו את העדכון החדש',color:'#1565C0'},
-    {type:'bday',name:'דוד שמיר',date:'25/06 🎂',dept:'ביטחון',color:'#E84040'},
-    {type:'msg',title:'ישיבת צוות שלישי',body:'10:00 בחדר ישיבות A',color:'#9B59B6'},
-    {type:'msg',title:'יום כיף שנתי 🌳',body:'15.07 — פרטים בקרוב',color:'#16A085'},
-    {type:'bday',name:'נועה ברק',date:'28/06 🎂',dept:'חינוך',color:'#E67E22'},
-    {type:'msg',title:'ברוכים הבאים 👋',body:'3 עובדים חדשים הצטרפו',color:'#2980B9'},
+    {type:'msg',title:'ברוכים הבאים לפורטל 🌟',body:'המערכת החדשה של שלוה',color:'#7B2D8B'},
+    {type:'msg',title:'ארוחת צוות קרובה 🎉',body:'פרטים בקרוב',color:'#27AE60'},
+    {type:'msg',title:'עדכון נהלי חופשה',body:'אנא קראו את העדכון',color:'#1565C0'},
+    {type:'msg',title:'יום כיף שנתי 🌳',body:'פרטים במעודכן',color:'#16A085'},
   ];
   // אם אין נתונים — הצג הדגמה. אם יש מעט — השלם מהדגמה כדי שהרולר יגלוש
   if (!items.length) items = demo;
-  else if (items.length < 5) items = [...items, ...demo.slice(0, 6)];
+  else if (items.length < 4) items = [...items, ...demo.slice(0, 6-items.length)];
 
   const card = (item) => {
     const c = item.color || '#7B2D8B';
@@ -1221,6 +1268,15 @@ async function loadRoller() {
         + '<div class="rc-av" style="background:linear-gradient(135deg,'+c+',color-mix(in srgb,'+c+' 60%,#000))">'+(item.name||'').substring(0,2)+'</div>'
         + '<div class="rc-name">'+item.name+'</div>'
         + '<div class="rc-date" style="color:'+c+'">'+item.date+'</div>'
+        + '<div class="rc-dept">'+(item.dept||'')+'</div></div>';
+    }
+    if (item.type==='anniversary') {
+      const emoji = item.years >= 10 ? '🏆' : item.years >= 5 ? '⭐' : '🎉';
+      return '<div class="rc rc-bday" style="background:linear-gradient(140deg,'+c+'22,'+c+'0a);border:1.5px solid '+c+'40" onclick="toast(\''+item.years+' שנים ל'+(item.name||'')+' בשלוה! '+emoji+'\')">'
+        + '<div class="rc-shine"></div><div class="rc-cake">'+emoji+'</div>'
+        + '<div class="rc-av" style="background:linear-gradient(135deg,'+c+',color-mix(in srgb,'+c+' 60%,#000))">'+(item.name||'').substring(0,2)+'</div>'
+        + '<div class="rc-name">'+item.name+'</div>'
+        + '<div class="rc-date" style="color:'+c+';font-weight:900">'+item.years+' שנים '+emoji+'</div>'
         + '<div class="rc-dept">'+(item.dept||'')+'</div></div>';
     }
     return '<div class="rc rc-msg" style="background:linear-gradient(140deg,'+c+'18,'+c+'08);border:1.5px solid '+c+'2a">'
@@ -2300,20 +2356,33 @@ async function pgAdash(cnt) {
 
 async function pgAemp(cnt) {
   const [users,depts]=await Promise.all([API.get('/users'),API.get('/departments').catch(()=>[])]);
+  const activeCount = users.filter(u=>u.active).length;
   cnt.innerHTML=`
-<div class="sh mb">
-  <span class="st">👥 ניהול עובדים (${users.length})</span>
-  <button class="btn bnt bnsm" onclick="openAddUser(${JSON.stringify(depts).replace(/"/g,'&quot;')})">+ הוסף עובד</button>
+<div class="card mb">
+  <div class="sh">
+    <span class="st">👥 ניהול עובדים</span>
+    <span class="b bgr">${activeCount} פעילים · ${users.length} סה"כ</span>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+    <button class="btn bnt bnsm" onclick="openAddUser(${JSON.stringify(depts).replace(/"/g,'&quot;')})">+ הוסף עובד יחיד</button>
+    <button class="btn bng bnsm" onclick="openXlsxImport()">📊 ייבוא מ-Excel</button>
+    <button class="btn bnr bnsm" onclick="openXlsxDeactivate()">🚪 השבתה גורפת (סיום עבודה)</button>
+    <div style="flex:1"></div>
+    <a class="btn bno bnsm" href="/api/users/export" download="shalva_employees.xlsx" style="text-decoration:none">⬇️ ייצוא לאקסל</a>
+    <a class="btn bno bnsm" href="/api/users/import-template" download="template.xlsx" style="text-decoration:none">📄 הורד תבנית</a>
+  </div>
 </div>
 <div class="card">
+  <div style="overflow-x:auto">
   <table class="tbl">
-    <thead><tr><th>שם</th><th>תפקיד</th><th>מחלקה</th><th>רמה</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+    <thead><tr><th>שם</th><th>תפקיד</th><th>מחלקה</th><th>שלוחה</th><th>רמה</th><th>סטטוס</th><th>פעולות</th></tr></thead>
     <tbody>
       ${users.map(u=>`
-      <tr>
+      <tr style="${u.active?'':'opacity:.5'}">
         <td><div style="display:flex;align-items:center;gap:7px"><div style="width:24px;height:24px;border-radius:50%;background:${u.color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;color:#fff">${(u.name||'').substring(0,2)}</div>${u.name}</div></td>
         <td class="mn">${u.title||'—'}</td>
         <td class="mn">${u.dept||'—'}</td>
+        <td class="mn" style="font-family:monospace">${u.extension||'—'}</td>
         <td><span class="b ${{super:'bv',adm:'bv',hr:'bs',mgr:'bg2',emp:'bgr'}[u.role]||'bgr'}">${{super:'👑 מנהל ראשי',adm:'🛡 אדמין',hr:'👥 HR',mgr:'👔 מנהל מחלקה',emp:'👤 עובד'}[u.role]||u.role}</span></td>
         <td><span class="b ${u.active?'bt':'br'}">${u.active?'פעיל':'לא פעיל'}</span></td>
         <td style="display:flex;gap:4px">
@@ -2354,6 +2423,7 @@ function userForm(u, depts) {
     </select>
   </div><div class="fg"><label class="fl">תפקיד</label><input class="fi" id="u_title" value="${u?.title||''}"/></div></div>
   <div class="fr2"><div class="fg"><label class="fl">מייל</label><input class="fi" id="u_email" type="email" value="${u?.email||''}"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="u_phone" value="${u?.phone||''}"/></div></div>
+  <div class="fr2"><div class="fg"><label class="fl">📞 שלוחה במשרד</label><input class="fi" id="u_ext" value="${u?.extension||''}" placeholder="למשל: 201"/></div><div class="fg"><label class="fl">תאריך לידה</label><input class="fi" type="date" id="u_bd" value="${u?.birth_date||''}"/></div></div>
   <div class="fr3"><div class="fg"><label class="fl">ימי חופשה</label><input class="fi" type="number" id="u_vac" value="${u?.vacation_days||16}"/></div><div class="fg"><label class="fl">ימי מחלה</label><input class="fi" type="number" id="u_sick" value="${u?.sick_days||10}"/></div><div class="fg"><label class="fl">ימי מילואים</label><input class="fi" type="number" id="u_res" value="${u?.reserve_days||0}"/></div></div>
   <div class="fg"><label class="fl">תאריך תחילת עבודה</label><input class="fi" type="date" id="u_hire" value="${u?.hire_date||''}"/></div>
   <div class="fg"><label class="fl">צבע</label><div class="cp-row" id="u_cprow">${['#7B2D8B','#F4813A','#E84393','#4BAEE8','#27AE60','#E84040','#2C3E50','#9B59B6','#E74C3C'].map(c=>`<div class="cp ${(u?.color||'#7B2D8B')===c?'on':''}" style="background:${c}" data-c="${c}" onclick="document.querySelectorAll('#u_cprow .cp').forEach(x=>x.classList.remove('on'));this.classList.add('on');document.getElementById('u_color').value=this.dataset.c"></div>`).join('')}</div><input type="hidden" id="u_color" value="${u?.color||'#7B2D8B'}"/></div>
@@ -2384,6 +2454,8 @@ async function saveUser(id) {
     title:document.getElementById('u_title')?.value,
     email:document.getElementById('u_email')?.value,
     phone:document.getElementById('u_phone')?.value,
+    extension:document.getElementById('u_ext')?.value,
+    birth_date:document.getElementById('u_bd')?.value,
     vacation_days:parseInt(document.getElementById('u_vac')?.value)||16,
     sick_days:parseInt(document.getElementById('u_sick')?.value)||10,
     reserve_days:parseInt(document.getElementById('u_res')?.value)||0,
@@ -2398,6 +2470,130 @@ async function saveUser(id) {
   toast(id?'עובד עודכן!':'עובד נוסף!');
   closeM('userModal');
   navigate('aemp');
+}
+
+// ── Excel Import / Deactivate modals ──
+function openXlsxImport() {
+  const modal = document.createElement('div');
+  modal.id = 'xlsxImportModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.onclick=(e)=>{if(e.target===modal)modal.remove();};
+  modal.innerHTML = `
+<div class="card" style="max-width:600px;width:100%" onclick="event.stopPropagation()">
+  <div class="sh"><span class="st">📊 ייבוא עובדים מקובץ Excel</span>
+    <button class="btn bno bnsm" onclick="this.closest('#xlsxImportModal').remove()">✕</button>
+  </div>
+  <div class="info-box">
+    <b>איך זה עובד?</b><br>
+    1. הורד את התבנית עם <a href="/api/users/import-template" download>📄 קישור זה</a> ומלא בעובדים שלך<br>
+    2. הקובץ צריך עמודות עם כותרות: <b>שם</b>, <b>שם משתמש</b>, <b>מייל</b>, <b>טלפון</b>, <b>שלוחה</b>, <b>מחלקה</b>, <b>תפקיד</b>, <b>תאריך לידה</b>, <b>תאריך תחילת עבודה</b>, <b>תעודת זהות</b>, <b>שכר</b>, <b>ימי חופשה</b>...<br>
+    3. עובדים חדשים ייווצרו, עובדים קיימים (זיהוי לפי שם משתמש/מייל/ת"ז) יתעדכנו<br>
+    4. עובדים ללא סיסמה יקבלו סיסמה ראשונית: <code>1234</code>
+  </div>
+  <div class="warn-box">⚠️ פעולה חד-כיוונית — לפני העלאה, בצע ייצוא לגיבוי!</div>
+  <div class="fg">
+    <label class="fl">קובץ Excel (.xlsx / .xls)</label>
+    <input class="fi" type="file" id="xlsxFile" accept=".xlsx,.xls,.csv"/>
+  </div>
+  <div id="xlsxResult"></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn bnt" onclick="runXlsxImport(this)">📤 העלה ועבד</button>
+    <button class="btn bno" onclick="this.closest('#xlsxImportModal').remove()">ביטול</button>
+  </div>
+</div>`;
+  document.body.appendChild(modal);
+}
+
+async function runXlsxImport(btn) {
+  const file = document.getElementById('xlsxFile')?.files[0];
+  if (!file) return toast('בחר קובץ קודם', false);
+  const resDiv = document.getElementById('xlsxResult');
+  btn.disabled = true; btn.innerHTML = '⟳ מעבד...';
+  try {
+    const fd = new FormData(); fd.append('file', file);
+    const r = await fetch('/api/users/import', {method:'POST', body:fd, credentials:'include'});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'שגיאה');
+    resDiv.innerHTML = `
+<div class="card" style="margin-top:12px;background:#F0F9F0;border:1px solid #27AE60">
+  <div style="font-size:14px;font-weight:800;color:#27AE60;margin-bottom:8px">✅ הייבוא הסתיים בהצלחה!</div>
+  <div style="font-size:11px;color:var(--tx2);line-height:1.7">
+    📊 סה"כ שורות בקובץ: <b>${d.total}</b><br>
+    ➕ עובדים חדשים שנוצרו: <b style="color:#27AE60">${d.created}</b><br>
+    ✏️ עובדים קיימים שעודכנו: <b style="color:#1565C0">${d.updated}</b><br>
+    ${d.skipped > 0 ? `⚠️ דילוגים: <b style="color:#F4813A">${d.skipped}</b>` : ''}
+  </div>
+  ${d.errors?.length ? `<details style="margin-top:8px"><summary style="font-size:10px;cursor:pointer">הצג ${d.errors.length} שגיאות</summary><pre style="font-size:9px;background:#fff;padding:8px;border-radius:6px;overflow:auto;max-height:150px">${JSON.stringify(d.errors,null,2)}</pre></details>` : ''}
+</div>`;
+    setTimeout(()=>{document.getElementById('xlsxImportModal')?.remove(); navigate('aemp');}, 3500);
+  } catch(e) {
+    resDiv.innerHTML = `<div class="warn-box" style="margin-top:12px">❌ ${e.message}</div>`;
+  } finally {
+    btn.disabled = false; btn.innerHTML = '📤 העלה ועבד';
+  }
+}
+
+function openXlsxDeactivate() {
+  const modal = document.createElement('div');
+  modal.id = 'xlsxDeactModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.onclick=(e)=>{if(e.target===modal)modal.remove();};
+  modal.innerHTML = `
+<div class="card" style="max-width:600px;width:100%" onclick="event.stopPropagation()">
+  <div class="sh"><span class="st">🚪 השבתה גורפת (עובדים שסיימו)</span>
+    <button class="btn bno bnsm" onclick="this.closest('#xlsxDeactModal').remove()">✕</button>
+  </div>
+  <div class="warn-box">
+    <b>⚠️ פעולה זו תבטל את הגישה של עובדים לפורטל!</b><br>
+    העלה קובץ Excel עם רשימת העובדים שסיימו. המערכת תזהה אותם לפי אחד מהשדות: <b>שם משתמש</b> / <b>מייל</b> / <b>תעודת זהות</b> / <b>שם מלא</b>.
+  </div>
+  <div class="info-box">
+    <b>הערות:</b><br>
+    • הנתונים ההיסטוריים של העובד נשמרים (פניות, הערכות)<br>
+    • רק הגישה לפורטל תבוטל — הוא יסומן "לא פעיל"<br>
+    • משתמש super/admin לא ניתן להשבית דרך הפעולה הזו<br>
+    • ניתן להפעיל עובד מחדש דרך "ערוך" בטבלה
+  </div>
+  <div class="fg">
+    <label class="fl">קובץ Excel (עם עמודה של שם משתמש / מייל / ת"ז / שם מלא)</label>
+    <input class="fi" type="file" id="xlsxDeactFile" accept=".xlsx,.xls,.csv"/>
+  </div>
+  <div id="xlsxDeactResult"></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn bnr" onclick="runXlsxDeactivate(this)">🚪 בטל הרשאות</button>
+    <button class="btn bno" onclick="this.closest('#xlsxDeactModal').remove()">ביטול</button>
+  </div>
+</div>`;
+  document.body.appendChild(modal);
+}
+
+async function runXlsxDeactivate(btn) {
+  const file = document.getElementById('xlsxDeactFile')?.files[0];
+  if (!file) return toast('בחר קובץ קודם', false);
+  if (!confirm('האם אתה בטוח? הפעולה תבטל את הגישה של העובדים ברשימה!')) return;
+  const resDiv = document.getElementById('xlsxDeactResult');
+  btn.disabled = true; btn.innerHTML = '⟳ מעבד...';
+  try {
+    const fd = new FormData(); fd.append('file', file);
+    const r = await fetch('/api/users/deactivate-batch', {method:'POST', body:fd, credentials:'include'});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'שגיאה');
+    resDiv.innerHTML = `
+<div class="card" style="margin-top:12px;background:#FEF6F0;border:1px solid #F4813A">
+  <div style="font-size:14px;font-weight:800;color:#F4813A;margin-bottom:8px">✅ ההשבתה הסתיימה</div>
+  <div style="font-size:11px;color:var(--tx2);line-height:1.7">
+    📊 סה"כ שורות בקובץ: <b>${d.total}</b><br>
+    🚪 עובדים שהושבתו: <b style="color:#E84040">${d.deactivated}</b><br>
+    ${d.notFound > 0 ? `⚠️ לא נמצאו במערכת: <b>${d.notFound}</b>` : ''}
+  </div>
+  ${d.notFoundList?.length ? `<details style="margin-top:8px"><summary style="font-size:10px;cursor:pointer">הצג עובדים שלא נמצאו</summary><ul style="font-size:9px;padding:6px 20px">${d.notFoundList.map(n=>`<li>${n}</li>`).join('')}</ul></details>` : ''}
+</div>`;
+    setTimeout(()=>{document.getElementById('xlsxDeactModal')?.remove(); navigate('aemp');}, 3500);
+  } catch(e) {
+    resDiv.innerHTML = `<div class="warn-box" style="margin-top:12px">❌ ${e.message}</div>`;
+  } finally {
+    btn.disabled = false; btn.innerHTML = '🚪 בטל הרשאות';
+  }
 }
 
 async function deactivateUser(id,name) {
@@ -2574,20 +2770,49 @@ async function setDeptMgr(deptId,managerId){
 }
 
 async function pgAbcast(cnt) {
+  const [lists, broadcasts] = await Promise.all([
+    API.get('/mailing-lists').catch(()=>[]),
+    API.get('/broadcasts').catch(()=>[])
+  ]);
   cnt.innerHTML=`
-<div class="card">
-  <div class="st mb">📡 שדר הודעה לכל העובדים</div>
+<div class="card mb">
+  <div class="sh">
+    <span class="st">📡 שדר הודעה לעובדים</span>
+    <button class="btn bno bnsm" onclick="navigate('amail')">📧 נהל רשימות תפוצה</button>
+  </div>
+  <div class="fg"><label class="fl">שלח אל *</label>
+    <select class="fsel" id="bc_list">
+      <option value="">📢 כל העובדים הפעילים</option>
+      ${lists.map(l=>`<option value="${l.id}">${l.icon||'📧'} ${l.name} (${l.member_count||0} חברים)</option>`).join('')}
+    </select>
+  </div>
   <div class="fg"><label class="fl">כותרת *</label><input class="fi" id="bc_subj" placeholder="נושא ההודעה"/></div>
   <div class="fg"><label class="fl">תוכן ההודעה *</label><textarea class="fta tall" id="bc_body" placeholder="תוכן ההודעה..."></textarea></div>
-  <button class="btn bnt" onclick="sendBcast()">📡 שדר לכולם ↗</button>
+  <button class="btn bnt" onclick="sendBcast()">📡 שדר ↗</button>
+</div>
+<div class="card">
+  <div class="st mb">📜 היסטוריית שידורים אחרונים</div>
+  ${broadcasts.length===0 ? '<div class="ldg">אין שידורים עדיין</div>' : broadcasts.slice(0,10).map(b=>`
+  <div class="row">
+    <div style="flex:1"><div style="font-size:11px;font-weight:700">${b.subject}</div><div style="font-size:9px;color:var(--tx3)">${b.sender_name} · ${fmtD(b.created_at)} · אל: ${b.recipients==='all'?'כולם':b.recipients}</div></div>
+  </div>`).join('')}
 </div>`;
 }
 async function sendBcast(){
   const s=document.getElementById('bc_subj')?.value.trim(),b=document.getElementById('bc_body')?.value.trim();
+  const listId = document.getElementById('bc_list')?.value;
   if (!s||!b){toast('מלא כותרת ותוכן',false);return;}
-  await API.post('/broadcasts',{subject:s,body:b,recipients:'all'});
-  toast('הודעה שודרה לכל העובדים! 📡');
-  navigate('abcast');
+  try {
+    const r = await API.post('/broadcasts/send', {
+      subject: s, body: b,
+      mailing_list_id: listId || null,
+      channels: ['portal']
+    });
+    toast(`✅ הודעה שודרה ל-${r.sent_to} עובדים!`);
+    navigate('abcast');
+  } catch(e) {
+    toast('שגיאה: '+e.message, false);
+  }
 }
 
 async function pgAusers(cnt) { await pgAemp(cnt); }
@@ -3107,7 +3332,7 @@ async function pgAhome(cnt) {
 function renderNavRow(item, rowNum, idx) {
   const targetOptions = [
     'home','feed','chat','req','forms','hr','train','personal',
-    'https://boomclub.org.il/','https://www.hilannet.co.il/','https://www.shalva.org/'
+    'https://boomclub.org.il/','https://shalva.net.hilan.co.il/login','https://www.shalva.org/'
   ];
   return `
 <div style="display:grid;grid-template-columns:60px 1fr 1.5fr 100px 60px auto;gap:6px;align-items:end;padding:8px 0;border-bottom:1px solid var(--bd2)" data-row="${rowNum}" data-idx="${idx}">
@@ -3561,6 +3786,375 @@ async function delForm(id) {
   await API.delete('/forms/'+id);
   toast('נמחק');
   navigate('aforms');
+}
+
+
+// ══════════════════════════════════════════════════
+// 📞 אלפון עובדים - עם חיפוש
+// ══════════════════════════════════════════════════
+async function pgDirectory(cnt) {
+  let users = [];
+  try { users = await API.get('/directory'); } catch(e) {}
+  window._dirUsers = users;
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh">
+    <span class="st">📞 אלפון עובדים</span>
+    <span class="b bgr" id="dirCount">${users.length} עובדים</span>
+  </div>
+  <input class="fi" id="dirSearch" placeholder="🔍 חיפוש לפי שם, מחלקה, תפקיד או שלוחה..." oninput="filterDir(this.value)" style="margin-top:8px"/>
+</div>
+<div class="card">
+  <div id="dirList">${renderDirList(users)}</div>
+</div>`;
+}
+
+function renderDirList(users) {
+  if (!users.length) return '<div class="ldg">אין עובדים להצגה</div>';
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+    ${users.map(u => `
+    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center">
+      <div style="width:44px;height:44px;border-radius:50%;background:${u.color||'#7B2D8B'};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">${(u.name||'').substring(0,2)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:800;color:var(--tx)">${u.name||'—'}</div>
+        <div style="font-size:9px;color:var(--tx3);margin-top:1px">${u.title||''} ${u.dept?'· '+u.dept:''}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px">
+          ${u.extension ? `<a href="tel:${u.extension}" style="background:#F4813A18;color:#F4813A;font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;text-decoration:none">📞 שלוחה ${u.extension}</a>` : ''}
+          ${u.phone ? `<a href="tel:${u.phone}" style="background:#27AE6018;color:#27AE60;font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;text-decoration:none">📱 ${u.phone}</a>` : ''}
+          ${u.email ? `<a href="mailto:${u.email}" style="background:#1565C018;color:#1565C0;font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;text-decoration:none">✉️ מייל</a>` : ''}
+        </div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function filterDir(q) {
+  const users = window._dirUsers || [];
+  const query = (q||'').toLowerCase().trim();
+  if (!query) {
+    document.getElementById('dirList').innerHTML = renderDirList(users);
+    document.getElementById('dirCount').textContent = users.length + ' עובדים';
+    return;
+  }
+  const filtered = users.filter(u =>
+    (u.name||'').toLowerCase().includes(query) ||
+    (u.dept||'').toLowerCase().includes(query) ||
+    (u.title||'').toLowerCase().includes(query) ||
+    (u.extension||'').includes(query) ||
+    (u.phone||'').includes(query)
+  );
+  document.getElementById('dirList').innerHTML = renderDirList(filtered);
+  document.getElementById('dirCount').textContent = filtered.length + ' עובדים';
+}
+
+
+// ══════════════════════════════════════════════════
+// 📧 רשימות תפוצה
+// ══════════════════════════════════════════════════
+async function pgAmail(cnt) {
+  let lists = [], users = [];
+  try {
+    [lists, users] = await Promise.all([
+      API.get('/mailing-lists'),
+      API.get('/users').catch(()=>[])
+    ]);
+  } catch(e) {}
+  window._mailLists = lists;
+  window._mailUsers = users;
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh">
+    <span class="st">📧 רשימות תפוצה</span>
+    <button class="btn bnt bnsm" onclick="openMailListEditor()">+ רשימה חדשה</button>
+  </div>
+  <div class="info-box">רשימות תפוצה משמשות ב"שידורים" כדי לשלוח הודעה רק לקבוצה ספציפית. אפשר להגדיר לפי בחירה ידנית, מחלקה, תפקיד או "כל העובדים".</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">
+  ${lists.length===0 ? '<div class="card ldg" style="grid-column:1/-1">אין רשימות תפוצה. צור את הראשונה!</div>' : lists.map(l => `
+  <div class="card" style="border-left:4px solid ${l.color}">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="font-size:22px">${l.icon||'📧'}</div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:800">${l.name}</div><div style="font-size:9px;color:var(--tx3)">${l.member_count||0} חברים · ${{manual:'בחירה ידנית',dept:'לפי מחלקה',role:'לפי תפקיד',all:'כל העובדים'}[l.criteria_type]||l.criteria_type}</div></div>
+    </div>
+    ${l.description?`<div style="font-size:10px;color:var(--tx2);margin-bottom:8px">${l.description}</div>`:''}
+    <div style="display:flex;gap:5px">
+      <button class="btn bno bnsm" onclick="viewMailListMembers(${l.id})">👥 חברים</button>
+      <button class="btn bno bnsm" onclick="editMailList(${l.id})">✏️ ערוך</button>
+      <button class="btn bnr bnsm" onclick="delMailList(${l.id})">🗑</button>
+    </div>
+  </div>`).join('')}
+</div>`;
+}
+
+function openMailListEditor(list) {
+  list = list || {name:'', description:'', icon:'📧', color:'#7B2D8B', criteria_type:'manual', criteria_value:'', member_ids:[]};
+  window._editingList = list;
+  const users = window._mailUsers || [];
+  const depts = [...new Set(users.map(u=>u.dept).filter(Boolean))];
+  const modal = document.createElement('div');
+  modal.id = 'mailListModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto';
+  modal.onclick=(e)=>{if(e.target===modal)modal.remove();};
+  modal.innerHTML = `
+<div class="card" style="max-width:700px;width:100%;max-height:95vh;overflow-y:auto" onclick="event.stopPropagation()">
+  <div class="sh"><span class="st">${list.id?'✏️ עריכת':'➕ יצירת'} רשימת תפוצה</span>
+    <button class="btn bno bnsm" onclick="this.closest('#mailListModal').remove()">✕</button>
+  </div>
+  <div style="display:grid;grid-template-columns:60px 1fr auto;gap:9px">
+    <div class="fg"><label class="fl">אייקון</label><input class="fi" id="ml_icon" value="${list.icon}" style="text-align:center;font-size:18px"/></div>
+    <div class="fg"><label class="fl">שם הרשימה *</label><input class="fi" id="ml_name" value="${list.name}"/></div>
+    <div class="fg"><label class="fl">צבע</label><input class="fi" type="color" id="ml_color" value="${list.color}" style="padding:2px;height:32px"/></div>
+  </div>
+  <div class="fg"><label class="fl">תיאור (אופציונלי)</label><input class="fi" id="ml_desc" value="${list.description||''}"/></div>
+  <div class="fg"><label class="fl">סוג הרשימה</label>
+    <select class="fsel" id="ml_ctype" onchange="onMailCriteriaChange()">
+      <option value="manual" ${list.criteria_type==='manual'?'selected':''}>בחירה ידנית של עובדים</option>
+      <option value="dept" ${list.criteria_type==='dept'?'selected':''}>אוטומטי לפי מחלקה</option>
+      <option value="role" ${list.criteria_type==='role'?'selected':''}>אוטומטי לפי תפקיד מערכתי</option>
+      <option value="all" ${list.criteria_type==='all'?'selected':''}>כל העובדים הפעילים</option>
+    </select>
+  </div>
+  <div id="ml_criteria_wrap"></div>
+  <div style="display:flex;gap:8px;margin-top:16px">
+    <button class="btn bnt" onclick="saveMailList()">💾 שמור</button>
+  </div>
+</div>`;
+  document.body.appendChild(modal);
+  onMailCriteriaChange();
+}
+
+function onMailCriteriaChange() {
+  const t = document.getElementById('ml_ctype').value;
+  const wrap = document.getElementById('ml_criteria_wrap');
+  const list = window._editingList;
+  const users = window._mailUsers || [];
+  const depts = [...new Set(users.map(u=>u.dept).filter(Boolean))];
+
+  if (t === 'manual') {
+    wrap.innerHTML = `
+    <div class="fg"><label class="fl">בחר עובדים (סמן):</label>
+      <input class="fi" placeholder="🔍 סנן..." oninput="filterMailUsers(this.value)" style="margin-bottom:6px"/>
+      <div id="ml_userlist" style="max-height:300px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;padding:6px">
+        ${renderMailUserList(users)}
+      </div>
+    </div>`;
+  } else if (t === 'dept') {
+    wrap.innerHTML = `
+    <div class="fg"><label class="fl">בחר מחלקות (הפרד בפסיקים)</label>
+      <input class="fi" id="ml_cval" value="${list.criteria_value||''}" placeholder="HR, שיווק, ..."/></div>
+    <div class="info-box">מחלקות קיימות: ${depts.join(', ') || 'אין'}</div>`;
+  } else if (t === 'role') {
+    wrap.innerHTML = `
+    <div class="fg"><label class="fl">בחר תפקידים (הפרד בפסיקים)</label>
+      <input class="fi" id="ml_cval" value="${list.criteria_value||''}" placeholder="mgr, hr, emp"/></div>
+    <div class="info-box">תפקידים אפשריים: emp (עובד), mgr (מנהל), hr (משאבי אנוש), super (מנהל ראשי)</div>`;
+  } else {
+    wrap.innerHTML = `<div class="info-box">✅ כל העובדים הפעילים יכללו ברשימה זו אוטומטית.</div>`;
+  }
+}
+
+function renderMailUserList(users) {
+  const list = window._editingList;
+  const selectedIds = Array.isArray(list.member_ids) ? list.member_ids : [];
+  return users.map(u => `
+  <label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:10.5px" data-name="${(u.name||'').toLowerCase()} ${(u.dept||'').toLowerCase()}">
+    <input type="checkbox" data-uid="${u.id}" ${selectedIds.includes(u.id)?'checked':''} onchange="toggleMailUser(${u.id},this.checked)"/>
+    <div style="width:22px;height:22px;border-radius:50%;background:${u.color||'#7B2D8B'};color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center">${(u.name||'').substring(0,2)}</div>
+    <span style="flex:1"><b>${u.name}</b> <span style="color:var(--tx3)">· ${u.dept||''}</span></span>
+  </label>`).join('');
+}
+
+function filterMailUsers(q) {
+  const query = (q||'').toLowerCase().trim();
+  document.querySelectorAll('#ml_userlist label').forEach(el => {
+    el.style.display = !query || (el.dataset.name||'').includes(query) ? 'flex' : 'none';
+  });
+}
+
+function toggleMailUser(uid, checked) {
+  const list = window._editingList;
+  list.member_ids = list.member_ids || [];
+  const idx = list.member_ids.indexOf(uid);
+  if (checked && idx === -1) list.member_ids.push(uid);
+  else if (!checked && idx !== -1) list.member_ids.splice(idx, 1);
+}
+
+async function saveMailList() {
+  const list = window._editingList;
+  const payload = {
+    name: document.getElementById('ml_name')?.value.trim(),
+    description: document.getElementById('ml_desc')?.value || '',
+    icon: document.getElementById('ml_icon')?.value || '📧',
+    color: document.getElementById('ml_color')?.value || '#7B2D8B',
+    criteria_type: document.getElementById('ml_ctype')?.value || 'manual',
+    criteria_value: document.getElementById('ml_cval')?.value || '',
+    member_ids: list.member_ids || []
+  };
+  if (!payload.name) return toast('שם חובה', false);
+  try {
+    if (list.id) await API.put('/mailing-lists/'+list.id, payload);
+    else await API.post('/mailing-lists', payload);
+    toast('✅ הרשימה נשמרה!');
+    document.getElementById('mailListModal')?.remove();
+    navigate('amail');
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+function editMailList(id) {
+  const list = (window._mailLists||[]).find(l => l.id === id);
+  if (list) openMailListEditor(list);
+}
+
+async function delMailList(id) {
+  if (!confirm('למחוק רשימה זו?')) return;
+  await API.delete('/mailing-lists/'+id);
+  toast('נמחק');
+  navigate('amail');
+}
+
+async function viewMailListMembers(id) {
+  try {
+    const members = await API.get('/mailing-lists/'+id+'/members');
+    const modal = document.createElement('div');
+    modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.onclick=(e)=>{if(e.target===modal)modal.remove();};
+    modal.innerHTML = `
+<div class="card" style="max-width:500px;width:100%;max-height:80vh;overflow-y:auto" onclick="event.stopPropagation()">
+  <div class="sh"><span class="st">👥 חברי הרשימה (${members.length})</span>
+    <button class="btn bno bnsm" onclick="this.closest('div[style*=fixed]').remove()">✕</button>
+  </div>
+  ${members.length===0 ? '<div class="ldg">אין חברים ברשימה</div>' : members.map(m=>`
+  <div class="row"><div style="flex:1"><b>${m.name}</b> <span style="color:var(--tx3);font-size:9px">· ${m.dept||''} · ${m.title||''}</span></div><div style="font-size:9px;color:var(--tx3)">${m.email||'ללא מייל'}</div></div>`).join('')}
+</div>`;
+    document.body.appendChild(modal);
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+
+// ══════════════════════════════════════════════════
+// 📸 רשתות חברתיות (Instagram וכו')
+// ══════════════════════════════════════════════════
+async function pgAsocial(cnt) {
+  let posts = [];
+  try { posts = await API.get('/social-posts/all'); } catch(e) {}
+  cnt.innerHTML = `
+<div class="card mb">
+  <div class="sh">
+    <span class="st">📸 רשתות חברתיות</span>
+    <span class="b bgr">${posts.length} פוסטים</span>
+  </div>
+  <div class="warn-box">
+    <b>למה יש להוסיף ידנית?</b> אינסטגרם וFacebook סגרו את ה-API הציבורי לפרטיות. הפתרון: העתק את התמונה של הפוסט + הקישור, הוסף כאן — יופיע בדף הבית עם מעבר ללחיצה לפוסט המקורי. לוקח ~30 שניות לפוסט.
+  </div>
+  <div class="info-box">
+    <b>איך מעתיקים פוסט מאינסטגרם?</b><br>
+    1. פתח את הפוסט באינסטגרם<br>
+    2. לחץ על 3 הנקודות ← "העתק קישור"<br>
+    3. הדבק כאן בשדה "קישור לפוסט"<br>
+    4. שמור את התמונה של הפוסט (מקש ימני ← שמור תמונה) והעלה בכפתור 📤
+  </div>
+</div>
+
+<div class="card mb">
+  <div class="st mb">➕ הוסף פוסט חדש</div>
+  <input type="hidden" id="sp_edit_id" value=""/>
+  <div style="display:grid;grid-template-columns:auto 1fr;gap:9px">
+    <div class="fg"><label class="fl">רשת</label>
+      <select class="fsel" id="sp_source">
+        <option value="instagram">📸 Instagram</option>
+        <option value="facebook">👥 Facebook</option>
+        <option value="youtube">▶️ YouTube</option>
+        <option value="twitter">🐦 X (Twitter)</option>
+        <option value="linkedin">💼 LinkedIn</option>
+        <option value="tiktok">🎵 TikTok</option>
+      </select></div>
+    <div class="fg"><label class="fl">סדר תצוגה</label><input class="fi" id="sp_order" type="number" value="0"/></div>
+  </div>
+  <div class="fg"><label class="fl">קישור לפוסט המקורי *</label>
+    <input class="fi" id="sp_url" placeholder="https://www.instagram.com/p/..."/></div>
+  <div class="fg"><label class="fl">URL תמונה של הפוסט *</label>
+    <div style="display:flex;gap:6px">
+      <input class="fi" id="sp_img" placeholder="/uploads/... או https://..." style="flex:1"/>
+      <button type="button" class="btn bno bnsm" style="white-space:nowrap" onclick="uploadFile('sp_img',{accept:'image/*',btn:this})">📤 העלה</button>
+    </div>
+  </div>
+  <div class="fg"><label class="fl">כיתוב (אופציונלי)</label><textarea class="fta" id="sp_caption"></textarea></div>
+  <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);margin-bottom:10px"><input type="checkbox" id="sp_active" checked/> ✅ פעיל (מוצג בדף הבית)</label>
+  <div style="display:flex;gap:8px">
+    <button class="btn bnt bnsm" id="sp_save_btn" onclick="saveSocialPost()">➕ הוסף פוסט</button>
+    <button class="btn bno bnsm" id="sp_cancel_btn" onclick="resetSocialForm()" style="display:none">ביטול</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="st mb">רשימת פוסטים</div>
+  ${posts.length===0 ? '<div class="ldg">אין פוסטים עדיין</div>' : `
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+    ${posts.map(p=>`
+    <div style="border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:#fff">
+      <div style="height:180px;background:url('${p.image_url}') center/cover;position:relative">
+        <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px">${{instagram:'📸 IG',facebook:'👥 FB',youtube:'▶️ YT',twitter:'🐦 X',linkedin:'💼 LI',tiktok:'🎵 TT'}[p.source]||p.source}</div>
+        ${!p.active?'<div style="position:absolute;bottom:6px;left:6px;background:#E840401A;color:#E84040;font-size:8px;font-weight:700;padding:2px 8px;border-radius:999px">⏸ מושבת</div>':''}
+      </div>
+      <div style="padding:8px 10px">
+        <div style="font-size:9px;color:var(--tx2);line-height:1.4;height:26px;overflow:hidden">${(p.caption||'').substring(0,60)}</div>
+        <div style="display:flex;gap:4px;margin-top:6px">
+          <button class="ab abv" onclick='editSocialPost(${JSON.stringify(p).replace(/'/g,"&#39;")})' style="flex:1">✏️</button>
+          <button class="ab abr" onclick="delSocialPost(${p.id})">🗑</button>
+        </div>
+      </div>
+    </div>`).join('')}
+  </div>`}
+</div>`;
+}
+
+function editSocialPost(p) {
+  document.getElementById('sp_edit_id').value = p.id;
+  document.getElementById('sp_source').value = p.source;
+  document.getElementById('sp_order').value = p.display_order;
+  document.getElementById('sp_url').value = p.post_url;
+  document.getElementById('sp_img').value = p.image_url;
+  document.getElementById('sp_caption').value = p.caption||'';
+  document.getElementById('sp_active').checked = !!p.active;
+  document.getElementById('sp_save_btn').innerHTML = '💾 שמור שינויים';
+  document.getElementById('sp_cancel_btn').style.display = 'inline-flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetSocialForm() {
+  document.getElementById('sp_edit_id').value = '';
+  document.getElementById('sp_url').value = '';
+  document.getElementById('sp_img').value = '';
+  document.getElementById('sp_caption').value = '';
+  document.getElementById('sp_order').value = 0;
+  document.getElementById('sp_active').checked = true;
+  document.getElementById('sp_save_btn').innerHTML = '➕ הוסף פוסט';
+  document.getElementById('sp_cancel_btn').style.display = 'none';
+}
+
+async function saveSocialPost() {
+  const payload = {
+    source: document.getElementById('sp_source').value,
+    post_url: document.getElementById('sp_url').value.trim(),
+    image_url: document.getElementById('sp_img').value.trim(),
+    caption: document.getElementById('sp_caption').value.trim(),
+    display_order: document.getElementById('sp_order').value,
+    active: document.getElementById('sp_active').checked
+  };
+  if (!payload.post_url || !payload.image_url) return toast('קישור ותמונה חובה', false);
+  try {
+    const editId = document.getElementById('sp_edit_id').value;
+    if (editId) { await API.put('/social-posts/'+editId, payload); toast('✅ עודכן!'); }
+    else { await API.post('/social-posts', payload); toast('✅ נוסף!'); }
+    navigate('asocial');
+  } catch(e) { toast('שגיאה: '+e.message, false); }
+}
+
+async function delSocialPost(id) {
+  if (!confirm('למחוק פוסט זה?')) return;
+  await API.delete('/social-posts/'+id);
+  toast('נמחק');
+  navigate('asocial');
 }
 
 
