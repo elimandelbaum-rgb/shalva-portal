@@ -1,0 +1,22 @@
+name: tmp-voiceover-krakow
+on:
+  push:
+    branches: [tmp-voiceover-krakow]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download voiceover and commit it to this temporary branch
+        run: |
+          mkdir -p media
+          curl -sSL --fail --retry 3 -o media/eli_voiceover_krakow.mp3 "https://backend.composio.dev/api/v3/sl/5RySsb1WFT"
+          ls -la media
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add media/eli_voiceover_krakow.mp3
+          git commit -m "Temporary: voiceover file transfer"
+          git push
